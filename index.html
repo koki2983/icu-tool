@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ICUツール">
+<meta name="theme-color" content="#0E6F80">
+<title>ICUツール</title>
+<style>
+:root{
+  --ink:#16232E; --muted:#5F6E79; --line:#D5DDE2; --bg:#F3F6F8; --card:#FFFFFF;
+  --teal:#0E6F80; --teal-soft:#E1F0F3; --amber:#B25E00; --amber-soft:#FFF1E0; --red:#B3261E; --red-soft:#FBE9E7;
+  --r:12px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",system-ui,sans-serif;
+  font-size:16px;line-height:1.55}
+body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+h1{font-size:18px;margin:0;font-weight:700}
+h2{font-size:17px;margin:0 0 10px;font-weight:700}
+h3{font-size:15px;margin:14px 0 6px;font-weight:700}
+p{margin:6px 0}
+small,.muted{color:var(--muted);font-size:13px}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);
+  padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;justify-content:space-between;align-items:baseline}
+header .sub{font-size:12px;color:var(--muted)}
+main{padding:14px 14px 24px;max-width:560px;margin:0 auto}
+.page{display:none}.page.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--muted);margin:8px 0 4px}
+input[type=text],input[type=number],select,textarea{
+  width:100%;font:inherit;font-size:17px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+  background:#fff;color:var(--ink);appearance:none;-webkit-appearance:none}
+textarea{min-height:90px;font-size:15px;line-height:1.5}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:0;border-color:var(--teal)}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 12px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:32px}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.unit{display:flex;align-items:center;gap:8px}
+.unit span{white-space:nowrap;color:var(--muted);font-size:14px}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:10px 14px}
+button.primary{background:var(--teal);color:#fff;border-color:var(--teal);font-weight:700}
+button.danger{color:var(--red);border-color:#E7C4C0}
+button.small{padding:6px 10px;font-size:14px}
+button:active{filter:brightness(.93)}
+.seg{display:flex;border:1px solid var(--teal);border-radius:10px;overflow:hidden;margin:6px 0 4px}
+.seg button{flex:1;border:0;border-radius:0;background:#fff;color:var(--teal);padding:9px 6px;font-size:15px}
+.seg button.on{background:var(--teal);color:#fff;font-weight:700}
+.result{background:var(--teal-soft);border-radius:var(--r);padding:16px 14px;margin-top:12px}
+.result .big{font-size:44px;font-weight:700;line-height:1.1;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.result .big em{font-style:normal;font-size:20px;font-weight:600;margin-left:6px;color:var(--teal)}
+.result .sub{color:var(--muted);font-size:13px;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:15px}
+td,th{padding:7px 6px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600;font-size:13px}
+td:first-child,th:first-child{text-align:left}
+.warn{background:var(--amber-soft);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--amber);margin-top:10px}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.item .t{font-weight:700}.item .d{font-size:13px;color:var(--muted)}
+.item button{flex:none}
+.empty{text-align:center;color:var(--muted);padding:24px 8px;font-size:14px}
+.opt{display:flex;flex-direction:column;gap:6px}
+.opt button{text-align:left;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;line-height:1.4}
+.opt button b{flex:none;width:28px;color:var(--teal)}
+.opt button.on{background:var(--teal-soft);border-color:var(--teal)}
+.score{display:flex;justify-content:space-between;align-items:baseline;padding:12px 14px;background:var(--teal-soft);border-radius:var(--r);margin-bottom:12px}
+.score .n{font-size:34px;font-weight:700;font-variant-numeric:tabular-nums}
+details{border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:8px}
+summary{padding:11px 12px;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"＋";color:var(--muted);font-weight:400}
+details[open] summary::after{content:"－"}
+.body{padding:0 12px 12px;font-size:15px}
+.body ul{padding-left:18px;margin:6px 0}.body li{margin:3px 0}
+.memo{margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+.memo textarea{min-height:60px}
+.memo .bar{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.search{margin-bottom:10px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);
+  display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav button{flex:1;border:0;border-radius:0;background:none;padding:8px 0 6px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--teal);font-weight:700}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));background:var(--ink);color:#fff;padding:8px 14px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:12px;background:var(--teal-soft);color:var(--teal);margin-right:4px}
+.fig{margin:6px 0 10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px}
+.fig svg{width:100%;height:auto;display:block}
+.phs{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0}
+.ph{width:calc(50% - 4px)}.ph img{width:100%;border-radius:8px;border:1px solid var(--line);display:block}
+.ph button{width:100%;margin-top:4px}
+.addph{display:inline-block;margin-top:4px;padding:8px 12px;border:1px dashed var(--teal);border-radius:10px;color:var(--teal);font-size:14px;cursor:pointer}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:20;align-items:center;justify-content:center;padding:16px}
+#overlay img{max-width:100%;max-height:100%;border-radius:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header><h1 id="ttl">ガンマ計算</h1><span class="sub">ICUツール</span></header>
+
+<main>
+
+<!-- ============ 計算 ============ -->
+<section id="p-calc" class="page on">
+  <div class="card">
+    <label>体重</label>
+    <div class="unit"><input type="number" inputmode="decimal" id="wt" placeholder="例 60" step="0.1"><span>kg</span></div>
+
+    <label>薬剤（登録済みから選択）</label>
+    <select id="drugSel"><option value="">手入力</option></select>
+
+    <div class="row">
+      <div><label>薬剤量</label><div class="unit"><input type="number" inputmode="decimal" id="mg" placeholder="例 3"><span>mg</span></div></div>
+      <div><label>溶液量（総量）</label><div class="unit"><input type="number" inputmode="decimal" id="ml" placeholder="例 50"><span>mL</span></div></div>
+    </div>
+    <p class="muted" id="concTxt">濃度：－</p>
+
+    <label>投与量の単位</label>
+    <select id="unitSel">
+      <option value="gkm">μg/kg/min（γ）</option>
+      <option value="gkh">μg/kg/h</option>
+      <option value="mkh">mg/kg/h</option>
+      <option value="mh">mg/h</option>
+    </select>
+
+    <div class="seg">
+      <button id="modeA" class="on">投与量 → mL/h</button>
+      <button id="modeB">mL/h → 投与量</button>
+    </div>
+
+    <div id="inA">
+      <label id="doseLbl">投与量（γ）</label>
+      <div class="unit"><input type="number" inputmode="decimal" id="dose" placeholder="例 0.1" step="0.01"><span id="doseUnit">μg/kg/min</span></div>
+    </div>
+    <div id="inB" style="display:none">
+      <label>流量</label>
+      <div class="unit"><input type="number" inputmode="decimal" id="rate" placeholder="例 6" step="0.1"><span>mL/h</span></div>
+    </div>
+
+    <div class="result">
+      <div class="big"><span id="resN">－</span><em id="resU">mL/h</em></div>
+      <div class="sub" id="resS">体重・濃度・投与量を入力してください</div>
+    </div>
+  </div>
+
+  <div class="card" id="quickCard" style="display:none">
+    <h2>早見表（この体重・この希釈）</h2>
+    <table id="quick"></table>
+  </div>
+
+  <div class="warn">計算結果は必ず指示量・実際の希釈とダブルチェックしてください。このツールは補助であり、投与の判断はできません。</div>
+</section>
+
+<!-- ============ 薬剤 ============ -->
+<section id="p-drug" class="page">
+  <div class="card">
+    <h2 id="drugFormTtl">薬剤を登録</h2>
+    <label>薬剤名</label>
+    <input type="text" id="dName" placeholder="例 ノルアドレナリン">
+    <div class="row">
+      <div><label>薬剤量</label><div class="unit"><input type="number" inputmode="decimal" id="dMg"><span>mg</span></div></div>
+      <div><label>溶液量（総量）</label><div class="unit"><input type="number" inputmode="decimal" id="dMl"><span>mL</span></div></div>
+    </div>
+    <label>よく使う単位</label>
+    <select id="dUnit">
+      <option value="gkm">μg/kg/min（γ）</option>
+      <option value="gkh">μg/kg/h</option>
+      <option value="mkh">mg/kg/h</option>
+      <option value="mh">mg/h</option>
+    </select>
+    <label>メモ（自院の目安量・注意点など）</label>
+    <textarea id="dNote" placeholder="例 0.05〜0.3γ。中心静脈から。"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="primary" id="dSave">保存する</button>
+      <button id="dCancel" style="display:none">やめる</button>
+    </div>
+  </div>
+
+  <h2 style="margin:4px 0 8px">登録済みの薬剤</h2>
+  <div class="list" id="drugList"></div>
+  <p class="muted" style="margin-top:12px">この端末内に保存されます。ホーム画面に追加した状態で使うとデータが消えにくくなります。</p>
+</section>
+
+<!-- ============ スコア ============ -->
+<section id="p-score" class="page">
+  <div class="seg" id="scoreSeg">
+    <button data-s="gcs" class="on">GCS</button>
+    <button data-s="rass">RASS</button>
+    <button data-s="sofa">SOFA</button>
+  </div>
+  <div id="s-gcs"></div>
+  <div id="s-rass" style="display:none"></div>
+  <div id="s-sofa" style="display:none"></div>
+</section>
+
+<!-- ============ 知識 ============ -->
+<section id="p-know" class="page">
+  <input type="text" id="kSearch" class="search" placeholder="検索（例：血液ガス、IABP）">
+  <div id="kList"></div>
+  <div class="card">
+    <h2>自分の項目を追加</h2>
+    <label>タイトル</label>
+    <input type="text" id="kNewT" placeholder="例 当院の人工呼吸器設定ルール">
+    <label>内容</label>
+    <textarea id="kNewB"></textarea>
+    <button class="primary" id="kAdd" style="margin-top:10px">追加する</button>
+  </div>
+  <p class="muted">組み込みの項目は一般的な知識の要点で、図は本アプリ用に描き起こしたものです。各項目の下のメモ欄に、自院のルールや自分の覚え書きを書き足せます。</p>
+</section>
+
+</main>
+
+<nav>
+  <button data-p="calc" class="on"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>計算</button>
+  <button data-p="drug"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v4l-4 8v5a2 2 0 002 2h8a2 2 0 002-2v-5l-4-8V3"/><path d="M7 15h10"/></svg>薬剤</button>
+  <button data-p="score"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>スコア</button>
+  <button data-p="know"><svg viewBox="0 0 24 24"><path d="M4 4h7a3 3 0 013 3v13a2 2 0 00-2-2H4zM20 4h-7a3 3 0 00-3 3v13a2 2 0 012-2h8z"/></svg>知識</button>
+</nav>
+<div class="toast" id="toast"></div>
+<div id="overlay"><img alt=""></div>
+
+<script>
+/* ---------- 保存（この端末内） ---------- */
+const mem={};
+const store={
+  async get(k){
+    try{ if(window.storage){ const r=await window.storage.get(k,false); if(r&&r.value) return JSON.parse(r.value);} }catch(e){}
+    try{ const v=localStorage.getItem(k); if(v) return JSON.parse(v);}catch(e){}
+    return mem[k]??null;
+  },
+  async set(k,v){
+    mem[k]=v; const s=JSON.stringify(v);
+    try{ if(window.storage){ await window.storage.set(k,s,false);} }catch(e){}
+    try{ localStorage.setItem(k,s);}catch(e){}
+  }
+};
+const $=id=>document.getElementById(id);
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400);}
+const UNITS={gkm:'μg/kg/min',gkh:'μg/kg/h',mkh:'mg/kg/h',mh:'mg/h'};
+const fmt=(n,d)=>{ if(!isFinite(n))return '－'; return Number(n.toFixed(d)).toLocaleString('ja-JP',{maximumFractionDigits:d}); };
+
+/* ---------- ナビ ---------- */
+const titles={calc:'ガンマ計算',drug:'薬剤登録',score:'スコア計算',know:'知識メモ'};
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.p));
+  $('ttl').textContent=titles[b.dataset.p]; window.scrollTo(0,0);
+});
+
+/* ---------- 薬剤 ---------- */
+let drugs=[]; let editIdx=-1;
+async function loadDrugs(){ drugs=(await store.get('drugs'))||[]; renderDrugs(); }
+function renderDrugs(){
+  const L=$('drugList'); L.innerHTML='';
+  if(!drugs.length){L.innerHTML='<div class="empty">まだ登録がありません。上のフォームから自院の希釈を登録してください。</div>';}
+  drugs.forEach((d,i)=>{
+    const el=document.createElement('div'); el.className='item';
+    el.innerHTML=`<div><div class="t">${esc(d.name)}</div><div class="d">${d.mg} mg / ${d.ml} mL（${fmt(d.mg*1000/d.ml,1)} μg/mL）・${UNITS[d.unit]}</div>${d.note?`<div class="d">${esc(d.note)}</div>`:''}</div>
+      <div><button class="small" data-e="${i}">編集</button> <button class="small danger" data-x="${i}">削除</button></div>`;
+    L.appendChild(el);
+  });
+  L.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{ editIdx=+b.dataset.e; const d=drugs[editIdx];
+    $('dName').value=d.name;$('dMg').value=d.mg;$('dMl').value=d.ml;$('dUnit').value=d.unit;$('dNote').value=d.note||'';
+    $('drugFormTtl').textContent='薬剤を編集';$('dSave').textContent='更新する';$('dCancel').style.display='';window.scrollTo(0,0);});
+  L.querySelectorAll('[data-x]').forEach(b=>b.onclick=async()=>{ if(!confirm(`「${drugs[+b.dataset.x].name}」を削除しますか？`))return;
+    drugs.splice(+b.dataset.x,1); await store.set('drugs',drugs); renderDrugs(); fillDrugSel(); toast('削除しました');});
+  fillDrugSel();
+}
+function resetDrugForm(){editIdx=-1;['dName','dMg','dMl','dNote'].forEach(i=>$(i).value='');$('dUnit').value='gkm';$('drugFormTtl').textContent='薬剤を登録';$('dSave').textContent='保存する';$('dCancel').style.display='none';}
+$('dCancel').onclick=resetDrugForm;
+$('dSave').onclick=async()=>{
+  const d={name:$('dName').value.trim(),mg:+$('dMg').value,ml:+$('dMl').value,unit:$('dUnit').value,note:$('dNote').value.trim()};
+  if(!d.name||!(d.mg>0)||!(d.ml>0)){toast('薬剤名・薬剤量・溶液量を入力してください');return;}
+  if(editIdx>=0)drugs[editIdx]=d; else drugs.push(d);
+  await store.set('drugs',drugs); renderDrugs(); resetDrugForm(); toast(editIdx>=0?'更新しました':'保存しました');
+};
+function fillDrugSel(){
+  const s=$('drugSel'); const cur=s.value; s.innerHTML='<option value="">手入力</option>';
+  drugs.forEach((d,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`${d.name}（${d.mg}mg/${d.ml}mL）`;s.appendChild(o);});
+  s.value=cur;
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+/* ---------- 計算 ---------- */
+let mode='A';
+$('modeA').onclick=()=>{mode='A';$('modeA').classList.add('on');$('modeB').classList.remove('on');$('inA').style.display='';$('inB').style.display='none';calc();};
+$('modeB').onclick=()=>{mode='B';$('modeB').classList.add('on');$('modeA').classList.remove('on');$('inB').style.display='';$('inA').style.display='none';calc();};
+$('drugSel').onchange=()=>{const d=drugs[$('drugSel').value]; if(d){$('mg').value=d.mg;$('ml').value=d.ml;$('unitSel').value=d.unit;} calc();};
+['wt','mg','ml','dose','rate','unitSel'].forEach(i=>$(i).addEventListener('input',calc));
+function factor(u,kg){ return {gkm:kg*60, gkh:kg, mkh:kg*1000, mh:1000}[u]; } // 投与量1あたりの μg/h
+function calc(){
+  const kg=+$('wt').value, mg=+$('mg').value, ml=+$('ml').value, u=$('unitSel').value;
+  $('doseUnit').textContent=UNITS[u]; $('doseLbl').textContent='投与量'+(u==='gkm'?'（γ）':'');
+  const conc=(mg>0&&ml>0)?mg*1000/ml:NaN; // μg/mL
+  $('concTxt').textContent='濃度：'+(isFinite(conc)?`${fmt(conc,2)} μg/mL（${fmt(conc/1000,3)} mg/mL）`:'－');
+  const needKg=u!=='mh';
+  const ok=isFinite(conc)&&(!needKg||kg>0);
+  const f=needKg?factor(u,kg):factor(u,0);
+  if(mode==='A'){
+    const d=+$('dose').value; $('resU').textContent='mL/h';
+    if(ok&&d>0){ const r=d*f/conc; $('resN').textContent=fmt(r,2); $('resS').textContent=`${d} ${UNITS[u]}${needKg?` × ${kg} kg`:''}　→ 1 mL/h ＝ ${fmt(conc/f,4)} ${UNITS[u]}`; }
+    else { $('resN').textContent='－'; $('resS').textContent=needKg?'体重・濃度・投与量を入力してください':'濃度・投与量を入力してください'; }
+  }else{
+    const r=+$('rate').value; $('resU').textContent=UNITS[u];
+    if(ok&&r>0){ const d=r*conc/f; $('resN').textContent=fmt(d,u==='gkm'?3:2); $('resS').textContent=`${r} mL/h${needKg?` ÷ ${kg} kg`:''}　→ 1 mL/h ＝ ${fmt(conc/f,4)} ${UNITS[u]}`; }
+    else { $('resN').textContent='－'; $('resS').textContent='体重・濃度・流量を入力してください'; }
+  }
+  // 早見表
+  const Q=$('quick'), C=$('quickCard');
+  if(ok){
+    const steps={gkm:[0.02,0.05,0.1,0.2,0.3,0.5,1],gkh:[0.2,0.4,0.7,1,1.4,2],mkh:[0.5,1,2,3,4],mh:[1,2,5,10,20]}[u];
+    Q.innerHTML=`<tr><th>${UNITS[u]}</th><th>mL/h</th></tr>`+steps.map(s=>`<tr><td>${s}</td><td>${fmt(s*f/conc,2)}</td></tr>`).join('');
+    C.style.display='';
+  } else C.style.display='none';
+}
+
+/* ---------- スコア ---------- */
+document.querySelectorAll('#scoreSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#scoreSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  ['gcs','rass','sofa'].forEach(s=>$('s-'+s).style.display=s===b.dataset.s?'':'none');
+});
+function optGroup(name,items,onPick){ // items:[{v,t}]
+  const wrap=document.createElement('div');wrap.className='card';
+  wrap.innerHTML=`<h2>${name}</h2>`;const o=document.createElement('div');o.className='opt';
+  items.forEach(it=>{const b=document.createElement('button');b.innerHTML=`<b>${it.v}</b><span>${it.t}</span>`;
+    b.onclick=()=>{o.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');onPick(it.v);};o.appendChild(b);});
+  wrap.appendChild(o);return wrap;
+}
+// GCS
+(function(){
+  const g={E:null,V:null,M:null}; const box=$('s-gcs');
+  const sc=document.createElement('div');sc.className='score';sc.innerHTML='<div><div class="muted">GCS 合計</div><div class="n" id="gcsN">－</div></div><div class="muted" id="gcsD">E － V － M －</div>';
+  box.appendChild(sc);
+  const upd=()=>{const t=Object.values(g).some(v=>v===null)?null:g.E+g.V+g.M;$('gcsN').textContent=t===null?'－':t+' 点';$('gcsD').textContent=`E${g.E??'－'} V${g.V??'－'} M${g.M??'－'}`;};
+  box.appendChild(optGroup('E 開眼',[{v:4,t:'自発的に開眼'},{v:3,t:'呼びかけで開眼'},{v:2,t:'痛み刺激で開眼'},{v:1,t:'開眼しない'}],v=>{g.E=v;upd();}));
+  box.appendChild(optGroup('V 言語',[{v:5,t:'見当識あり'},{v:4,t:'混乱した会話'},{v:3,t:'不適当な単語'},{v:2,t:'理解不能な発声'},{v:1,t:'発声なし'}],v=>{g.V=v;upd();}));
+  box.appendChild(optGroup('M 運動',[{v:6,t:'指示に従う'},{v:5,t:'痛み刺激部位に手を持っていく'},{v:4,t:'痛みから逃避する'},{v:3,t:'異常屈曲（除皮質）'},{v:2,t:'伸展（除脳）'},{v:1,t:'動かない'}],v=>{g.M=v;upd();}));
+  const n=document.createElement('p');n.className='muted';n.textContent='挿管中で発語評価不能のときは V を「T」と記録（例 E4VTM6）。';box.appendChild(n);
+})();
+// RASS
+(function(){
+  const box=$('s-rass');
+  const sc=document.createElement('div');sc.className='score';sc.innerHTML='<div><div class="muted">RASS</div><div class="n" id="rassN">－</div></div><div class="muted" id="rassD"></div>';box.appendChild(sc);
+  const items=[
+    {v:'+4',t:'好戦的：明らかに攻撃的、スタッフに危険'},
+    {v:'+3',t:'非常に興奮：チューブやカテーテルを引き抜く、攻撃的'},
+    {v:'+2',t:'興奮：頻繁な非意図的な動き、人工呼吸器とファイティング'},
+    {v:'+1',t:'落ち着きがない：不安だが動きは攻撃的でない'},
+    {v:'0',t:'意識清明で落ち着いている'},
+    {v:'-1',t:'傾眠：呼びかけに10秒以上アイコンタクトを保てる'},
+    {v:'-2',t:'軽い鎮静：呼びかけに開眼するが10秒未満'},
+    {v:'-3',t:'中等度鎮静：呼びかけに動きや開眼はあるがアイコンタクトなし'},
+    {v:'-4',t:'深い鎮静：呼びかけに無反応、身体刺激で動きや開眼'},
+    {v:'-5',t:'昏睡：呼びかけにも身体刺激にも無反応'}];
+  box.appendChild(optGroup('観察して当てはまるもの',items,v=>{$('rassN').textContent=v;const it=items.find(i=>i.v===v);$('rassD').textContent=it.t.split('：')[0];}));
+  const n=document.createElement('p');n.className='muted';n.textContent='まず観察（+4〜0）。反応がなければ呼びかけ、それでもなければ身体刺激で評価。-3〜+4 で CAM-ICU のせん妄評価に進む。';box.appendChild(n);
+})();
+// SOFA
+(function(){
+  const box=$('s-sofa'); const s={};
+  const sc=document.createElement('div');sc.className='score';sc.innerHTML='<div><div class="muted">SOFA 合計</div><div class="n" id="sofaN">－</div></div><div class="muted" id="sofaD">6項目を選択</div>';box.appendChild(sc);
+  const upd=()=>{const k=Object.keys(s);const t=k.reduce((a,b)=>a+s[b],0);$('sofaN').textContent=t+' 点';$('sofaD').textContent=k.length<6?`${k.length}/6 項目入力`:'全項目入力済み';};
+  const G=[
+    ['呼吸 PaO₂/FiO₂',[[0,'≥ 400'],[1,'< 400'],[2,'< 300'],[3,'< 200（呼吸補助あり）'],[4,'< 100（呼吸補助あり）']]],
+    ['凝固 血小板（×10³/μL）',[[0,'≥ 150'],[1,'< 150'],[2,'< 100'],[3,'< 50'],[4,'< 20']]],
+    ['肝 ビリルビン（mg/dL）',[[0,'< 1.2'],[1,'1.2〜1.9'],[2,'2.0〜5.9'],[3,'6.0〜11.9'],[4,'≥ 12.0']]],
+    ['循環',[[0,'MAP ≥ 70'],[1,'MAP < 70'],[2,'DOA ≤ 5γ または DOB（量問わず）'],[3,'DOA > 5γ または Ad ≤ 0.1γ または NA ≤ 0.1γ'],[4,'DOA > 15γ または Ad > 0.1γ または NA > 0.1γ']]],
+    ['中枢神経 GCS',[[0,'15'],[1,'13〜14'],[2,'10〜12'],[3,'6〜9'],[4,'< 6']]],
+    ['腎 クレアチニン（mg/dL）／尿量',[[0,'< 1.2'],[1,'1.2〜1.9'],[2,'2.0〜3.4'],[3,'3.5〜4.9 または 尿量 < 500 mL/日'],[4,'≥ 5.0 または 尿量 < 200 mL/日']]]];
+  G.forEach(([n,items],i)=>box.appendChild(optGroup(n,items.map(([v,t])=>({v,t})),v=>{s[i]=v;upd();})));
+  const n=document.createElement('p');n.className='muted';n.textContent='循環のカテコラミン量は1時間以上投与。感染疑いで SOFA がベースラインから 2 点以上上昇すれば敗血症を疑う。';box.appendChild(n);
+})();
+
+/* ---------- 知識 ---------- */
+const FIG={
+abg:`<svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#5F6E79"/></marker></defs>
+<rect x="110" y="8" width="120" height="30" rx="8" fill="#E1F0F3" stroke="#0E6F80"/><text x="170" y="27" text-anchor="middle" font-weight="700">pH を見る</text>
+<line x1="140" y1="38" x2="70" y2="70" stroke="#5F6E79" marker-end="url(#a)"/><line x1="200" y1="38" x2="270" y2="70" stroke="#5F6E79" marker-end="url(#a)"/>
+<text x="90" y="52" text-anchor="middle" fill="#B3261E">&lt; 7.35</text><text x="250" y="52" text-anchor="middle" fill="#B3261E">&gt; 7.45</text>
+<rect x="15" y="72" width="110" height="30" rx="8" fill="#FBE9E7" stroke="#B3261E"/><text x="70" y="91" text-anchor="middle" font-weight="700">アシデミア</text>
+<rect x="215" y="72" width="110" height="30" rx="8" fill="#FBE9E7" stroke="#B3261E"/><text x="270" y="91" text-anchor="middle" font-weight="700">アルカレミア</text>
+<text x="70" y="122" text-anchor="middle">PaCO₂↑ → 呼吸性</text><text x="70" y="140" text-anchor="middle">HCO₃⁻↓ → 代謝性</text>
+<text x="270" y="122" text-anchor="middle">PaCO₂↓ → 呼吸性</text><text x="270" y="140" text-anchor="middle">HCO₃⁻↑ → 代謝性</text>
+<rect x="30" y="160" width="280" height="80" rx="8" fill="#F3F6F8" stroke="#D5DDE2"/>
+<text x="170" y="180" text-anchor="middle" font-weight="700">代償を見る</text>
+<text x="170" y="200" text-anchor="middle">代謝性なら PaCO₂ が同じ方向に動く（呼吸で代償）</text>
+<text x="170" y="218" text-anchor="middle">呼吸性なら HCO₃⁻ が同じ方向に動く（腎で代償・数日）</text>
+<text x="170" y="234" text-anchor="middle" fill="#5F6E79">代償は pH を正常には戻しきらない（過剰代償なし）</text></svg>`,
+ecg:`<svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+<ellipse cx="120" cy="120" rx="85" ry="95" fill="#FBE9E7" stroke="#B3261E" stroke-width="2"/>
+<path d="M120 25 L120 215" stroke="#B3261E" stroke-dasharray="4 3"/><path d="M40 120 L200 120" stroke="#B3261E" stroke-dasharray="4 3"/>
+<text x="80" y="80" text-anchor="middle" font-weight="700">前壁</text><text x="80" y="96" text-anchor="middle">V1〜V4</text>
+<text x="160" y="80" text-anchor="middle" font-weight="700">側壁</text><text x="160" y="96" text-anchor="middle">Ⅰ aVL V5 V6</text>
+<text x="120" y="165" text-anchor="middle" font-weight="700">下壁</text><text x="120" y="181" text-anchor="middle">Ⅱ Ⅲ aVF</text>
+<text x="120" y="45" text-anchor="middle" fill="#5F6E79">中隔 V1 V2</text>
+<rect x="215" y="40" width="115" height="150" rx="8" fill="#F3F6F8" stroke="#D5DDE2"/>
+<text x="272" y="60" text-anchor="middle" font-weight="700">主な責任血管</text>
+<text x="222" y="85">前壁・中隔</text><text x="222" y="100" fill="#0E6F80">→ LAD</text>
+<text x="222" y="125">側壁</text><text x="222" y="140" fill="#0E6F80">→ LCX（LAD 対角枝）</text>
+<text x="222" y="165">下壁</text><text x="222" y="180" fill="#0E6F80">→ RCA（一部 LCX）</text>
+<text x="170" y="220" text-anchor="middle" fill="#5F6E79">ST 上昇の誘導から梗塞部位を推定する</text></svg>`,
+iabp:`<svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+<line x1="20" y1="180" x2="330" y2="180" stroke="#D5DDE2"/>
+<path d="M20 150 C40 150 45 60 60 60 C75 60 80 130 95 135 C110 140 115 100 130 100 C145 100 150 165 165 160 C180 155 185 60 200 60 C215 60 220 130 235 135 C250 140 255 30 270 30 C285 30 290 160 305 160 L330 160" fill="none" stroke="#0E6F80" stroke-width="2.5"/>
+<text x="60" y="50" text-anchor="middle" font-size="11">収縮期</text>
+<text x="130" y="90" text-anchor="middle" font-size="11" fill="#5F6E79">拡張期</text>
+<text x="200" y="50" text-anchor="middle" font-size="11">収縮期</text>
+<rect x="240" y="20" width="70" height="28" fill="#FFF1E0" rx="6"/><text x="275" y="38" text-anchor="middle" font-size="11" fill="#B25E00">拡張期増強</text>
+<text x="305" y="176" text-anchor="middle" font-size="11" fill="#B25E00">↓ 収縮期終末圧</text>
+<path d="M240 100 L262 100 L262 160" fill="none" stroke="#B25E00" stroke-dasharray="3 3"/>
+<text x="230" y="112" text-anchor="end" font-size="11" fill="#B25E00">バルーン膨張 →</text>
+<text x="170" y="205" text-anchor="middle" fill="#5F6E79">拡張期に膨らんで冠血流↑、収縮直前にしぼんで後負荷↓</text></svg>`,
+pcps:`<svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+<defs><marker id="b" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#0E6F80"/></marker></defs>
+<ellipse cx="80" cy="115" rx="45" ry="80" fill="#F3F6F8" stroke="#D5DDE2"/><text x="80" y="60" text-anchor="middle" font-weight="700">患者</text>
+<text x="80" y="110" text-anchor="middle" font-size="11">大腿静脈</text><text x="80" y="124" text-anchor="middle" font-size="11">大腿動脈</text>
+<circle cx="80" cy="92" r="4" fill="#0E6F80"/><circle cx="80" cy="140" r="4" fill="#B3261E"/>
+<path d="M84 92 L180 92 L180 60" fill="none" stroke="#0E6F80" stroke-width="2.5" marker-end="url(#b)"/>
+<text x="130" y="86" text-anchor="middle" font-size="11" fill="#0E6F80">脱血（静脈血）</text>
+<circle cx="180" cy="42" r="18" fill="#E1F0F3" stroke="#0E6F80"/><text x="180" y="46" text-anchor="middle" font-size="11">ポンプ</text>
+<path d="M198 42 L250 42 L250 70" fill="none" stroke="#0E6F80" stroke-width="2.5" marker-end="url(#b)"/>
+<rect x="225" y="72" width="50" height="60" rx="6" fill="#FFF1E0" stroke="#B25E00"/><text x="250" y="98" text-anchor="middle" font-size="11">人工肺</text><text x="250" y="114" text-anchor="middle" font-size="10">O₂/CO₂</text>
+<path d="M250 132 L250 140 L84 140" fill="none" stroke="#B3261E" stroke-width="2.5" marker-end="url(#b)"/>
+<text x="165" y="156" text-anchor="middle" font-size="11" fill="#B3261E">送血（動脈血・逆行性）</text>
+<text x="200" y="20" font-size="10" fill="#5F6E79">遠心ポンプ</text>
+<rect x="15" y="190" width="310" height="32" rx="6" fill="#F3F6F8"/>
+<text x="170" y="210" text-anchor="middle" font-size="11" fill="#5F6E79">自己心と送血が大動脈で合流 → 右手の血ガスで脳の酸素化を確認</text></svg>`,
+chdf:`<svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+<defs><marker id="c" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#0E6F80"/></marker></defs>
+<rect x="15" y="80" width="50" height="60" rx="8" fill="#F3F6F8" stroke="#D5DDE2"/><text x="40" y="115" text-anchor="middle" font-weight="700">患者</text>
+<path d="M65 95 L120 95" stroke="#0E6F80" stroke-width="2.5" marker-end="url(#c)"/><text x="92" y="88" text-anchor="middle" font-size="10">脱血圧</text>
+<circle cx="140" cy="95" r="16" fill="#E1F0F3" stroke="#0E6F80"/><text x="140" y="99" text-anchor="middle" font-size="10">ポンプ</text>
+<path d="M156 95 L200 95" stroke="#0E6F80" stroke-width="2.5" marker-end="url(#c)"/><text x="178" y="88" text-anchor="middle" font-size="10">入口圧</text>
+<rect x="205" y="60" width="40" height="80" rx="6" fill="#FFF1E0" stroke="#B25E00"/><text x="225" y="104" text-anchor="middle" font-size="10">膜</text>
+<path d="M245 95 L300 95 L300 125 L65 125" fill="none" stroke="#B3261E" stroke-width="2.5" marker-end="url(#c)"/>
+<text x="272" y="88" text-anchor="middle" font-size="10">返血圧</text>
+<path d="M225 140 L225 175" stroke="#B25E00" stroke-width="2" marker-end="url(#c)"/><text x="225" y="192" text-anchor="middle" font-size="10">濾液（除水）</text>
+<path d="M180 40 L215 60" stroke="#5F6E79" stroke-dasharray="3 3"/><text x="160" y="36" text-anchor="middle" font-size="10">透析液（向流）</text>
+<path d="M170 150 L215 140" stroke="#5F6E79" stroke-dasharray="3 3"/><text x="150" y="160" text-anchor="end" font-size="10">補充液</text>
+<path d="M100 100 L100 110" stroke="#5F6E79"/><text x="100" y="118" text-anchor="middle" font-size="9">抗凝固薬</text>
+<text x="170" y="212" text-anchor="middle" font-size="11" fill="#5F6E79">TMP 上昇 ＝ 膜の目詰まり（回路交換の目安）</text></svg>`,
+o2:`<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+<line x1="120" y1="20" x2="120" y2="170" stroke="#D5DDE2"/><line x1="120" y1="170" x2="330" y2="170" stroke="#D5DDE2"/>
+<text x="325" y="185" text-anchor="end" font-size="10" fill="#5F6E79">FiO₂ の目安（%）</text>
+<g font-size="10" fill="#5F6E79"><text x="120" y="184" text-anchor="middle">21</text><text x="190" y="184" text-anchor="middle">40</text><text x="260" y="184" text-anchor="middle">70</text><text x="330" y="184" text-anchor="middle">100</text></g>
+<text x="115" y="44" text-anchor="end">鼻カニューラ 1〜6L</text><rect x="125" y="32" width="72" height="16" rx="4" fill="#E1F0F3" stroke="#0E6F80"/><text x="161" y="44" text-anchor="middle" font-size="10">24〜44</text>
+<text x="115" y="74" text-anchor="end">簡易マスク 5〜10L</text><rect x="167" y="62" width="60" height="16" rx="4" fill="#E1F0F3" stroke="#0E6F80"/><text x="197" y="74" text-anchor="middle" font-size="10">40〜60</text>
+<text x="115" y="104" text-anchor="end">リザーバー 10L〜</text><rect x="213" y="92" width="94" height="16" rx="4" fill="#E1F0F3" stroke="#0E6F80"/><text x="260" y="104" text-anchor="middle" font-size="10">60〜90</text>
+<text x="115" y="134" text-anchor="end">ネーザルハイフロー</text><rect x="120" y="122" width="210" height="16" rx="4" fill="#FFF1E0" stroke="#B25E00"/><text x="225" y="134" text-anchor="middle" font-size="10">21〜100（設定どおり）</text>
+<text x="115" y="160" text-anchor="end">人工呼吸器</text><rect x="120" y="148" width="210" height="16" rx="4" fill="#FFF1E0" stroke="#B25E00"/><text x="225" y="160" text-anchor="middle" font-size="10">21〜100（設定どおり）</text></svg>`,
+cor:`<svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+<path d="M170 30 C110 30 60 80 70 140 C80 195 140 215 170 215 C200 215 260 195 270 140 C280 80 230 30 170 30z" fill="#FBE9E7" stroke="#B3261E" stroke-width="2"/>
+<rect x="150" y="10" width="40" height="30" rx="6" fill="#FFF" stroke="#B3261E"/><text x="170" y="30" text-anchor="middle" font-size="11">大動脈</text>
+<path d="M155 40 C120 55 95 100 90 160" fill="none" stroke="#0E6F80" stroke-width="3"/><text x="70" y="110" text-anchor="end" fill="#0E6F80" font-weight="700">RCA</text>
+<text x="95" y="180" text-anchor="middle" font-size="10" fill="#0E6F80">→ 下壁・右室・洞結節</text>
+<path d="M185 40 C200 50 210 60 210 70" fill="none" stroke="#B25E00" stroke-width="3"/><text x="232" y="62" fill="#B25E00" font-weight="700">LMT</text>
+<path d="M210 70 C205 100 185 150 175 200" fill="none" stroke="#B25E00" stroke-width="3"/><text x="150" y="130" text-anchor="end" fill="#B25E00" font-weight="700">LAD</text>
+<text x="140" y="150" text-anchor="end" font-size="10" fill="#B25E00">→ 前壁・中隔</text>
+<path d="M210 70 C235 90 255 120 250 160" fill="none" stroke="#B25E00" stroke-width="3"/><text x="265" y="120" fill="#B25E00" font-weight="700">LCX</text>
+<text x="262" y="180" text-anchor="middle" font-size="10" fill="#B25E00">→ 側壁・後壁</text>
+<text x="170" y="228" text-anchor="middle" font-size="10" fill="#5F6E79">RCA：右冠動脈　LMT：左主幹部　LAD：左前下行枝　LCX：左回旋枝</text></svg>`,
+cxr:`<svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+<rect x="70" y="15" width="200" height="220" rx="12" fill="#F3F6F8" stroke="#D5DDE2"/>
+<path d="M170 20 L170 95" stroke="#5F6E79" stroke-width="6" opacity=".4"/><path d="M170 95 L130 150 M170 95 L210 150" stroke="#5F6E79" stroke-width="5" opacity=".4"/>
+<text x="185" y="100" font-size="10" fill="#5F6E79">気管分岐部</text>
+<path d="M170 20 L170 70" stroke="#0E6F80" stroke-width="3"/><circle cx="170" cy="70" r="4" fill="#0E6F80"/>
+<text x="60" y="66" text-anchor="end" font-size="11" fill="#0E6F80">気管チューブ先端</text><text x="60" y="80" text-anchor="end" font-size="10" fill="#0E6F80">分岐部の 3〜5cm 上</text>
+<path d="M60 40 L165 66" stroke="#0E6F80" stroke-dasharray="3 3"/>
+<path d="M230 25 C215 50 195 70 190 90" fill="none" stroke="#B25E00" stroke-width="3"/><circle cx="190" cy="90" r="4" fill="#B25E00"/>
+<text x="280" y="60" font-size="11" fill="#B25E00">CV カテ先端</text><text x="280" y="74" font-size="10" fill="#B25E00">上大静脈内</text>
+<text x="280" y="88" font-size="10" fill="#B25E00">（分岐部の高さ付近）</text>
+<path d="M275 68 L195 88" stroke="#B25E00" stroke-dasharray="3 3"/>
+<path d="M85 215 Q115 175 145 200" fill="none" stroke="#5F6E79" stroke-width="2"/><path d="M195 200 Q225 175 255 215" fill="none" stroke="#5F6E79" stroke-width="2"/>
+<text x="80" y="232" font-size="10" fill="#5F6E79">肋骨横隔膜角（鈍化→胸水）</text>
+<circle cx="150" cy="150" r="1"/><text x="140" y="140" font-size="10" fill="#5F6E79">心陰影 CTR &lt; 50%</text></svg>`,
+evd:`<svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+<rect x="20" y="20" width="110" height="180" rx="10" fill="#F3F6F8" stroke="#D5DDE2"/>
+<circle cx="75" cy="70" r="35" fill="#FBE9E7" stroke="#B3261E"/><circle cx="105" cy="76" r="4" fill="#0E6F80"/>
+<text x="75" y="130" text-anchor="middle" font-size="11">頭部（30度挙上）</text>
+<text x="112" y="62" font-size="10" fill="#0E6F80">外耳孔</text>
+<line x1="109" y1="76" x2="215" y2="76" stroke="#0E6F80" stroke-dasharray="4 3"/>
+<text x="162" y="92" text-anchor="middle" font-size="10" fill="#0E6F80">ゼロ点＝外耳孔の高さ</text>
+<rect x="215" y="30" width="18" height="130" fill="#FFF" stroke="#5F6E79"/>
+<g stroke="#5F6E79" font-size="9" fill="#5F6E79"><line x1="215" y1="46" x2="223" y2="46"/><text x="238" y="49">20</text><line x1="215" y1="61" x2="223" y2="61"/><text x="238" y="64">10</text><line x1="215" y1="76" x2="225" y2="76"/><text x="238" y="79">0 cmH₂O</text><line x1="215" y1="91" x2="223" y2="91"/><text x="238" y="94">−10</text></g>
+<rect x="216" y="47" width="16" height="29" fill="#E1F0F3"/>
+<path d="M250 40 L250 47" stroke="#B25E00" stroke-width="2"/><text x="265" y="44" font-size="10" fill="#B25E00">設定圧（例 15）</text>
+<path d="M75 105 C120 120 180 110 224 110" fill="none" stroke="#B3261E" stroke-width="2"/>
+<rect x="205" y="165" width="38" height="40" rx="4" fill="#FFF" stroke="#5F6E79"/><text x="224" y="190" text-anchor="middle" font-size="9">排液</text>
+<text x="170" y="214" text-anchor="middle" font-size="10" fill="#5F6E79">体位変換・移動・吸引の前はクランプ、後でゼロ点を合わせて開放</text></svg>`,
+valve:`<svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+<rect x="60" y="30" width="105" height="80" rx="10" fill="#E1F0F3" stroke="#0E6F80"/><text x="112" y="75" text-anchor="middle" font-weight="700">右房</text>
+<rect x="175" y="30" width="105" height="80" rx="10" fill="#FBE9E7" stroke="#B3261E"/><text x="227" y="75" text-anchor="middle" font-weight="700">左房</text>
+<rect x="60" y="130" width="105" height="80" rx="10" fill="#E1F0F3" stroke="#0E6F80"/><text x="112" y="175" text-anchor="middle" font-weight="700">右室</text>
+<rect x="175" y="130" width="105" height="80" rx="10" fill="#FBE9E7" stroke="#B3261E"/><text x="227" y="175" text-anchor="middle" font-weight="700">左室</text>
+<rect x="80" y="112" width="65" height="16" rx="8" fill="#FFF" stroke="#0E6F80"/><text x="112" y="124" text-anchor="middle" font-size="10">三尖弁</text>
+<rect x="195" y="112" width="65" height="16" rx="8" fill="#FFF" stroke="#B3261E"/><text x="227" y="124" text-anchor="middle" font-size="10">僧帽弁</text>
+<rect x="15" y="150" width="45" height="16" rx="8" fill="#FFF" stroke="#0E6F80"/><text x="37" y="162" text-anchor="middle" font-size="9">肺動脈弁</text>
+<rect x="280" y="150" width="50" height="16" rx="8" fill="#FFF" stroke="#B3261E"/><text x="305" y="162" text-anchor="middle" font-size="9">大動脈弁</text>
+<text x="20" y="20" font-size="10" fill="#5F6E79">静脈血 →</text><text x="320" y="20" text-anchor="end" font-size="10" fill="#5F6E79">→ 全身へ</text>
+<text x="170" y="10" text-anchor="middle" font-size="10" fill="#5F6E79">肺 ⇄</text></svg>`,
+adr:`<svg viewBox="0 0 340 190" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+<g font-size="11" fill="#5F6E79"><text x="120" y="22" text-anchor="middle">α1</text><text x="175" y="22" text-anchor="middle">β1</text><text x="230" y="22" text-anchor="middle">β2</text><text x="295" y="22" text-anchor="middle">主な効果</text></g>
+<g font-size="11">
+<text x="10" y="48">ノルアドレナリン</text><text x="120" y="48" text-anchor="middle">◎</text><text x="175" y="48" text-anchor="middle">○</text><text x="230" y="48" text-anchor="middle">−</text><text x="295" y="48" text-anchor="middle" font-size="10">血管収縮</text>
+<text x="10" y="76">アドレナリン</text><text x="120" y="76" text-anchor="middle">◎</text><text x="175" y="76" text-anchor="middle">◎</text><text x="230" y="76" text-anchor="middle">◎</text><text x="295" y="76" text-anchor="middle" font-size="10">収縮＋収縮力</text>
+<text x="10" y="104">ドパミン</text><text x="120" y="104" text-anchor="middle">高用量</text><text x="175" y="104" text-anchor="middle">中用量</text><text x="230" y="104" text-anchor="middle">−</text><text x="295" y="104" text-anchor="middle" font-size="10">用量依存</text>
+<text x="10" y="132">ドブタミン</text><text x="120" y="132" text-anchor="middle">−</text><text x="175" y="132" text-anchor="middle">◎</text><text x="230" y="132" text-anchor="middle">○</text><text x="295" y="132" text-anchor="middle" font-size="10">収縮力↑ 拡張</text>
+<text x="10" y="160">バソプレシン</text><text x="120" y="160" text-anchor="middle" font-size="10">V1 受容体</text><text x="230" y="160" text-anchor="middle">−</text><text x="295" y="160" text-anchor="middle" font-size="10">血管収縮</text></g>
+<g stroke="#D5DDE2"><line x1="10" y1="30" x2="330" y2="30"/><line x1="10" y1="58" x2="330" y2="58"/><line x1="10" y1="86" x2="330" y2="86"/><line x1="10" y1="114" x2="330" y2="114"/><line x1="10" y1="142" x2="330" y2="142"/></g>
+<text x="170" y="184" text-anchor="middle" font-size="10" fill="#5F6E79">α1：血管収縮　β1：心収縮力・心拍数↑　β2：血管拡張・気管支拡張</text></svg>`,
+trach:`<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+<rect x="130" y="20" width="60" height="170" rx="20" fill="#F3F6F8" stroke="#D5DDE2"/><text x="160" y="185" text-anchor="middle" font-size="10" fill="#5F6E79">気管</text>
+<path d="M60 60 L110 60 C130 60 140 70 140 90 L140 150" fill="none" stroke="#0E6F80" stroke-width="8" stroke-linecap="round"/>
+<ellipse cx="140" cy="135" rx="24" ry="18" fill="#E1F0F3" stroke="#0E6F80"/>
+<text x="55" y="50" text-anchor="end" font-size="11">フランジ</text>
+<text x="215" y="140" font-size="11" fill="#0E6F80">カフ 20〜30 cmH₂O</text>
+<text x="215" y="155" font-size="10" fill="#5F6E79">高すぎ→気管粘膜虚血</text><text x="215" y="169" font-size="10" fill="#5F6E79">低すぎ→垂れ込み・リーク</text>
+<rect x="60" y="66" width="48" height="12" fill="#FFF1E0" stroke="#B25E00"/><text x="84" y="92" text-anchor="middle" font-size="10" fill="#B25E00">Yガーゼ・皮膚観察</text>
+<text x="215" y="50" font-size="11">術後 1 週間は瘻孔未完成</text><text x="215" y="66" font-size="10" fill="#B3261E">事故抜去 → 経口挿管の準備</text>
+<text x="215" y="90" font-size="11">加湿を確実に</text><text x="215" y="106" font-size="10" fill="#5F6E79">乾燥→痰の固着→閉塞</text></svg>`
+};
+
+const KNOW=[
+{t:'血液ガスの読み方',fig:'abg',s:[
+ {h:'正常値',b:['pH 7.35〜7.45','PaCO₂ 35〜45 mmHg','PaO₂ 80〜100 mmHg（室内気）','HCO₃⁻ 22〜26 mEq/L','BE −2〜+2','乳酸 < 2 mmol/L（4 以上は重症）','SaO₂ 95% 以上']},
+ {h:'読む順番',b:['① pH：アシデミアかアルカレミアか','② PaCO₂：呼吸性の成分','③ HCO₃⁻：代謝性の成分','④ 代償：もう一方が同じ方向に動いているか','⑤ 酸素化：PaO₂、P/F 比、A-aDO₂','⑥ 乳酸・電解質・血糖']},
+ {h:'代謝性アシドーシスの鑑別',b:['アニオンギャップ AG ＝ Na − (Cl + HCO₃⁻)、正常 12±2','AG 上昇：乳酸（ショック・虚血）、ケトン（DKA・飢餓）、腎不全、中毒（メタノール・エチレングリコール・サリチル酸）','AG 正常：下痢、尿細管性アシドーシス、生食大量輸液（高 Cl 性）','アルブミン低値では AG が見かけ上低くなる（Alb 1 g/dL 低下ごとに約 2.5 補正）']},
+ {h:'代謝性アルカローシス',b:['嘔吐・胃管からの大量排液、利尿薬、低 K','Cl 反応性なら生食と K 補充で改善']},
+ {h:'呼吸性',b:['急性の呼吸性アシドーシス：PaCO₂ 10 上昇で pH 約 0.08 低下','慢性（COPD）：腎代償で HCO₃⁻ が上がり pH は正常近く。PaCO₂ だけを見て慌てない','過換気：疼痛・不安・敗血症初期・肝不全・代謝性アシドーシスの代償']},
+ {h:'酸素化の指標',b:['P/F 比 ＝ PaO₂ ÷ FiO₂（例 PaO₂ 80、FiO₂ 0.4 → 200）','ARDS のベルリン定義：P/F 300 以下（軽症）、200 以下（中等症）、100 以下（重症）、PEEP 5 以上で','SpO₂ 90% ≒ PaO₂ 60 mmHg。SpO₂ 90% を切ると PaO₂ は急降下する（解離曲線の肩）']},
+ {h:'静脈血ガス',b:['pH は動脈より約 0.03 低く、PCO₂ は約 5 高い','PO₂ の評価には使えない。酸塩基の傾向・乳酸・電解質の確認には十分']}
+]},
+{t:'呼吸の生理と人工呼吸管理',s:[
+ {h:'酸素化と換気は別物',b:['酸素化：PaO₂・SpO₂・P/F。上げる手段は FiO₂ と PEEP（平均気道内圧）','換気：PaCO₂・EtCO₂。上げる手段は 1 回換気量と呼吸回数（分時換気量）','酸素化が悪い＝換気が悪い、ではない。それぞれ別に評価する']},
+ {h:'基本設定の目安',b:['1 回換気量 6〜8 mL/kg（理想体重で計算。実体重ではない）','プラトー圧 30 cmH₂O 未満、駆動圧（プラトー − PEEP）15 cmH₂O 未満','PEEP は 5 から。ARDS では PEEP/FiO₂ 表に沿って上げる','SpO₂ 92〜96% 程度を目標にし、高すぎる FiO₂ は避ける']},
+ {h:'モード',b:['A/C（VC・PC）：設定回数は保証。自発でも設定量が入る','SIMV：設定回数は強制、それ以外は自発（PS で補助）','PSV（CPAP＋PS）：全て自発。ウィーニングで使う','VC は換気量が保証されるが圧が変動、PC は圧が一定で換気量が変動。どちらが変動しているかを見る']},
+ {h:'グラフィックで見る異常',b:['吸気努力が強い（波形の引き込み）：鎮痛・鎮静不足、設定不足','オートPEEP：呼気流量がゼロに戻る前に次の吸気が始まる。喘息・COPD で','ダブルトリガー：1 回の吸気努力で 2 回送気。換気量不足のサイン','リークで換気量が戻らない：回路・カフ・胸腔ドレーン']},
+ {h:'急変時 DOPE',b:['D 位置ずれ：チューブの深さ、胸の上がり、呼吸音の左右差','O 閉塞：痰、屈曲、噛み込み。吸引カテーテルが入るか','P 気胸：片側の呼吸音減弱、皮下気腫、血圧低下','E 機器：回路外れ、酸素供給、加湿器','迷ったら回路を外してバッグ換気に切り替え、患者と機器を切り分ける']},
+ {h:'VAP 予防バンドル',b:['頭部挙上 30〜45 度','毎日の鎮静中断と抜管可能性の評価','口腔ケア（歯磨きを含む）','カフ上部吸引','手指衛生と回路を不必要に交換しない']},
+ {h:'ウィーニングと抜管',b:['SBT（自発呼吸トライアル）：PS 5〜8 または T ピースで 30〜120 分','RSBI（呼吸回数 ÷ 1 回換気量 L）105 未満が成功の目安','抜管前に確認：意識、咳嗽力、痰の量、カフリークテスト（上気道浮腫）、循環の安定','抜管後の上気道閉塞（吸気性喘鳴）は再挿管の準備をしつつ報告']}
+]},
+{t:'酸素療法',fig:'o2',s:[
+ {h:'デバイスと FiO₂ の目安',b:['鼻カニューラ 1〜6 L/分：FiO₂ 約 24〜44%（1 L で約 4% 上がる）。6 L 以上は鼻粘膜が乾き効果も頭打ち','簡易マスク 5〜10 L/分：FiO₂ 40〜60%。5 L 未満はマスク内の CO₂ を再呼吸する','リザーバー付きマスク 10 L/分以上：FiO₂ 60〜90%。バッグが吸気でしぼみきらない流量に','ベンチュリーマスク：アダプターの色で FiO₂ を固定。COPD で正確に管理したいとき','ネーザルハイフロー：30〜60 L/分、FiO₂ 21〜100%、加温加湿、解剖学的死腔の洗い流し、軽い PEEP 様効果']},
+ {h:'目標 SpO₂',b:['一般：94〜98%','CO₂ 貯留リスク（COPD、肥満低換気、神経筋疾患）：88〜92%','心肺停止後・心筋梗塞：高酸素は避け 94〜98%','SpO₂ 100% が続くのは PaO₂ が不明なだけで安心ではない']},
+ {h:'CO₂ ナルコーシス',b:['高 CO₂ 慢性患者に高濃度酸素 → 換気ドライブ低下・V/Q 不均衡悪化・ホールデン効果で PaCO₂ 上昇','傾眠・頭痛・羽ばたき振戦・発汗。SpO₂ は正常なので見逃しやすい','酸素を急に止めない。減らして血ガスで確認、必要なら NPPV']},
+ {h:'SpO₂ の落とし穴',b:['末梢冷感・低灌流・体動・マニキュア・強い外光で不正確','一酸化炭素中毒では偽高値','貧血が強いと SpO₂ 正常でも酸素運搬量は少ない','脈波が安定して出ているかを必ず見る']},
+ {h:'NPPV',b:['適応：COPD 増悪、心原性肺水腫、抜管後の予防的使用','禁忌：意識障害で気道確保困難、嘔吐・大量分泌物、顔面外傷、循環不安定','マスクフィッティングと皮膚（鼻梁）の保護。開始 1〜2 時間で血ガスと呼吸状態を再評価し、改善なければ挿管を遅らせない']}
+]},
+{t:'体液量の評価',s:[
+ {h:'考え方',b:['「足りているか」ではなく「輸液で心拍出量が増えるか（輸液反応性）」を考える','一つの指標で決めない。複数を組み合わせ、時間経過で見る','入室時は輸液が必要でも、48〜72 時間以降は過剰輸液の害が大きくなる']},
+ {h:'身体所見',b:['血圧・脈拍・脈圧（脈圧が狭い→1 回拍出量低下）','末梢冷感、CRT 3 秒以上、皮膚のまだら（mottling）','頸静脈怒張、浮腫、肺のクラックル','尿量 0.5 mL/kg/h 未満が 2 時間以上続く','口渇・粘膜乾燥は感度が低い']},
+ {h:'静的指標',b:['CVP：正常 2〜8 mmHg。単独では輸液反応性を予測できない。傾向と極端な値（3 未満、15 以上）を参考に','PAWP：6〜12 mmHg','これらは「圧」であって「量」ではない。PEEP・胸腔内圧・心機能の影響を受ける']},
+ {h:'動的指標',b:['下肢挙上テスト（PLR）：45 度挙上で心拍出量が 10% 以上増えれば反応性あり。自己輸血 300 mL 相当','脈圧変動 PPV・1 回拍出量変動 SVV：調節換気・洞調律で 13% 以上なら反応性あり','下大静脈径の呼吸性変動（エコー）','エンドタイダル CO₂ の変化']},
+ {h:'検査',b:['乳酸：組織低灌流。2 時間ごとの推移で蘇生の効果を判断','ScvO₂ 70% 未満：酸素供給不足（心拍出量・Hb・SaO₂ のどれか）','BUN/Cr 比 20 以上、尿比重、尿 Na で腎前性を推定','Hb・Alb の濃縮／希釈の変化']},
+ {h:'過剰輸液の害',b:['肺水腫、酸素化悪化、人工呼吸期間の延長','腹腔内圧上昇（IAP 12 以上）→ 腎血流低下','消化管浮腫による吸収不良、創傷治癒遅延','毎日の体重と累積 in/out を必ず確認。ゴールが達成されたら de-resuscitation を考える']}
+]},
+{t:'カテーテル管理とモニタリング',s:[
+ {h:'動脈圧ライン',b:['ゼロ点：右房の高さ（腋窩中線と第 4 肋間の交点）。体位を変えたら合わせ直す','方形波テスト（フラッシュ）：フラッシュ後に 1〜2 回の振動で戻れば適正。なまり（オーバーダンピング）は気泡・血栓・屈曲・ライン長','なまると収縮期圧は低く、拡張期圧は高く出る。MAP は比較的信頼できる','挿入側の手指の色・温度・運動を毎回観察','採血後は確実にフラッシュ。加圧バッグ 300 mmHg']},
+ {h:'中心静脈カテーテル',b:['CVP 正常 2〜8 mmHg。呼気終末で読む','X線で先端が上大静脈内にあることを確認してから使う','CRBSI 予防：挿入部を毎日観察、透明ドレッシングは 7 日ごと（汚染時は随時）、必要性を毎日評価し不要なら抜く','三方活栓・接続部は使用前に消毒（スクラブ）。ハブの汚染が最大の感染経路','抜去は仰臥位〜頭低位、呼気時に抜き、5 分以上圧迫。気密性のあるドレッシングで覆う（空気塞栓予防）']},
+ {h:'肺動脈カテーテル（スワンガンツ）',b:['PAP 収縮期 15〜30／拡張期 5〜15 mmHg','PAWP 6〜12 mmHg','CO 4〜8 L/分、CI 2.5〜4.0 L/分/m²','SvO₂ 65〜75%。低下は酸素供給不足か消費増加','バルーンは測定時のみ膨らませ、必ずしぼませる（肺動脈損傷・梗塞予防）','波形が楔入型のままなら先端が奥に進んでいる。すぐ報告']},
+ {h:'よく出るパラメータ',b:['SVR ＝ (MAP − CVP) ÷ CO × 80、正常 800〜1,200 dyn·s/cm⁵','敗血症：CO 高・SVR 低。心原性：CO 低・SVR 高。循環血液量減少：CO 低・CVP 低・SVR 高','フロートラックなどの動脈圧波形解析は不整脈・自発呼吸・血管作動薬急変時に精度が落ちる']},
+ {h:'アラーム対応の基本',b:['アラームが鳴ったら、まず患者を見る','波形が出ているか、センサーが外れていないか','アラーム設定は患者ごとに見直し、鳴りっぱなしにしない（アラーム疲労）']}
+]},
+{t:'循環作動薬と身体の相互作用',fig:'adr',s:[
+ {h:'受容体で覚える',b:['α1：血管収縮 → 血圧↑、後負荷↑','β1：心収縮力↑、心拍数↑、刺激伝導↑','β2：血管拡張、気管支拡張','薬ごとにどの受容体が優位かで、血圧・心拍数・末梢への効き方が決まる']},
+ {h:'ノルアドレナリン',b:['α1 優位＋弱い β1。血管収縮で血圧を上げる。心拍数はあまり増えない','敗血症性ショックの第一選択。開始 0.05γ 前後、0.5γ を超えて必要なら次の手を','末梢では原則使わない（漏出で壊死）。やむを得ず末梢から使うときは太い静脈・短時間・頻回観察','副作用：末梢虚血、乳酸上昇、反射性徐脈']},
+ {h:'アドレナリン',b:['α・β 両方に強く効く。心停止、アナフィラキシー、心原性ショック、ノルアド不応時の追加','頻脈・不整脈、乳酸上昇（β2 による代謝亢進で、灌流悪化とは限らない）、高血糖','アナフィラキシーは筋注 0.3〜0.5 mg（大腿外側）が第一選択']},
+ {h:'ドパミン',b:['低用量（〜3γ）：ドパミン受容体、腎血流。ただし腎保護効果は否定されている','中用量（3〜10γ）：β1 → 心収縮力','高用量（10γ〜）：α → 血管収縮','不整脈が多く、敗血症性ショックではノルアドより成績が悪い。使う場面は限られる']},
+ {h:'ドブタミン',b:['β1 優位で心収縮力↑。β2 で末梢は拡張ぎみなので血圧は上がらないか下がることもある','心原性ショック、敗血症で心機能低下があるとき、ノルアドと併用','頻脈・心筋酸素消費↑に注意。目安 2〜10γ']},
+ {h:'バソプレシン',b:['V1 受容体。カテコラミン受容体が鈍っていても効く','敗血症性ショックでノルアド 0.25γ 以上のときに追加（0.03 単位/分程度）','腸管虚血、指趾の虚血、低 Na に注意','急に止めるとリバウンド低血圧。漸減する']},
+ {h:'血管拡張薬',b:['ニトログリセリン：静脈拡張優位で前負荷↓。心不全・狭心症。頭痛・耐性・低血圧','ニカルジピン：Ca 拮抗で動脈拡張。高血圧緊急症、術後の血圧管理。反射性頻脈','ニトロプルシド：強力・即効。長期高用量でシアン中毒','血圧が急に下がったら薬を減らす前に、脱水・出血・鎮静薬の影響を確認']},
+ {h:'投与の実際',b:['カテコラミンは専用ルート。側管からの薬剤投与やフラッシュはしない','シリンジ交換時の血圧変動を避ける（ダブルポンプ法など）','三方活栓の向き、接続部の緩みを毎回確認。少しの流量変化で血圧が動く','漏出時：投与中止、吸引、部位のマーキング、報告。フェントラミン局注が検討される']}
+]},
+{t:'心電図の読み方',fig:'ecg',s:[
+ {h:'読む順番',b:['① 心拍数（RR 間隔）','② リズム：P があるか、P と QRS が 1:1 か、RR が規則的か','③ PR 間隔 0.12〜0.20 秒','④ QRS 幅 0.12 秒未満','⑤ ST・T：上昇、低下、陰性 T','⑥ QT/QTc 0.44〜0.46 秒未満']},
+ {h:'ICU でよく見る不整脈',b:['心房細動：RR 不整、P なし。術後・敗血症で頻発。頻脈なら β 遮断薬・アミオダロン、不安定なら除細動','心房粗動：鋸歯状 F 波、2:1 伝導で HR 150 前後','発作性上室頻拍：規則正しい狭い QRS 頻拍。迷走神経刺激・アデノシン','心室頻拍：幅広 QRS 頻拍。脈があるか、意識があるかで対応が変わる','房室ブロック：Ⅰ度（PR 延長）、Ⅱ度（脱落）、Ⅲ度（P と QRS が無関係）。Mobitz Ⅱ 以上はペーシング準備','洞性徐脈：鎮静薬、迷走神経反射、低体温、高 K']},
+ {h:'致死性不整脈',b:['VF、無脈性 VT：即 CPR、除細動','心静止、PEA：CPR、アドレナリン、原因検索（5H5T：低酸素・循環血液量減少・H⁺・K 異常・低体温／緊張性気胸・タンポナーデ・中毒・血栓）','モニタで VF に見えても、まず患者を見る（電極外れ・体動）']},
+ {h:'虚血の見方',b:['ST 上昇：隣接する 2 誘導以上で 1 mm 以上 → STEMI を疑い、12 誘導と報告','Ⅱ・Ⅲ・aVF：下壁（RCA）、V1〜V4：前壁・中隔（LAD）、Ⅰ・aVL・V5・V6：側壁（LCX）','V1〜V2 の ST 低下＋高い R：後壁梗塞の鏡像','ST 低下・陰性 T：虚血、狭心症、ジギタリス、左室肥大の負荷','胸痛時は必ず 12 誘導。モニタ Ⅱ 誘導だけでは前壁の変化を見逃す']},
+ {h:'電解質の影響',b:['高 K：テント状 T → P 平低化、PR 延長 → QRS 幅広 → サインカーブ → VF/心静止。グルコン酸 Ca、GI 療法、透析','低 K：T 平低化、U 波、QT 延長、心室性不整脈','高 Ca：QT 短縮。低 Ca：QT 延長','低 Mg：トルサード・ド・ポアンツの誘因。硫酸 Mg']},
+ {h:'ペースメーカー',b:['スパイクの後に QRS/P が続いているか（キャプチャ）','自己波を感知して抑制されているか（センシング）','一時ペーシングの設定（モード・レート・出力・感度）を勤務ごとに確認、ワイヤーの固定と絶縁']}
+]},
+{t:'胸部X線の見方',fig:'cxr',s:[
+ {h:'読む順番',b:['撮影条件：ポータブルか、吸気十分か（横隔膜が第 9〜10 肋骨後部）、回旋（棘突起が鎖骨の中央）','A：Airway 気管の位置、チューブ','B：Bones 骨折、皮下気腫','C：Cardiac 心陰影の大きさ（CTR 50% 未満、ポータブルでは大きく見える）、縦隔','D：Diaphragm 横隔膜、肋骨横隔膜角','E：Everything else 肺野、デバイス']},
+ {h:'デバイスの位置',b:['気管チューブ：先端は気管分岐部の 3〜5 cm 上、鎖骨の高さ付近。頸部の屈伸で 2 cm 動く','CV カテーテル：先端は上大静脈内。右房内は不整脈・穿孔のリスク','胃管：先端が横隔膜の下、胃内。気管内に入っていないか','胸腔ドレーン：側孔がすべて胸腔内','PA カテーテル：先端が肺門から 2〜3 cm 以内','IABP：先端が左鎖骨下動脈分岐の 2 cm 下、大動脈弓の下']},
+ {h:'よく見る異常',b:['肺水腫：両側肺門中心の陰影（バタフライ）、Kerley B 線、上肺野の血管増強、胸水','肺炎：区域性の浸潤影、エアブロンコグラム','無気肺：陰影と、縦隔・気管がその側に引かれる。挿管チューブの片肺挿管でも','気胸：肺紋理の消失した部分、臥位では肋骨横隔膜角が深く鋭くなる（ディープサルカスサイン）','胸水：肋骨横隔膜角の鈍化。臥位では全体がうっすら白くなる','ARDS：両側びまん性の浸潤影で心拡大なし']},
+ {h:'比較の重要性',b:['前回の写真と並べて見る。少しの変化が大切','写真は撮影時点の情報。呼吸状態の変化とセットで判断']}
+]},
+{t:'栄養管理',s:[
+ {h:'基本方針',b:['腸が使えるなら腸から：入室 24〜48 時間以内に経腸栄養を開始','循環が不安定（カテコラミン増量中）なら開始は待つ。安定したら少量から','静脈栄養は経腸栄養で足りないときに補う。早期の完全静脈栄養は感染が増える']},
+ {h:'必要量の目安',b:['エネルギー 25〜30 kcal/kg/日。急性期（最初の 1 週間）は 70% 程度から徐々に','蛋白 1.2〜2.0 g/kg/日。CRRT 中や熱傷ではさらに多く','肥満では理想体重ベースで計算','間接熱量計があれば実測が最も正確']},
+ {h:'経腸栄養の管理',b:['頭部挙上 30〜45 度を維持。仰臥位は誤嚥リスク','胃内残量：500 mL 以上で中断を検討。それ以下なら続けながら消化管運動促進薬を検討','下痢：まず薬剤（抗菌薬、ソルビトール含有薬）と感染（C. difficile）を疑う。栄養剤の変更や投与速度調整','腹部膨満・嘔吐・腹痛：腸管虚血を見逃さない（乳酸、腹部所見）','幽門後（十二指腸・空腸）投与：胃排出遅延や誤嚥リスクが高いとき']},
+ {h:'チューブ管理',b:['経鼻胃管の位置確認：X線が確実。気泡音のみでの確認は不十分','注入前後のフラッシュで閉塞予防','薬剤は可能な限り液剤か粉砕して個別に。徐放剤・腸溶錠は粉砕不可','鼻翼の圧迫潰瘍を予防（固定位置の変更）']},
+ {h:'リフィーディング症候群',b:['低栄養・長期絶食の患者に栄養を再開すると、インスリン分泌で P・K・Mg が細胞内に移動し急低下','不整脈、心不全、呼吸筋力低下、意識障害','リスク患者は 10 kcal/kg/日程度から開始し、開始前と毎日電解質を確認、ビタミン B1 を先に投与']},
+ {h:'血糖管理',b:['目標 140〜180 mg/dL 程度。厳格すぎる管理は低血糖が増える','インスリン持続投与中は 1〜2 時間ごとに測定','経腸栄養の中断時にはインスリンも見直す（低血糖）','低血糖（70 未満）は即ブドウ糖、再測定']}
+]},
+{t:'輸血',s:[
+ {h:'製剤と目安',b:['RBC：2 単位で Hb 約 1〜1.5 g/dL 上昇（体重 50〜60 kg）。急性期の輸血閾値は Hb 7 g/dL 前後、心疾患・活動性出血は 8〜9','FFP：凝固因子の補充。PT-INR 1.5 以上や大量出血で。解凍後 3 時間以内に','PC（血小板）：10 単位で 2.5〜5 万上昇。振とう保存、冷やさない。出血時 5 万、処置前 5 万、中枢神経 10 万が目安','クリオ・フィブリノゲン製剤：フィブリノゲン 150 以下の大量出血']},
+ {h:'投与の実際',b:['患者・製剤・血液型・有効期限・クロスマッチをダブルチェック','開始 5 分は 1 mL/分程度でベッドサイド観察、15 分で再評価','RBC は 2〜4 時間以内に投与終了。専用フィルター付き輸血セット','同一ルートに乳酸リンゲル・Ca 含有液を混ぜない（凝固）','加温は大量輸血・小児など必要時に専用加温器で']},
+ {h:'副作用の見分け',b:['発熱性非溶血性反応：発熱・悪寒のみ。最も多い','アレルギー：蕁麻疹 → 抗ヒスタミン。呼吸困難・血圧低下ならアナフィラキシー','急性溶血性反応：腰痛、発熱、血尿、血圧低下、DIC。型違いが原因。即中止、ルート確保、輸液','TRALI：輸血 6 時間以内の急性肺障害。低酸素、両側浸潤影、心不全なし','TACO：循環過負荷。高血圧、頸静脈怒張、肺水腫。高齢・心不全・急速投与で','細菌汚染：血小板製剤で多い。高熱・ショック']},
+ {h:'副作用が疑われたら',b:['輸血中止、ルートは生食でキープ','バイタル、尿の色、呼吸状態を確認','製剤とバッグを保管し、血液型再検査・輸血部へ連絡','記録：開始時間、量、症状の出現時間']},
+ {h:'大量輸血',b:['RBC：FFP：PC を 1:1:1 に近い比率で','低 Ca（クエン酸）→ 心収縮力低下、QT 延長。Ca 補正','高 K、低体温、アシドーシス、希釈性凝固障害','トラネキサム酸は外傷出血で早期（3 時間以内）に']}
+]},
+{t:'IABP',fig:'iabp',s:[
+ {h:'原理',b:['大動脈内のバルーンが拡張期に膨らむ → 拡張期圧上昇 → 冠血流↑','収縮期の直前にしぼむ → 大動脈内圧が下がる → 後負荷↓、心筋酸素消費↓','心拍出量の増加は 10〜20% 程度。心臓を「休ませる」補助']},
+ {h:'適応と禁忌',b:['心原性ショック、急性心筋梗塞の機械的合併症、心臓手術の離脱困難、難治性狭心症','禁忌：大動脈弁閉鎖不全（逆流が増える）、大動脈解離・大動脈瘤、重度の末梢動脈疾患']},
+ {h:'位置の確認',b:['先端は左鎖骨下動脈分岐の約 2 cm 下（第 2〜3 肋間の高さ）','高すぎると左鎖骨下動脈閉塞（左橈骨動脈の脈が弱くなる）、低すぎると腎動脈閉塞（尿量低下）','X線で毎日確認。カテーテルの固定と刻印位置を勤務ごとに記録']},
+ {h:'波形とタイミング',b:['正常：拡張期増強圧が収縮期圧より高い、バルーン収縮後の拡張期終末圧が元より低い','膨張が早い：大動脈弁が閉じる前に膨らみ、収縮期に重なる → 逆流・後負荷増','膨張が遅い：拡張期増強が小さい','収縮が早い：後負荷軽減が得られない','収縮が遅い：次の収縮期に重なり後負荷が増える。最も危険','トリガーは心電図か動脈圧。不整脈や電気メスで乱れたら動脈圧トリガーへ']},
+ {h:'観察',b:['挿入側下肢：足背動脈・後脛骨動脈の触知、色、温度、しびれ。1 時間ごと','左橈骨動脈（先端位置）、尿量（腎動脈）','出血：穿刺部、消化管、血尿。ヘパリン使用中は ACT・血小板','溶血：LDH、ビリルビン、ヘモグロビン尿','血小板減少（HIT の可能性も）','バルーンの破裂：チューブ内の血液の逆流。即停止し報告']},
+ {h:'離脱',b:['1:1 → 1:2 → 1:3 と補助比率を下げ、循環が保てるか評価','バルーンを止めたまま放置しない（30 分以上で血栓形成）。離脱中も最低限の動作は続ける','抜去後は 30 分以上の圧迫、その後 6〜8 時間の安静。下肢血流の確認を続ける']},
+ {h:'体位',b:['挿入側の股関節を屈曲させない（30 度以下）。頭部挙上も 30 度まで','体位変換はログロールで。カテーテルの屈曲・移動に注意']}
+]},
+{t:'PCPS / VA-ECMO',fig:'pcps',s:[
+ {h:'原理',b:['大腿静脈から脱血 → 遠心ポンプ → 人工肺で酸素化 → 大腿動脈へ送血','心臓と肺の両方を代行。IABP より強力な循環補助','VV-ECMO（静脈脱血・静脈送血）は肺のみの代行。呼吸不全に']},
+ {h:'ミキシングゾーン',b:['自己心拍出（肺で酸素化された血液）と送血（人工肺で酸素化）が大動脈で合流','自己肺が悪いと、上半身（脳・冠動脈）には酸素化の悪い血液が行く','必ず右手（右橈骨動脈）で血ガスを測り、脳の酸素化を評価する','SpO₂ は右手で測る。左手や足は送血側の値になる']},
+ {h:'回路の観察',b:['脱血不良：回路の振動（チャタリング）、脱血圧の陰圧増大、フロー低下。循環血液量不足やカニューレ位置','人工肺：血漿リーク（出口の泡・黄色い液）、酸素化能低下（人工肺後の PO₂）、血栓','回路内の血栓：白っぽい付着、黒っぽい塊。特に接続部','ポンプの回転数とフローの関係が変わったら要注意','回路をペンライトで照らして確認する']},
+ {h:'患者の観察',b:['送血側下肢の虚血：足背動脈、色、温度、コンパートメント症候群。ディスタル灌流カテーテルの有無','左室の拡張（脱血で後負荷が増える）：脈圧の消失、肺水腫。左室ベントや IABP 併用','出血：カニューレ部、消化管、頭蓋内。抗凝固の効果を ACT または APTT で','溶血：ヘモグロビン尿、LDH 上昇。回転数が高すぎる、脱血不良','感染、下肢の圧迫、褥瘡']},
+ {h:'管理の目標',b:['フローは体格に合わせ 2.5〜4 L/分程度。MAP 65 以上','適度な脈圧（自己心拍出）を残す','鎮痛鎮静、体温管理','頭部挙上は 30 度まで、カニューレ側の股関節屈曲を避ける']},
+ {h:'離脱',b:['自己心機能の回復をエコーで確認、フローを段階的に下げて評価','離脱後も下肢血流、出血、感染の観察を続ける']}
+]},
+{t:'CHDF（持続的血液濾過透析）',fig:'chdf',s:[
+ {h:'原理',b:['持続的に少量ずつ血液を浄化。血圧が不安定でも導入できる','濾過（限外濾過）：圧で水と溶質を押し出す。中分子まで除去','透析（拡散）：透析液との濃度差で小分子を除去','CHDF は両方を組み合わせる。除水は濾液量と補充液量の差']},
+ {h:'適応',b:['急性腎障害で乏尿・高 K・アシドーシス・体液過剰','薬剤・中毒の除去','敗血症の補助（サイトカイン除去を狙うことも）']},
+ {h:'回路圧の見方',b:['脱血圧：陰圧が強くなる → 脱血不良（血管内脱水、カテーテル位置、体位）','入口圧・返血圧：上昇 → 回路やカテーテルの閉塞','TMP：上昇 → 膜の目詰まり。回路交換のタイミング','圧の推移を記録し、急な変化はすぐ対応']},
+ {h:'抗凝固',b:['ナファモスタット：半減期が短く出血リスクが低い。アナフィラキシー、高 K に注意','ヘパリン：APTT や ACT で確認。HIT のリスク','出血傾向があれば抗凝固なしで短時間ずつ']},
+ {h:'合併症と観察',b:['低血圧：導入直後、除水過多','低体温：回路で血液が冷える。加温','電解質異常：K、P、Mg、Ca が低下しやすい。定期採血','低血糖：透析液・補充液に糖が含まれない場合','薬剤の除去：抗菌薬の投与量を薬剤師と確認','カテーテル感染、脱血不良による回路凝固']},
+ {h:'看護のポイント',b:['除水目標と許容血圧を医師と共有し、in/out・体重で評価','回路交換・カテーテル操作時の血圧変動に備える','ライン整理：回路の屈曲・引っ張りを避ける','患者に説明し、不安と体動を減らす']}
+]},
+{t:'冠動脈バイパス術後',fig:'cor',s:[
+ {h:'術式の理解',b:['狭窄部の先にグラフト（内胸動脈、橈骨動脈、大伏在静脈）をつなぐ','人工心肺を使う on-pump と、心拍動下で行う OPCAB','どの血管に何本つないだかを術式記録で確認。グラフト部位に応じた ST 変化を予測']},
+ {h:'循環管理',b:['グラフト血流を守る：MAP 65〜90 程度、極端な高血圧（吻合部）も低血圧（グラフト閉塞）も避ける','頻脈は冠血流時間を減らす。疼痛・不安・低容量・発熱を除く','橈骨動脈グラフトは攣縮しやすく、Ca 拮抗薬や硝酸薬が続くことが多い','術後の ST 上昇・胸痛は早期グラフト閉塞を疑い、12 誘導と報告']},
+ {h:'出血とタンポナーデ',b:['ドレーン排液 200 mL/h が 2 時間、または急な増加は報告','急に減る＋血圧低下・CVP 上昇・脈圧狭小・尿量低下 → タンポナーデ。ドレーン閉塞を疑いミルキング、緊急再開胸に備える','凝固能（ACT、血小板、フィブリノゲン）、体温低下の補正']},
+ {h:'不整脈',b:['術後心房細動：術後 2〜4 日がピーク。K 4.0 以上、Mg 2.0 以上に保つ','β 遮断薬の早期再開','一時ペーシングワイヤーの設定と固定を毎勤務確認']},
+ {h:'呼吸と離床',b:['早期抜管、深呼吸・排痰、早期離床が無気肺・肺炎予防','胸骨保護：起き上がりは側臥位から、両腕で押さない、咳は枕で胸を抱える','下肢グラフト採取部の創傷・腫脹・感染']},
+ {h:'その他',b:['血糖 140〜180 で創感染予防','腎機能（造影剤・人工心肺・低灌流）','抗血小板薬の再開時期、スタチン継続']}
+]},
+{t:'心臓弁置換・弁形成術後',fig:'valve',s:[
+ {h:'弁の位置と病態',b:['大動脈弁：左室 → 大動脈。狭窄（AS）では左室が肥厚し、前負荷と洞調律に依存','僧帽弁：左房 → 左室。狭窄（MS）は左房圧↑・肺高血圧・心房細動、逆流（MR）は左室拡大','三尖弁：右房 → 右室。右心不全、肝うっ血','肺動脈弁：右室 → 肺動脈']},
+ {h:'人工弁',b:['機械弁：耐久性が高いが生涯抗凝固（ワーファリン、PT-INR 目標を確認）。DOAC は使えない','生体弁：抗凝固は一定期間のみ、耐久性は 10〜20 年','弁形成：自己弁を残す。抗凝固は短期']},
+ {h:'術後の循環',b:['AS 術後：肥厚した左室は容量に敏感。血管拡張や脱水で血圧が急に下がる','MS 術後：左房圧が急に下がり肺うっ血は改善するが、右心不全は残る','MR 術後：逆流がなくなり後負荷が増える。左室機能が悪いと心不全','術前の病態と術後に何が変わったかを結びつける']},
+ {h:'不整脈',b:['大動脈弁・僧帽弁の近くに刺激伝導系がある → 房室ブロックのリスク。ペーシングワイヤーを確認','心房細動は術前からある患者が多い','徐脈でも心拍出量が保てているか、脈圧・尿量で評価']},
+ {h:'観察',b:['新しい心雑音、心不全徴候：人工弁機能不全、弁周囲逆流','溶血：LDH、ビリルビン、赤褐色の尿','感染性心内膜炎の予防：口腔ケア、ラインの清潔操作','抗凝固中の出血：ドレーン、創、消化管、頭蓋内']}
+]},
+{t:'胸部・腹部大動脈瘤術後',s:[
+ {h:'血圧管理が最優先',b:['吻合部・ステント固定部を守るため、指示された血圧範囲を厳守（例 収縮期 100〜140）','降圧薬の持続投与中は急な変動に注意。疼痛・覚醒・排尿による上昇を予測','低血圧も臓器虚血の原因。輸液・出血の評価']},
+ {h:'胸部大動脈（開胸・TEVAR）',b:['脊髄虚血 → 対麻痺：術後 24〜48 時間は下肢の運動・感覚を 1 時間ごとに確認。遅発性もある','予防：MAP 80〜90 以上を保つ、脊髄ドレナージ（設定圧・排液量）、Hb 維持','反回神経麻痺（嗄声・誤嚥）、横隔神経麻痺','脳梗塞（弓部操作）：意識、瞳孔、麻痺','左開胸後は左肺の無気肺、胸水']},
+ {h:'腹部大動脈（開腹・EVAR）',b:['腸管虚血：腹痛、腹部膨満、下血、乳酸上昇、代謝性アシドーシス。下腸間膜動脈の処理後','腎虚血：尿量、Cr。腎動脈より上での遮断','下肢虚血：足背動脈、色、温度。塞栓や解離','腹部コンパートメント症候群：腹部膨満、気道内圧上昇、尿量低下','術後イレウス、腹壁の創']},
+ {h:'ステントグラフト特有',b:['エンドリーク：瘤内への血流残存。CT で経過観察','アクセス部（大腿）の血腫・仮性動脈瘤・出血','造影剤腎症の予防（輸液、腎機能）','ステント後症候群：発熱、CRP 上昇（数日で改善）']},
+ {h:'共通の観察',b:['出血：ドレーン、後腹膜（腹部膨満、Hb 低下）','大量輸液・輸血後の肺水腫、凝固異常','体温管理（低体温は凝固障害と血管攣縮）','疼痛管理と早期離床']}
+]},
+{t:'消化器術後のドレーン管理',s:[
+ {h:'ドレーンの目的',b:['情報ドレーン：出血・縫合不全・胆汁漏を早く知る','治療ドレーン：貯留した液を排出する','どこに、何のために入っているかをカルテと図で把握する']},
+ {h:'排液の見方',b:['正常な経過：血性 → 淡血性 → 漿液性へ、量は減っていく','血性が増える、100 mL/h 以上：術後出血','混濁・膿性・悪臭：感染、縫合不全','緑〜黄色：胆汁漏。ワインレッド・褐色：膵液瘻を疑う','急に止まる：閉塞か、位置ずれ。腹部所見と合わせて判断']},
+ {h:'食道再建術後',b:['縫合不全は術後 5〜7 日前後。頸部吻合では頸部の発赤・腫脹・唾液様の排液、胸腔内吻合では胸腔ドレーンの混濁、発熱','反回神経麻痺（嗄声、誤嚥）。嚥下開始は評価してから','呼吸器合併症が最多。排痰、早期離床','再建胃管の血流障害：内視鏡で確認されることがある']},
+ {h:'膵臓手術後（膵頭十二指腸切除など）',b:['膵液瘻：排液アミラーゼが血清の 3 倍以上（術後 3 日以降）','膵液は蛋白分解酵素を含み、周囲の血管を溶かして大出血（仮性動脈瘤）の原因になる','排液が赤くなる前の「センチネル出血（少量の血性）」を見逃さない','ドレーン周囲の皮膚保護（パウチング）','胃排出遅延、血糖変動（インスリン分泌低下）']},
+ {h:'肝切除術後',b:['胆汁漏：排液が黄〜緑、ビリルビン高値','出血：血性増加。凝固能低下（肝機能）を考慮','肝不全：黄疸、意識障害、PT 延長、アンモニア上昇','低血糖・低アルブミン・腹水。腹水増加は体重と腹囲で','術後の血糖・電解質（低 P）']},
+ {h:'管理の基本',b:['固定：抜けないよう、かつ皮膚を圧迫しないよう','屈曲・閉塞・逆流を毎回確認。排液バッグは挿入部より低く','ミルキングは指示に従い、無理な吸引をしない','排液量・性状を経時的に記録し、変化を報告。写真を残す']}
+]},
+{t:'脳の解剖と脳ドレーン',fig:'evd',s:[
+ {h:'頭蓋内圧の基本',b:['頭蓋内は脳・血液・髄液で満たされ、どれかが増えると圧が上がる（モンロー・ケリーの法則）','ICP 正常 5〜15 mmHg。20 以上が持続すると治療','CPP（脳灌流圧）＝ MAP − ICP。60〜70 mmHg 以上を目標','脳圧亢進の徴候：意識低下、頭痛・嘔吐、瞳孔不同・対光反射消失、Cushing 徴候（血圧↑・徐脈・呼吸不整）']},
+ {h:'脳室ドレナージ（EVD）',b:['目的：髄液を排出して ICP を下げる、ICP を測る','ゼロ点：外耳孔（モンロー孔の高さ）。設定圧は cmH₂O で医師指示','体位変換・移動・吸引の前は必ずクランプ、終わったら高さを合わせて開放','排液量が急に増える（オーバードレナージ → 硬膜下血腫）、急に止まる（閉塞）、性状の変化（血性増加、混濁）は報告','拍動があるか（髄液面の呼吸性・拍動性変動）で開存を確認','感染予防：閉鎖回路を保ち、サンプリングは無菌操作']},
+ {h:'スパイナルドレナージ',b:['腰部から髄液を排出。くも膜下出血の血性髄液除去、胸部大動脈手術の脊髄保護','オーバードレナージ：頭痛、嘔吐、意識低下、脳ヘルニア。1 時間あたりの排液量の上限を守る','起き上がり・体位変換時のクランプ']},
+ {h:'くも膜下出血',b:['再破裂：発症 24 時間以内が最多。血圧管理、安静、刺激を避ける','脳血管攣縮：4〜14 日目。新たな麻痺・意識低下・失語。血圧維持、輸液、循環血液量の確保','水頭症：意識レベルの低下。ドレナージで改善','低 Na（SIADH・中枢性塩類喪失）、心電図変化・たこつぼ型心筋症']},
+ {h:'脳圧管理の看護',b:['頭部挙上 30 度、頸部を正中に（静脈還流）','体温 37.5 度以下、血糖、Na 140〜150 程度を維持','吸引は短時間で、前後の酸素化。咳・怒責を避ける','鎮痛・鎮静を十分に。GCS・瞳孔を定期的に']}
+]},
+{t:'体位管理',s:[
+ {h:'頭部挙上',b:['30〜45 度：VAP 予防、脳圧管理、胃食道逆流の予防','仙骨部・踵のずれ・圧に注意。膝を軽く曲げてずり落ちを防ぐ','IABP・PCPS 挿入側は股関節屈曲 30 度まで']},
+ {h:'腹臥位療法',b:['中等症以上の ARDS（P/F 150 未満）で 1 日 12〜16 時間以上','背側の虚脱肺胞が開き、換気血流比が改善。生存率を改善する','実施前：チューブ・ライン・ドレーンの固定と長さ、胃内容の吸引、眼と顔面の保護','圧迫部位（前額、眼、頬、乳房、腸骨、膝、足趾）の除圧。2 時間ごとに頭部の向きと腕の位置（スイマーポジション）を変える','合併症：事故抜管、顔面浮腫、褥瘡、腕神経叢麻痺','戻す前に吸引と循環の確認']},
+ {h:'側臥位と酸素化',b:['片肺病変では健側を下にすると酸素化が改善することが多い（下側の肺に血流が集まる）','ただし分泌物が多い片側肺炎では、患側を下にすると健側への流れ込みを防げる','術後は術式による制限（片肺切除後は患側を下に、など）を確認','体位を変えたら SpO₂ と血圧の変化を確認する']},
+ {h:'体位変換と褥瘡予防',b:['2 時間ごとが目安。循環不安定時は小さな体位変換（スモールシフト）から','体圧分散マットレス。ずれ・摩擦を減らす（引きずらない）','仙骨、踵、後頭部、耳介、デバイス接触部（酸素マスク、チューブ固定）','低栄養・失禁・浮腫・カテコラミン投与は高リスク']},
+ {h:'早期離床',b:['深鎮静を避け、可能なら覚醒下で。多職種で目標と中止基準を共有','段階：ベッド上関節可動域 → 端座位 → 立位 → 歩行','中止基準の例：HR 130 以上、SpO₂ 88% 未満、収縮期血圧 90 未満や 180 以上、新たな不整脈、苦痛','ライン・ドレーン・チューブの長さと固定を先に確認']}
+]},
+{t:'気管切開時の気道チューブ管理',fig:'trach',s:[
+ {h:'術後早期の注意',b:['気管切開後 1 週間程度は瘻孔が完成していない。事故抜去時の再挿入は困難で、盲目的な再挿入は皮下に入る危険','事故抜去時：まず酸素化（バッグマスク、必要なら経口挿管）。カニューレを無理に戻さない','出血：術後 24 時間は少量の血性痰は許容。持続する出血や凝血塊による閉塞に注意','皮下気腫、気胸、縦隔気腫']},
+ {h:'カフ',b:['20〜30 cmH₂O。高すぎると気管粘膜の虚血・気管食道瘻、低すぎると垂れ込み・リーク','カフ圧計で定期的に測定（勤務ごと、体位変換後）','カフ上部吸引ポート付きなら分泌物を定期的に吸引']},
+ {h:'加湿と吸引',b:['上気道を通らないため加湿が必須。人工鼻か加温加湿器','痰の性状・量・色・吸引回数を記録。粘稠なら加湿不足','吸引は無菌操作、カテーテルは内径の半分以下、10〜15 秒以内、吸引前後の酸素化','内筒（インナーカニューレ）があるタイプは定期的に洗浄・交換']},
+ {h:'固定と皮膚',b:['固定バンドは指 1 本分の余裕。緩いと抜ける、きついと皮膚障害','Y ガーゼは分泌物で汚れたら交換。皮膚の発赤・浸軟・肉芽を観察','フランジの圧迫による潰瘍に注意（フォーム材で保護）']},
+ {h:'合併症の観察',b:['閉塞：換気圧上昇、SpO₂ 低下、吸引カテーテルが通らない。内筒交換、それでも改善なければ交換','気管腕頭動脈瘻：大量出血。カニューレ先端の圧迫が原因。搏動性の出血は緊急','肉芽形成、気管狭窄（長期）','感染：発赤、膿、発熱']},
+ {h:'発声と嚥下',b:['スピーチカニューレ・スピーチバルブ：カフを完全に抜いた状態でのみ。カフを入れたままだと窒息','カフを抜くと垂れ込みが増える。嚥下評価と吸引体制をセットで','コミュニケーション手段（筆談、文字盤）を確保。患者の不安が強い']}
+]},
+{t:'薬剤投与の基礎知識',s:[
+ {h:'ガンマ計算',b:['γ ＝ μg/kg/min','mL/h ＝ γ × 体重(kg) × 60 ÷ 濃度(μg/mL)','濃度(μg/mL) ＝ 薬剤量(mg) × 1,000 ÷ 溶液量(mL)','例：ノルアド 3 mg/50 mL（60 μg/mL）、体重 60 kg、0.1γ → 0.1×60×60÷60 ＝ 6 mL/h','希釈を変えたら必ず流量を計算し直す。シリンジ交換時のダブルチェック']},
+ {h:'投与経路とルート',b:['カテコラミン・高濃度 K・高浸透圧液は中心静脈から','末梢からの投与で漏出しやすい薬：カテコラミン、造影剤、抗がん剤、高濃度糖','カテコラミンのルートには側管を使わない。フラッシュもしない','ルートの数が足りないときは薬剤師に配合の可否を確認']},
+ {h:'配合変化の代表例',b:['カテコラミン ＋ 炭酸水素 Na（アルカリで失活）','ミダゾラム ＋ プロポフォールは同ルートを避ける','フロセミド（アルカリ性）とドパミン等（酸性）で白濁','セフトリアキソン ＋ Ca 含有液で沈殿','ジアゼパムは他薬と混ぜない、PVC に吸着','白濁・沈殿・色の変化を見たら止めて確認']},
+ {h:'鎮痛・鎮静',b:['鎮痛が先（Analgesia-first）。痛みを取れば鎮静薬は減らせる','鎮痛：フェンタニル（蓄積しにくい）、モルヒネ（腎不全で蓄積）、アセトアミノフェン','鎮静：プロポフォール（覚醒が早い、脂質、PRIS）、デクスメデトミジン（浅い鎮静、徐脈・低血圧）、ミダゾラム（蓄積・せん妄）','浅い鎮静（RASS −1〜0）を目標。毎日鎮静を中断して評価','せん妄評価は CAM-ICU。予防は非薬物的介入（睡眠、見当識、早期離床、眼鏡・補聴器）']},
+ {h:'電解質補正',b:['K：末梢は 40 mEq/L 以下の濃度、中心静脈でも 20 mEq/h 以下が目安。心電図モニター下で。原液は絶対に静注しない','Mg：硫酸 Mg は急速静注で血圧低下・徐脈','Ca：グルコン酸 Ca は緩徐に。高 K の心保護に','P：グリセロリン酸 Na など。急速投与で低 Ca','Na：補正速度は 1 日 8〜10 mEq/L 以内（急速補正で浸透圧性脱髄）']},
+ {h:'抗凝固・抗血小板',b:['ヘパリン持続：APTT を目標範囲で。HIT（開始 5〜10 日で血小板減少・血栓）','ワーファリン：PT-INR。ビタミン K 含有食品・抗菌薬で変動','DOAC：腎機能で用量調整。中和薬の有無','抗血小板薬の休薬・再開時期は必ず確認']},
+ {h:'インシデントを防ぐ',b:['6R：正しい患者・薬剤・用量・時間・経路・目的','ハイリスク薬（カテコラミン、インスリン、K、ヘパリン、麻薬、筋弛緩薬）はダブルチェック','シリンジ・ラインにラベル。同じ形の薬を並べない','口頭指示は復唱し、記録に残す']}
+]},
+{t:'抗菌薬の基本',s:[
+ {h:'開始のタイミング',b:['敗血症性ショックでは 1 時間以内に投与。培養は投与前に採取するが、投与を遅らせない','血液培養は 2 セット以上、別の部位から','痰・尿・創・カテーテルなど感染巣ごとの培養']},
+ {h:'PK/PD で使い分ける',b:['時間依存性（β ラクタム：ペニシリン、セフェム、カルバペネム）：MIC を超える時間が大事 → 投与回数を増やす、点滴時間を延ばす','濃度依存性（アミノグリコシド、キノロン）：ピーク濃度が大事 → 1 回量を大きく、1 日 1 回','バンコマイシン：AUC/MIC。TDM で調整','腎機能・CRRT・体液量で血中濃度が変わる']},
+ {h:'de-escalation',b:['最初は広域で、培養結果と臨床経過で狭域に変更','原因菌が判明したら感受性のある最も狭い薬に','投与期間は必要最短で（多くの感染症で 5〜7 日）','プロカルシトニンは中止の参考に']},
+ {h:'主な薬とポイント',b:['ペニシリン・セフェム：アレルギー歴の確認','カルバペネム：バルプロ酸との併用で血中濃度が下がる、けいれん','バンコマイシン：腎障害、レッドマン症候群（急速投与）、TDM','アミノグリコシド：腎障害、聴力障害、TDM','キノロン：QT 延長、腱障害、金属との相互作用','メトロニダゾール：アルコールとの相互作用','抗真菌薬（アゾール系）：多くの薬と相互作用']},
+ {h:'投与時の観察',b:['過敏反応：発疹、喘鳴、血圧低下。初回投与は特に','静脈炎：バンコマイシン、キノロン','抗菌薬関連下痢・C. difficile 感染：発熱、白血球上昇、水様便。接触予防策、手洗い（アルコールが効かない）','薬剤熱、肝機能・腎機能・血球の変化']},
+ {h:'感染対策',b:['耐性菌（MRSA、ESBL、CRE、MDRP）：接触予防策、個室または集団隔離','手指衛生が最大の対策','デバイス関連感染（CLABSI、CAUTI、VAP）はバンドルで予防し、不要なデバイスは抜く']}
+]},
+{t:'よく使う正常値一覧',s:[
+ {h:'血液ガス',b:['pH 7.35〜7.45','PaCO₂ 35〜45 mmHg','PaO₂ 80〜100 mmHg','HCO₃⁻ 22〜26 mEq/L','BE −2〜+2','SaO₂ 95% 以上','乳酸 < 2 mmol/L']},
+ {h:'電解質',b:['Na 135〜145 mEq/L','K 3.5〜5.0 mEq/L','Cl 98〜108 mEq/L','Ca 8.5〜10.5 mg/dL（イオン化 Ca 1.1〜1.3 mmol/L）','Mg 1.8〜2.6 mg/dL','P 2.5〜4.5 mg/dL','血糖 70〜110 mg/dL（ICU 目標 140〜180）']},
+ {h:'血液・凝固',b:['Hb 男 13〜17／女 12〜15 g/dL','Ht 40〜50%','血小板 15〜35 万/μL','WBC 4,000〜9,000/μL','PT-INR 0.9〜1.1','APTT 25〜40 秒','フィブリノゲン 200〜400 mg/dL','D ダイマー < 1.0 μg/mL','ACT 90〜120 秒（ヘパリン中の目標は用途で異なる）']},
+ {h:'腎・肝',b:['Cr 0.6〜1.1 mg/dL','BUN 8〜20 mg/dL','尿量 0.5 mL/kg/h 以上','T-Bil < 1.2 mg/dL','AST/ALT < 35 U/L','Alb 3.5〜5.0 g/dL','アンモニア < 70 μg/dL']},
+ {h:'循環動態',b:['MAP 65 mmHg 以上','CVP 2〜8 mmHg','PAP 15〜30／5〜15 mmHg','PAWP 6〜12 mmHg','CO 4〜8 L/分、CI 2.5〜4.0 L/分/m²','SVR 800〜1,200 dyn·s/cm⁵','SvO₂ 65〜75%、ScvO₂ 70% 以上','ICP 5〜15 mmHg、CPP 60〜70 以上']},
+ {h:'呼吸',b:['1 回換気量 6〜8 mL/kg（理想体重）','プラトー圧 < 30 cmH₂O','駆動圧 < 15 cmH₂O','P/F 比 300 以上','EtCO₂ 35〜45 mmHg','カフ圧 20〜30 cmH₂O','RSBI < 105']},
+ {h:'炎症・その他',b:['CRP < 0.3 mg/dL','プロカルシトニン < 0.5 ng/mL','体温 36〜37.5℃','血糖 ICU 目標 140〜180 mg/dL']}
+]}
+];
+
+let kMemo={}, kUser=[], kImg={};
+async function loadKnow(){ kMemo=(await store.get('kmemo'))||{}; kUser=(await store.get('kuser'))||[]; kImg=(await store.get('kimg'))||{}; renderKnow(); }
+function kText(k){ return k.s.map(sec=>sec.h+sec.b.join('')).join(''); }
+function renderKnow(){
+  const q=$('kSearch').value.trim(); const L=$('kList'); L.innerHTML='';
+  const all=[...kUser.map((u,i)=>({t:u.t,s:[{h:'',b:u.b.split('\n')}],user:i})),...KNOW];
+  all.filter(k=>!q||k.t.includes(q)||kText(k).includes(q)).forEach(k=>{
+    const key='k:'+k.t; const d=document.createElement('details');
+    const secs=k.s.map(sec=>`${sec.h?`<h3>${esc(sec.h)}</h3>`:''}<ul>${sec.b.filter(x=>x.trim()).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`).join('');
+    const fig=k.fig?`<div class="fig">${FIG[k.fig]}</div>`:'';
+    const imgs=(kImg[key]||[]).map((src,i)=>`<div class="ph"><img src="${src}" data-full="1"><button class="small danger" data-del="${i}">削除</button></div>`).join('');
+    d.innerHTML=`<summary>${k.user!==undefined?'<span><span class="tag">自分</span>'+esc(k.t)+'</span>':esc(k.t)}</summary>
+      <div class="body">${fig}${secs}
+      <div class="memo"><label>自分のメモ</label><textarea placeholder="自院のルール、覚え書き">${esc(kMemo[key]||'')}</textarea>
+      <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}</div>
+      <label>自分の画像（自院の資料・手書きメモなど）</label>
+      <div class="phs">${imgs}</div>
+      <label class="addph"><input type="file" accept="image/*" hidden>＋ 画像を追加</label>
+      </div></div>`;
+    const ta=d.querySelector('textarea'), btns=d.querySelectorAll('.bar button');
+    btns[0].onclick=async()=>{kMemo[key]=ta.value;await store.set('kmemo',kMemo);toast('保存しました');};
+    if(btns[1])btns[1].onclick=async()=>{if(!confirm('この項目を削除しますか？'))return;kUser.splice(k.user,1);await store.set('kuser',kUser);renderKnow();};
+    d.querySelector('input[type=file]').onchange=async e=>{const f=e.target.files[0];if(!f)return;
+      try{const src=await shrink(f);(kImg[key]=kImg[key]||[]).push(src);await store.set('kimg',kImg);
+        const t=JSON.stringify(kImg).length; if(t>4000000)toast('画像の容量が上限に近づいています');
+        d.open=true;renderKnow();document.querySelector(`[data-key="${key}"]`)?.scrollIntoView();toast('追加しました');}
+      catch(err){toast('画像を保存できませんでした（容量上限の可能性）');}};
+    d.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('この画像を削除しますか？'))return;kImg[key].splice(+b.dataset.del,1);await store.set('kimg',kImg);d.open=true;renderKnow();});
+    d.querySelectorAll('img[data-full]').forEach(im=>im.onclick=()=>{const o=$('overlay');o.querySelector('img').src=im.src;o.style.display='flex';});
+    d.dataset.key=key; if(q||openKeys.has(key))d.open=true;
+    d.addEventListener('toggle',()=>{d.open?openKeys.add(key):openKeys.delete(key);});
+    L.appendChild(d);
+  });
+  if(!L.children.length)L.innerHTML='<div class="empty">該当する項目がありません</div>';
+}
+const openKeys=new Set();
+function shrink(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const M=1000;let w=im.width,h=im.height;const s=Math.min(1,M/Math.max(w,h));w=Math.round(w*s);h=Math.round(h*s);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);res(c.toDataURL('image/jpeg',0.7));};im.onerror=rej;im.src=r.result;};r.onerror=rej;r.readAsDataURL(file);});}
+$('overlay').onclick=()=>{$('overlay').style.display='none';};
+$('kSearch').addEventListener('input',renderKnow);
+$('kAdd').onclick=async()=>{const t=$('kNewT').value.trim(),b=$('kNewB').value.trim();if(!t){toast('タイトルを入力してください');return;}
+  kUser.push({t,b});await store.set('kuser',kUser);$('kNewT').value='';$('kNewB').value='';renderKnow();toast('追加しました');};
+
+loadDrugs(); loadKnow(); calc();
+
+</script>
+</body>
+</html>
