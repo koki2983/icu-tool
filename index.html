@@ -119,6 +119,7 @@ table.o2{margin:4px 0 2px;font-size:14px}table.o2 th,table.o2 td{text-align:cent
 table.compat td{text-align:left;font-weight:400;font-size:13px;vertical-align:top}table.compat th{text-align:left}table.compat td:nth-child(2){white-space:nowrap;color:var(--muted);font-size:12px}table.compat td:first-child{color:var(--ink);font-weight:600;min-width:6em}
 #scoreSeg button{font-size:13px;padding:9px 2px}
 .ph2{margin:8px 0 14px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}.ph2 img{width:100%;display:block;background:#000;cursor:zoom-in}.ph2 figcaption{padding:8px 12px 10px}.ph2 figcaption b{display:block;margin-bottom:4px}.ph2 ul{margin:4px 0;padding-left:18px}.ph2 small{display:block;margin-top:6px;color:var(--muted);font-size:11px}.ph2 a{color:var(--teal)}
+.cath{font-size:13px;font-weight:700;color:var(--muted);margin:16px 0 6px 2px;letter-spacing:.04em;text-transform:uppercase}.cath:first-child{margin-top:4px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -1868,6 +1869,18 @@ KNOW.push({t:'看護師のためのベッドサイドエコー手順',fig:'probe
 META['看護師のためのベッドサイドエコー手順']={cat:'循環',key:['「診断」ではなく「観察して報告」。施設のルールの範囲で','手順は固定：準備 → 剣状突起下（心嚢液・IVC）→ 傍胸骨長軸 → 四腔像 → 肺 6 か所 → 膀胱','プローブは 1 度に 1 方向だけ動かす。マーカーの向きを毎回確認'],secfig:{}};
 
 const CATS=['すべて','呼吸','循環','補助療法','術後','神経・鎮静','薬剤・感染','全身管理','基準値'];
+
+/* 表示順（カテゴリ内） */
+const ORDER={
+'呼吸':['血液ガスの読み方','酸素療法','呼吸の生理と人工呼吸管理','気管切開時の気道チューブ管理','胸腔ドレーンと気胸','胸部X線の見方'],
+'循環':['体液量の評価','カテーテル管理とモニタリング','循環作動薬と身体の相互作用','心電図の読み方','心エコーの見方（ICU で必要な範囲）','看護師のためのベッドサイドエコー手順','ショックの分類と初期対応','心不全の急性期管理','心肺蘇生（ACLS の要点）'],
+'補助療法':['IABP','PCPS / VA-ECMO','CHDF（持続的血液濾過透析）'],
+'術後':['冠動脈バイパス術後','心臓弁置換・弁形成術後','胸部・腹部大動脈瘤術後','消化器術後のドレーン管理'],
+'神経・鎮静':['脳の解剖と脳ドレーン','鎮痛・鎮静・せん妄（PADIS）'],
+'薬剤・感染':['薬剤投与の基礎知識','抗菌薬の基本','敗血症'],
+'全身管理':['栄養管理','輸血','体位管理','急性腎障害（AKI）と電解質','DIC と凝固管理','急変の察知と初期対応（ABCDE）','CT の見方（ICU で必要な範囲）'],
+'基準値':['よく使う正常値一覧','出典・参考ガイドライン']};
+function kOrder(k){const ci=CATS.indexOf(k.cat);const arr=ORDER[k.cat]||[];let oi=arr.indexOf(k.t);if(oi<0)oi=999;return (ci<0?99:ci)*1000+oi;}
 let curCat='すべて';
 (function(){const bar=$('catBar');CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
 
@@ -1879,7 +1892,10 @@ function renderKnow(){
   const q=$('kSearch').value.trim(); const L=$('kList'); L.innerHTML='';
   const all=[...kUser.map((u,i)=>({t:u.t,s:[{h:'',b:u.b.split('\n')}],user:i,cat:'自分'})),...KNOW.map(k=>Object.assign({},k,META[k.t]||{}))];
   const li=x=>{const w=x.startsWith('!');return `<li${w?' class="w"':''}>${esc(w?x.slice(1):x)}</li>`;};
-  all.filter(k=>(curCat==='すべて'||k.cat===curCat||(k.user!==undefined))&&(!q||k.t.includes(q)||kText(k).includes(q))).forEach(k=>{
+  let lastCat=null;
+  all.filter(k=>(curCat==='すべて'||k.cat===curCat||(k.user!==undefined))&&(!q||k.t.includes(q)||kText(k).includes(q))).sort((a,b)=>(a.user!==undefined?-1:kOrder(a))-(b.user!==undefined?-1:kOrder(b))).forEach(k=>{
+    const gc=k.user!==undefined?'自分の項目':k.cat;
+    if(gc!==lastCat){const hd=document.createElement('div');hd.className='cath';hd.textContent=gc;L.appendChild(hd);lastCat=gc;}
     const key='k:'+k.t; const d=document.createElement('details');
     const secs=[...k.s,...(k.extra||[])].map((sec,i)=>{const f=sec.f||(k.secfig&&k.secfig[i]);return `${sec.h?`<h3>${esc(sec.h)}</h3>`:''}${f?`<div class="fig">${FIG[f]}</div>`:''}<ul>${sec.b.filter(x=>x.trim()).map(li).join('')}</ul>`;}).join('');
     const ph2=(PHOTOS[k.t]||[]).map(p=>{const c=PHOTOCRED[p.id];return `<figure class="ph2"><img src="${PHOTO[p.id]}" data-full="1" alt=""><figcaption><b>${esc(p.t)}</b><ul>${p.b.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><small>出典：Wikimedia Commons／${esc(c.a)}／${esc(c.l)}（<a href="${c.u}" target="_blank" rel="noopener">元画像</a>）</small></figcaption></figure>`;}).join('');
@@ -1887,7 +1903,7 @@ function renderKnow(){
     const keyBox=k.key&&k.key.length?`<div class="keybox"><div class="kh">まず押さえる</div><ol>${k.key.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>`:'';
     const fig=k.fig?`<div class="fig">${FIG[k.fig]}</div>`:'';
     const imgs=(kImg[key]||[]).map((src,i)=>`<div class="ph"><img src="${src}" data-full="1"><button class="small danger" data-del="${i}">削除</button></div>`).join('');
-    d.innerHTML=`<summary><span>${k.user!==undefined?'<span class="tag">自分</span>':(k.cat?`<span class="tag c">${k.cat}</span>`:'')}${esc(k.t)}</span></summary>
+    d.innerHTML=`<summary><span>${k.user!==undefined?'<span class="tag">自分</span>':''}${esc(k.t)}</span></summary>
       <div class="body">${keyBox}${fig}${secs}${photoBlock}
       <div class="memo"><label>自分のメモ</label><textarea placeholder="当院の値・ルール、覚え書き（例：目標血糖 ___、カフ圧の測定間隔 ___）">${esc(kMemo[key]||'')}</textarea>
       <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}</div>
