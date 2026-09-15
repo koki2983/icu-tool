@@ -120,6 +120,17 @@ table.compat td{text-align:left;font-weight:400;font-size:13px;vertical-align:to
 #scoreSeg button{font-size:13px;padding:9px 2px}
 .ph2{margin:8px 0 14px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}.ph2 img{width:100%;display:block;background:#000;cursor:zoom-in}.ph2 figcaption{padding:8px 12px 10px}.ph2 figcaption b{display:block;margin-bottom:4px}.ph2 ul{margin:4px 0;padding-left:18px}.ph2 small{display:block;margin-top:6px;color:var(--muted);font-size:11px}.ph2 a{color:var(--teal)}
 .cath{font-size:13px;font-weight:700;color:var(--muted);margin:16px 0 6px 2px;letter-spacing:.04em;text-transform:uppercase}.cath:first-child{margin-top:4px}
+
+.xl{color:var(--teal);text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer}
+.rel{margin-top:10px;padding-top:8px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.rel .muted{width:100%;font-size:12px}
+.relb{background:var(--teal-soft);border-color:#BFDDE3;color:var(--teal);font-size:13px}
+.fab{position:fixed;right:14px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:6;background:var(--teal);color:#fff;border:0;border-radius:22px;padding:10px 16px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.18)}
+.fab.back{right:auto;left:14px;background:#fff;color:var(--teal);border:1px solid var(--teal);font-weight:600;max-width:60vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tocSheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:30;align-items:flex-end}
+#tocSheet .sheet{background:var(--card);width:100%;max-height:80vh;overflow:auto;border-radius:16px 16px 0 0;padding:12px 14px calc(16px + env(safe-area-inset-bottom))}
+.sheet-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.tocb{display:block;width:100%;text-align:left;border:0;background:none;padding:9px 6px;border-bottom:1px solid var(--line);font-size:15px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -277,6 +288,9 @@ table.compat td{text-align:left;font-weight:400;font-size:13px;vertical-align:to
   <button data-p="score"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>スコア</button>
   <button data-p="know"><svg viewBox="0 0 24 24"><path d="M4 4h7a3 3 0 013 3v13a2 2 0 00-2-2H4zM20 4h-7a3 3 0 00-3 3v13a2 2 0 012-2h8z"/></svg>知識</button>
 </nav>
+<button id="tocBtn" class="fab" title="目次">目次</button>
+<button id="backBtn" class="fab back" style="display:none">← 戻る</button>
+<div id="tocSheet"><div class="sheet"><div class="sheet-h"><b>知識メモ 目次</b><button class="small" id="tocClose">閉じる</button></div><div id="tocList"></div></div></div>
 <div class="toast" id="toast"></div>
 <div id="overlay"><img alt=""><div class="figbox"></div></div>
 
@@ -826,6 +840,7 @@ function renderKnow(){
       catch(err){toast('画像を保存できませんでした（容量上限の可能性）');}};
     d.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('この画像を削除しますか？'))return;kImg[key].splice(+b.dataset.del,1);await store.set('kimg',kImg);d.open=true;renderKnow();});
     d.querySelectorAll('img[data-full]').forEach(im=>im.onclick=()=>{const o=$('overlay');o.querySelector('img').src=im.src;o.style.display='flex';});
+    d.querySelectorAll('[data-go]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();goTopic(b.dataset.go,k.t);});
     d.dataset.key=key; if(q||openKeys.has(key))d.open=true;
     d.addEventListener('toggle',()=>{d.open?openKeys.add(key):openKeys.delete(key);});
     L.appendChild(d);
@@ -1905,6 +1920,38 @@ PHOTOS['呼吸の生理と人工呼吸管理']=[
  {id:'pulm',t:'肺循環（右心 → 肺 → 左心）',b:['右室から肺動脈幹（Pulmonary trunk）→ 左右の肺動脈へ。ここを流れるのは静脈血（青）。肺毛細血管（Pulmonary capillaries）でガス交換して、肺静脈（Pulmonary veins）から左房へ戻る','肺動脈圧は体循環の 1/5〜1/6 と低い（収縮期 15〜30 mmHg）。だから右室の壁は薄く、後負荷（肺高血圧・肺塞栓・高い PEEP）に弱い','スワンガンツカテーテルは右房 → 右室 → 肺動脈と進み、肺動脈の枝で楔入する。楔入圧（PAWP）は左房圧の代用','肺水腫は左房圧が上がって肺毛細血管から水が漏れる状態。ARDS は毛細血管の壁自体が壊れて漏れる状態。X線は似ていても機序と治療が違う','VV-ECMO はこの肺の役割を体外で代行する。VA-ECMO は肺も心臓も飛ばして動脈へ戻す']}
 ];
 
+
+/* 項目間ジャンプ */
+const XLINK=[
+ ['血液ガス','血液ガスの読み方'],['酸素療法','酸素療法'],['人工呼吸','呼吸の生理と人工呼吸管理'],['気管切開','気管切開時の気道チューブ管理'],['胸腔ドレーン','胸腔ドレーンと気胸'],['気胸','胸腔ドレーンと気胸'],['胸部X線','胸部X線の見方'],
+ ['輸液反応性','体液量の評価'],['体液量','体液量の評価'],['CVP','カテーテル管理とモニタリング'],['スワンガンツ','カテーテル管理とモニタリング'],['カテコラミン','循環作動薬と身体の相互作用'],['ノルアドレナリン','循環作動薬と身体の相互作用'],['心電図','心電図の読み方'],['心エコー','心エコーの見方（ICU で必要な範囲）'],['エコー手順','看護師のためのベッドサイドエコー手順'],['ショック','ショックの分類と初期対応'],['心不全','心不全の急性期管理'],['心肺蘇生','心肺蘇生（ACLS の要点）'],['CPR','心肺蘇生（ACLS の要点）'],
+ ['IABP','IABP'],['PCPS','PCPS / VA-ECMO'],['ECMO','PCPS / VA-ECMO'],['CHDF','CHDF（持続的血液濾過透析）'],['CRRT','CHDF（持続的血液濾過透析）'],
+ ['バイパス','冠動脈バイパス術後'],['CABG','冠動脈バイパス術後'],['弁置換','心臓弁置換・弁形成術後'],['大動脈瘤','胸部・腹部大動脈瘤術後'],['膵液瘻','消化器術後のドレーン管理'],['縫合不全','消化器術後のドレーン管理'],
+ ['EVD','脳の解剖と脳ドレーン'],['脳室ドレナージ','脳の解剖と脳ドレーン'],['ICP','脳の解剖と脳ドレーン'],['せん妄','鎮痛・鎮静・せん妄（PADIS）'],['RASS','鎮痛・鎮静・せん妄（PADIS）'],['CAM-ICU','鎮痛・鎮静・せん妄（PADIS）'],
+ ['配合変化','薬剤投与の基礎知識'],['ガンマ計算','薬剤投与の基礎知識'],['抗菌薬','抗菌薬の基本'],['敗血症','敗血症'],
+ ['経腸栄養','栄養管理'],['リフィーディング','栄養管理'],['輸血','輸血'],['TRALI','輸血'],['腹臥位','体位管理'],['褥瘡','体位管理'],['早期離床','体位管理'],['AKI','急性腎障害（AKI）と電解質'],['高 K','急性腎障害（AKI）と電解質'],['低 Na','急性腎障害（AKI）と電解質'],['DIC','DIC と凝固管理'],['HIT','DIC と凝固管理'],['SBAR','急変の察知と初期対応（ABCDE）'],['ABCDE','急変の察知と初期対応（ABCDE）'],['CT','CT の見方（ICU で必要な範囲）'],['正常値','よく使う正常値一覧']
+];
+const jumpStack=[];
+function goTopic(title,from){
+  const el=document.querySelector(`[data-key="${CSS.escape('k:'+title)}"]`);
+  if(!el){toast('その項目は今のカテゴリ表示にありません');return;}
+  if(from&&from!==title){jumpStack.push(from);$('backBtn').style.display='';$('backBtn').textContent='← '+(from.length>10?from.slice(0,10)+'…':from)+' に戻る';}
+  el.open=true;openKeys.add('k:'+title);
+  const y=el.getBoundingClientRect().top+window.scrollY-70;window.scrollTo({top:y,behavior:'smooth'});
+}
+function linkify(escText,seen){
+  let t=escText;
+  for(const [kw,title] of XLINK){
+    if(seen.has(title))continue;
+    const i=t.indexOf(kw); if(i<0)continue;
+    if(i>0&&/[A-Za-z]/.test(t[i-1]))continue;
+    seen.add(title);
+    t=t.slice(0,i)+`<a class="xl" data-go="${esc(title)}">${kw}</a>`+t.slice(i+kw.length);
+  }
+  return t;
+}
+function relatedOf(k){const txt=kText(k);const s=new Set();for(const [kw,title] of XLINK){if(title!==k.t&&txt.includes(kw))s.add(title);}return [...s].slice(0,8);}
+
 const CATS=['すべて','呼吸','循環','補助療法','術後','神経・鎮静','薬剤・感染','全身管理','基準値'];
 
 /* 表示順（カテゴリ内） */
@@ -1934,14 +1981,19 @@ function renderKnow(){
     const gc=k.user!==undefined?'自分の項目':k.cat;
     if(gc!==lastCat){const hd=document.createElement('div');hd.className='cath';hd.textContent=gc;L.appendChild(hd);lastCat=gc;}
     const key='k:'+k.t; const d=document.createElement('details');
-    const secs=[...k.s,...(k.extra||[])].map((sec,i)=>{const f=sec.f||(k.secfig&&k.secfig[i]);return `${sec.h?`<h3>${esc(sec.h)}</h3>`:''}${f?`<div class="fig">${FIG[f]}</div>`:''}<ul>${sec.b.filter(x=>x.trim()).map(li).join('')}</ul>`;}).join('');
+    const self=k.t;
+    const secs=[...k.s,...(k.extra||[])].map((sec,i)=>{const f=sec.f||(k.secfig&&k.secfig[i]);const seen=new Set([self]);
+      const li2=x=>{const w=x.startsWith('!');const body=linkify(esc(w?x.slice(1):x),seen);return `<li${w?' class="w"':''}>${body}</li>`;};
+      return `${sec.h?`<h3>${esc(sec.h)}</h3>`:''}${f?`<div class="fig">${FIG[f]}</div>`:''}<ul>${sec.b.filter(x=>x.trim()).map(k.user!==undefined?li:li2).join('')}</ul>`;}).join('');
+    const rel=k.user!==undefined?[]:relatedOf(k);
+    const relBlock=rel.length?`<div class="rel"><span class="muted">関連項目</span>${rel.map(t=>`<button class="small relb" data-go="${esc(t)}">${esc(t.replace(/（.*?）/g,''))}</button>`).join('')}</div>`:'';
     const ph2=(PHOTOS[k.t]||[]).map(p=>{const c=PHOTOCRED[p.id];return `<figure class="ph2"><img src="${PHOTO[p.id]}" data-full="1" alt=""><figcaption><b>${esc(p.t)}</b><ul>${p.b.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><small>出典：Wikimedia Commons／${esc(c.a)}／${esc(c.l)}（<a href="${c.u}" target="_blank" rel="noopener">元画像</a>）</small></figcaption></figure>`;}).join('');
     const photoBlock=ph2?`<h3>写真で見る所見</h3><p class="muted" style="font-size:12px">教育目的で公開ライセンスの画像を使用。矢印・注釈は元画像のもの。</p>${ph2}`:'';
     const keyBox=k.key&&k.key.length?`<div class="keybox"><div class="kh">まず押さえる</div><ol>${k.key.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>`:'';
     const fig=k.fig?`<div class="fig">${FIG[k.fig]}</div>`:'';
     const imgs=(kImg[key]||[]).map((src,i)=>`<div class="ph"><img src="${src}" data-full="1"><button class="small danger" data-del="${i}">削除</button></div>`).join('');
     d.innerHTML=`<summary><span>${k.user!==undefined?'<span class="tag">自分</span>':(k.cat?`<span class="tag c">${k.cat}</span>`:'')}${esc(k.t)}</span></summary>
-      <div class="body">${keyBox}${fig}${secs}${photoBlock}
+      <div class="body">${keyBox}${fig}${secs}${photoBlock}${relBlock}
       <div class="memo"><label>自分のメモ</label><textarea placeholder="当院の値・ルール、覚え書き（例：目標血糖 ___、カフ圧の測定間隔 ___）">${esc(kMemo[key]||'')}</textarea>
       <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}</div>
       <label>自分の画像（自院の資料・手書きメモなど）</label>
@@ -1957,6 +2009,7 @@ function renderKnow(){
     d.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('この画像を削除しますか？'))return;kImg[key].splice(+b.dataset.del,1);await store.set('kimg',kImg);openKeys.add(key);renderKnow();});
     d.querySelectorAll('img[data-full]').forEach(im=>im.onclick=()=>{const o=$('overlay');o.querySelector('img').src=im.src;o.style.display='flex';});
     d.querySelectorAll('.fig').forEach(fg=>fg.onclick=()=>{const o=$('overlay');const box=o.querySelector('.figbox');box.innerHTML=fg.innerHTML;o.querySelector('img').style.display='none';box.style.display='block';o.style.display='flex';});
+    d.querySelectorAll('[data-go]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();goTopic(b.dataset.go,k.t);});
     d.dataset.key=key; if(q||openKeys.has(key))d.open=true;
     d.addEventListener('toggle',()=>{d.open?openKeys.add(key):openKeys.delete(key);});
     L.appendChild(d);
@@ -2109,6 +2162,20 @@ META['輸血'].extra=[...(META['輸血'].extra||[]),
  {h:'予測 Hb 上昇と投与時間',b:['循環血液量（dL）＝ 70 mL/kg × 体重 ÷ 100。50 kg なら 35 dL','RBC 1 単位（約 140 mL）に含まれる Hb ≒ 26〜30 g。2 単位で約 53〜60 g','予測上昇 Hb（g/dL）＝ 投与 Hb 量（g）÷ 循環血液量（dL）。50 kg に 2 単位 → 約 1.5 g/dL 上昇。70 kg なら約 1.1 g/dL','必要単位数 ＝（目標 Hb − 現在 Hb）× 循環血液量 ÷ 28。計算タブに電卓あり','投与速度：開始 10〜15 分は 1 mL/分、その後 RBC は 5 mL/分まで、FFP は 5〜10 mL/分、PC は 10 mL/分程度。RBC 2 単位で 1〜2 時間、4 時間以内に終了','FFP は解凍後 3 時間以内、PC は受け取ったらすぐ。RBC は冷蔵庫から出して 30 分以内に開始','輸血後の Hb 確認は終了 1 時間以降（急ぐなら 15 分後でも概ね平衡）。出血中は予測より上がらない']}];
 META['よく使う正常値一覧'].extra=[...(META['よく使う正常値一覧'].extra||[]),
  {h:'よく使う式',b:['BSA（DuBois）＝ 0.007184 × 体重^0.425 × 身長^0.725（m²）','CI ＝ CO ÷ BSA（2.5〜4.0）。SV ＝ CO ÷ HR × 1000（60〜100 mL）。SVI ＝ SV ÷ BSA','SVR ＝（MAP − CVP）÷ CO × 80（800〜1,200）。PVR ＝（mPAP − PAWP）÷ CO × 80（100〜250）','酸素運搬量 DO₂ ＝ CO × 1.34 × Hb × SaO₂ × 10（900〜1,100 mL/分）','酸素消費量 VO₂ ＝ CO × 1.34 × Hb ×（SaO₂ − SvO₂）× 10（200〜250 mL/分）。酸素摂取率 O₂ER ＝ VO₂ ÷ DO₂（22〜30%）','SvO₂ ≒ SaO₂ −（VO₂ ÷（CO × Hb × 1.34 × 10））。低下の原因は CO・Hb・SaO₂ の低下か、消費の増加（発熱・シバリング・体動）','MAP ＝ 拡張期圧 ＋（収縮期圧 − 拡張期圧）÷ 3。CPP ＝ MAP − ICP','P/F ＝ PaO₂ ÷ FiO₂。A-aDO₂ ＝（FiO₂ × 713 − PaCO₂ ÷ 0.8）− PaO₂','AG ＝ Na −（Cl ＋ HCO₃⁻）。補正 HCO₃⁻ ＝ HCO₃⁻ ＋（AG − 12）','必要 HCO₃⁻（mEq）＝ 不足 BE × 体重 × 0.2。メイロン 7% は 1 mL ＝ 0.833 mEq','FENa ＝（尿 Na × 血清 Cr）÷（血清 Na × 尿 Cr）× 100。FEUN ＝（尿 UN × 血清 Cr）÷（血清 UN × 尿 Cr）× 100','理想体重（kg）：男性 50 ＋ 0.91 ×（身長 cm − 152.4）、女性 45.5 ＋ 0.91 ×（身長 − 152.4）','Na 欠乏量（mEq）＝（目標 Na − 現在 Na）× 体重 × 0.6。補正は 1 日 8〜10 mEq/L 以内','水分欠乏量（L）＝ 体重 × 0.6 ×（1 − 140 ÷ 血清 Na）（高 Na のとき）','γ → mL/h ＝ γ × 体重 × 60 ÷ 濃度（μg/mL）']}];
+
+
+/* 目次シート */
+(function(){
+  const sheet=$('tocSheet'),list=$('tocList');
+  function build(){list.innerHTML='';CATS.filter(c=>c!=='すべて').forEach(c=>{const hd=document.createElement('div');hd.className='cath';hd.textContent=c;list.appendChild(hd);(ORDER[c]||[]).forEach(t=>{const b=document.createElement('button');b.className='tocb';b.textContent=t;b.onclick=()=>{sheet.style.display='none';if(curCat!=='すべて'&&curCat!==c){curCat='すべて';document.querySelectorAll('#catBar button').forEach(x=>x.classList.toggle('on',x.textContent==='すべて'));renderKnow();}
+      const cur=[...document.querySelectorAll('#kList details[open]')].map(d=>d.dataset.key.slice(2))[0];goTopic(t,cur);};list.appendChild(b);});});}
+  $('tocBtn').onclick=()=>{build();sheet.style.display='flex';};
+  $('tocClose').onclick=()=>sheet.style.display='none';
+  sheet.onclick=e=>{if(e.target===sheet)sheet.style.display='none';};
+  $('backBtn').onclick=()=>{const t=jumpStack.pop();if(!t)return;$('backBtn').style.display=jumpStack.length?'':'none';if(jumpStack.length){const f=jumpStack[jumpStack.length-1];$('backBtn').textContent='← '+(f.length>10?f.slice(0,10)+'…':f)+' に戻る';}goTopic(t,null);};
+  const upd=()=>{const on=document.querySelector('nav button.on')?.dataset.p==='know';$('tocBtn').style.display=on?'':'none';if(!on)$('backBtn').style.display='none';};
+  document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>setTimeout(upd,0)));upd();
+})();
 
 loadDrugs(); loadKnow(); calc();
 
