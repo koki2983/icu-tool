@@ -274,8 +274,9 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
 /* ---------- 薬剤 ---------- */
 const PRESET=[
 {name:'ノルアドレナリン',mg:5,ml:50,unit:'gkm',note:'1mg/1mL 5A ＋ 生食 45mL（100 μg/mL）'},
-{name:'ドパミン（DOA）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）'},
-{name:'ドブタミン（DOB）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）'}
+{name:'ドパミン 0.3%（DOA）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）'},
+{name:'ドパミン 0.1%（DOA）',mg:200,ml:200,unit:'gkm',note:'0.1% バッグ 200mg/200mL（1,000 μg/mL）'},
+{name:'ドブタミン 0.3%（DOB）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）'}
 ];
 let drugs=[]; let editIdx=-1;
 async function loadDrugs(){ drugs=(await store.get('drugs'))||[]; renderDrugs(); }
