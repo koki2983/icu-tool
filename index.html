@@ -786,7 +786,7 @@ function renderKnow(){
     const imgs=(kImg[key]||[]).map((src,i)=>`<div class="ph"><img src="${src}" data-full="1"><button class="small danger" data-del="${i}">削除</button></div>`).join('');
     d.innerHTML=`<summary>${k.user!==undefined?'<span><span class="tag">自分</span>'+esc(k.t)+'</span>':esc(k.t)}</summary>
       <div class="body">${fig}${secs}
-      <div class="memo"><label>自分のメモ</label><textarea placeholder="自院のルール、覚え書き">${esc(kMemo[key]||'')}</textarea>
+      <div class="memo"><label>自分のメモ</label><textarea placeholder="当院の値・ルール、覚え書き（例：目標血糖 ___、カフ圧の測定間隔 ___）">${esc(kMemo[key]||'')}</textarea>
       <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}</div>
       <label>自分の画像（自院の資料・手書きメモなど）</label>
       <div class="phs">${imgs}</div>
@@ -1431,6 +1431,29 @@ META['体位管理'].secfig={3:'prone'};
 META['体液量の評価'].secfig={0:'starling'};
 META['カテーテル管理とモニタリング'].secfig={1:'square',4:'swan'};
 
+/* ---------- 最近のガイドラインの動き（ICU看護の要点ノートを参考） ---------- */
+const UPD={
+'栄養管理':['ESPEN 2023：急性期の最初の 1 週間はエネルギーを目標の 70% 以下に抑える「低用量戦略」。蛋白は段階的に 1.3 g/kg/日へ。間接熱量計があれば実測を優先','J-SSCG 2024：敗血症でも 48 時間以内の早期経腸栄養を弱く推奨。急性期の高用量投与は推奨しない','「早く目標量を入れれば予後が良い」という考えは否定され、「入れすぎない」方向に動いている'],
+'体液量の評価':['SSCG 2021 / J-SSCG 2024：敗血症性ショックの初期輸液は晶質液 30 mL/kg を 3 時間以内に。その後は動的指標で反応性を見ながら追加','輸液の 4 つの相（蘇生 → 最適化 → 安定化 → 除去）が標準の考え方に。急性期を過ぎたら積極的に除水へ','生食よりバランス晶質液（乳酸・酢酸リンゲル）を優先。大量の生食は高 Cl 性アシドーシスと AKI の懸念'],
+'カテーテル管理とモニタリング':['動脈圧波形解析（CO・SVV）の普及で、肺動脈カテーテルの適応は心臓手術後・肺高血圧・重症心不全などに絞られる傾向','CDC・日本の指針とも中心静脈カテーテルの「定期交換」は推奨しない。必要がなくなった時点で抜去する'],
+'輸血':['日本輸血・細胞治療学会の赤血球製剤ガイドライン改訂：ICU 患者でも Hb 7 g/dL を閾値とする制限的輸血が基本','血小板製剤の細菌汚染対策（初流血除去、スワーリングの確認）が標準化','外傷出血ではトラネキサム酸を受傷 3 時間以内に投与するのが標準'],
+'酸素療法':['ネーザルハイフローが急性低酸素性呼吸不全の第一選択の一つに位置づけられた（日本呼吸療法医学会、ESICM 2023）','高酸素の害を示す研究（ICU-ROX、LOCO2 など）を受け、SpO₂ に上限を設ける「保守的酸素療法」が広まった'],
+'血液ガスの読み方':['ARDS の定義（ベルリン 2012 → 2023 の新定義案）では、ハイフロー 30 L/分以上での P/F 300 以下も含める方向。SpO₂/FiO₂ 比（S/F 比）も指標として扱われる'],
+'PCPS / VA-ECMO':['ELSO ガイドラインの更新。日本でも心停止に対する ECMO（ECPR）のエビデンスが蓄積（SAVE-J II、2022）','左室減圧（ベンティング）として Impella の併用（ECPELLA）が普及','国際的には「PCPS」より「VA-ECMO」の呼称が主流。VV-ECMO（呼吸のみ、送血が静脈）と区別する'],
+'抗菌薬の基本':['バンコマイシンの TDM は「トラフ 15〜20」から「AUC 400〜600」へ（日本化学療法学会・日本 TDM 学会 2022）','β ラクタム薬の持続・延長投与が重症患者で推奨される傾向（J-SSCG 2024）','抗菌薬適正使用支援（AST）が診療報酬上も評価され、看護師も培養提出・投与時刻・副作用観察で関与する'],
+'消化器術後のドレーン管理':['膵液瘻の定義（ISGPS 2016）：排液アミラーゼが血清の 3 倍以上でも臨床的に問題がなければ「生化学的リーク」、治療介入が必要なら Grade B、臓器不全・再手術・死亡に至れば Grade C'],
+'体位管理':['腹臥位療法は PROSEVA 試験（2013）で重症 ARDS の死亡率低下が示され、ESICM 2023・ARDS 診療ガイドライン 2021 で標準治療に。1 回 16 時間以上が目安'],
+'鎮痛・鎮静・せん妄（PADIS）':['PADIS 2018：鎮痛優先、浅い鎮静、ベンゾジアゼピンより非ベンゾジアゼピン（プロポフォール、デクスメデトミジン）、せん妄には非薬物的介入を推奨。睡眠と不動も対象に加わった','J-SSCG 2024：敗血症でも早期離床・浅い鎮静・せん妄の予防を推奨']
+};
+Object.keys(UPD).forEach(t=>{const m=META[t]=META[t]||{};m.extra=[...(m.extra||[]),{h:'最近のガイドラインの動き',b:UPD[t]}];});
+
+KNOW.push({t:'出典・参考ガイドライン',s:[
+ {h:'この知識メモの位置づけ',b:['テーマ構成は『3年目ICUナースのノート 改訂増強版』（道又元裕 総監修、露木菜緒 指導・解説、日総研出版、2017）を骨組みにしている。本文は独自にまとめたもので、書籍本文の転載ではない','数値はすべて一般的な目安。自施設の基準・医師の指示が優先される','各項目の「自分のメモ」欄に自院の値・ルールを書き込んで使う']},
+ {h:'主なガイドライン・文献',b:['日本版敗血症診療ガイドライン 2024（J-SSCG 2024）／Surviving Sepsis Campaign 2021','PADIS ガイドライン 2018（痛み・不穏・鎮静・せん妄・不動・睡眠）','ESPEN ICU 栄養ガイドライン 2023／日本版重症患者の栄養療法ガイドライン 2016','ESICM ARDS ガイドライン 2023／ARDS 診療ガイドライン 2021／PROSEVA 試験 2013','日本輸血・細胞治療学会：赤血球・血小板・新鮮凍結血漿の使用ガイドライン','CDC 血管内カテーテル関連感染予防ガイドライン 2011（2017 更新）','ELSO ガイドライン／SAVE-J II（2022）','弁膜症治療のガイドライン 2020／大動脈瘤・大動脈解離診療ガイドライン 2020／急性・慢性心不全診療ガイドライン','ISGPS 膵液瘻の定義 2016','日本化学療法学会・日本 TDM 学会：バンコマイシン TDM ガイドライン 2022','JRC 蘇生ガイドライン 2020／AHA ACLS 2020','KDIGO AKI ガイドライン 2012']},
+ {h:'使うときの注意',b:['ガイドラインは数年ごとに改訂される。年号を見て、最新版を確認する習慣を','ガイドラインの推奨の強さ（強い・弱い）と、自施設のプロトコルは別物。迷ったら施設のルールと医師に','アプリの内容に誤りや古い情報を見つけたら、管理者（作成者）に伝えて更新する']}
+]});
+META['出典・参考ガイドライン']={cat:'基準値',key:[]};
+
 const CATS=['すべて','呼吸','循環','補助療法','術後','神経・鎮静','薬剤・感染','全身管理','基準値'];
 let curCat='すべて';
 (function(){const bar=$('catBar');CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
@@ -1451,7 +1474,7 @@ function renderKnow(){
     const imgs=(kImg[key]||[]).map((src,i)=>`<div class="ph"><img src="${src}" data-full="1"><button class="small danger" data-del="${i}">削除</button></div>`).join('');
     d.innerHTML=`<summary><span>${k.user!==undefined?'<span class="tag">自分</span>':(k.cat?`<span class="tag c">${k.cat}</span>`:'')}${esc(k.t)}</span></summary>
       <div class="body">${keyBox}${fig}${secs}
-      <div class="memo"><label>自分のメモ</label><textarea placeholder="自院のルール、覚え書き">${esc(kMemo[key]||'')}</textarea>
+      <div class="memo"><label>自分のメモ</label><textarea placeholder="当院の値・ルール、覚え書き（例：目標血糖 ___、カフ圧の測定間隔 ___）">${esc(kMemo[key]||'')}</textarea>
       <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}</div>
       <label>自分の画像（自院の資料・手書きメモなど）</label>
       <div class="phs">${imgs}</div>
