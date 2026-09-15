@@ -282,8 +282,7 @@ const PRESET=[
 {name:'ドパミン 0.3%（DOA）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）'},
 {name:'ドパミン 0.1%（DOA）',mg:200,ml:200,unit:'gkm',note:'0.1% バッグ 200mg/200mL（1,000 μg/mL）'},
 {name:'ドブタミン 0.3%（DOB）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）'},
-{name:'オノアクト（ランジオロール）',mg:150,ml:50,unit:'gkm',note:'50mg 3V ＋ 生食 50mL（3,000 μg/mL）'},
-{name:'ピトレシン（バソプレシン）',mg:20,ml:20,unit:'umin',note:'20単位/1mL 1A ＋ 生食 19mL（1 単位/mL）'}
+{name:'オノアクト（ランジオロール）',mg:150,ml:50,unit:'gkm',note:'50mg 3V ＋ 生食 50mL（3,000 μg/mL）'}
 ];
 let drugs=[]; let editIdx=-1;
 async function loadDrugs(){ drugs=(await store.get('drugs'))||[]; renderDrugs(); }
