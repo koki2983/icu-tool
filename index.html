@@ -131,6 +131,8 @@ table.compat td{text-align:left;font-weight:400;font-size:13px;vertical-align:to
 #tocSheet .sheet{background:var(--card);width:100%;max-height:80vh;overflow:auto;border-radius:16px 16px 0 0;padding:12px 14px calc(16px + env(safe-area-inset-bottom))}
 .sheet-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .tocb{display:block;width:100%;text-align:left;border:0;background:none;padding:9px 6px;border-bottom:1px solid var(--line);font-size:15px}
+.ai{border-color:var(--amber);color:var(--amber);margin-left:auto}
+#aiSheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:30;align-items:flex-end}#aiSheet .sheet{background:var(--card);width:100%;max-height:85vh;overflow:auto;border-radius:16px 16px 0 0;padding:12px 14px calc(16px + env(safe-area-inset-bottom))}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -291,6 +293,13 @@ table.compat td{text-align:left;font-weight:400;font-size:13px;vertical-align:to
 <button id="tocBtn" class="fab" title="目次">目次</button>
 <button id="backBtn" class="fab back" style="display:none">← 戻る</button>
 <div id="tocSheet"><div class="sheet"><div class="sheet-h"><b>知識メモ 目次</b><button class="small" id="tocClose">閉じる</button></div><div id="tocList"></div></div></div>
+<div id="aiSheet"><div class="sheet"><div class="sheet-h"><b>AI に聞く</b><button class="small" id="aiClose">閉じる</button></div>
+<p class="muted" id="aiTopic"></p>
+<label>質問</label><textarea id="aiQ" placeholder="例：この項目の観察ポイントを新人向けに3つに絞ると？"></textarea>
+<div class="warn" style="margin-top:8px">患者の氏名・ID・具体的な症例情報は入力しないでください（外部サービスに送信されます）。回答は必ず施設のルールと医師の判断で確認を。</div>
+<div class="row" style="margin-top:10px"><button class="primary" id="aiGPT">ChatGPT</button><button class="primary" id="aiClaude">Claude</button><button class="primary" id="aiPplx">Perplexity</button></div>
+<div class="row" style="margin-top:8px"><button id="aiCopy">質問文をコピー（Gemini などに貼る）</button></div>
+</div></div>
 <div class="toast" id="toast"></div>
 <div id="overlay"><img alt=""><div class="figbox"></div></div>
 
@@ -825,7 +834,7 @@ function renderKnow(){
     d.innerHTML=`<summary>${k.user!==undefined?'<span><span class="tag">自分</span>'+esc(k.t)+'</span>':esc(k.t)}</summary>
       <div class="body">${fig}${secs}
       <div class="memo"><label>自分のメモ</label><textarea placeholder="当院の値・ルール、覚え書き（例：目標血糖 ___、カフ圧の測定間隔 ___）">${esc(kMemo[key]||'')}</textarea>
-      <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}</div>
+      <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}<button class="small ai" data-ai="${esc(k.t)}">AI に聞く</button></div>
       <label>自分の画像（自院の資料・手書きメモなど）</label>
       <div class="phs">${imgs}</div>
       <label class="addph"><input type="file" accept="image/*" hidden>＋ 画像を追加</label>
@@ -841,6 +850,7 @@ function renderKnow(){
     d.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('この画像を削除しますか？'))return;kImg[key].splice(+b.dataset.del,1);await store.set('kimg',kImg);d.open=true;renderKnow();});
     d.querySelectorAll('img[data-full]').forEach(im=>im.onclick=()=>{const o=$('overlay');o.querySelector('img').src=im.src;o.style.display='flex';});
     d.querySelectorAll('[data-go]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();goTopic(b.dataset.go,k.t);});
+    d.querySelector('[data-ai]').onclick=()=>openAI(k);
     d.dataset.key=key; if(q||openKeys.has(key))d.open=true;
     d.addEventListener('toggle',()=>{d.open?openKeys.add(key):openKeys.delete(key);});
     L.appendChild(d);
@@ -1995,7 +2005,7 @@ function renderKnow(){
     d.innerHTML=`<summary><span>${k.user!==undefined?'<span class="tag">自分</span>':(k.cat?`<span class="tag c">${k.cat}</span>`:'')}${esc(k.t)}</span></summary>
       <div class="body">${keyBox}${fig}${secs}${photoBlock}${relBlock}
       <div class="memo"><label>自分のメモ</label><textarea placeholder="当院の値・ルール、覚え書き（例：目標血糖 ___、カフ圧の測定間隔 ___）">${esc(kMemo[key]||'')}</textarea>
-      <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}</div>
+      <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}<button class="small ai" data-ai="${esc(k.t)}">AI に聞く</button></div>
       <label>自分の画像（自院の資料・手書きメモなど）</label>
       <div class="phs">${imgs}</div>
       <label class="addph"><input type="file" accept="image/*" hidden>＋ 画像を追加</label>
@@ -2010,6 +2020,7 @@ function renderKnow(){
     d.querySelectorAll('img[data-full]').forEach(im=>im.onclick=()=>{const o=$('overlay');o.querySelector('img').src=im.src;o.style.display='flex';});
     d.querySelectorAll('.fig').forEach(fg=>fg.onclick=()=>{const o=$('overlay');const box=o.querySelector('.figbox');box.innerHTML=fg.innerHTML;o.querySelector('img').style.display='none';box.style.display='block';o.style.display='flex';});
     d.querySelectorAll('[data-go]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();goTopic(b.dataset.go,k.t);});
+    d.querySelector('[data-ai]').onclick=()=>openAI(k);
     d.dataset.key=key; if(q||openKeys.has(key))d.open=true;
     d.addEventListener('toggle',()=>{d.open?openKeys.add(key):openKeys.delete(key);});
     L.appendChild(d);
@@ -2175,6 +2186,22 @@ META['よく使う正常値一覧'].extra=[...(META['よく使う正常値一覧
   $('backBtn').onclick=()=>{const t=jumpStack.pop();if(!t)return;$('backBtn').style.display=jumpStack.length?'':'none';if(jumpStack.length){const f=jumpStack[jumpStack.length-1];$('backBtn').textContent='← '+(f.length>10?f.slice(0,10)+'…':f)+' に戻る';}goTopic(t,null);};
   const upd=()=>{const on=document.querySelector('nav button.on')?.dataset.p==='know';$('tocBtn').style.display=on?'':'none';if(!on)$('backBtn').style.display='none';};
   document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>setTimeout(upd,0)));upd();
+})();
+
+
+/* AI に聞く（外部サービスへ質問を渡す） */
+let aiCtx=null;
+function openAI(k){aiCtx=k;$('aiTopic').textContent='項目：'+k.t;$('aiQ').value='';$('aiSheet').style.display='flex';setTimeout(()=>$('aiQ').focus(),100);}
+function aiPrompt(){const k=aiCtx;const q=$('aiQ').value.trim()||'この項目の要点と、看護師が特に注意すべき点を教えてください。';const m=META[k.t]||{};const keys=(m.key||[]).map(x=>'・'+x).join('\n');
+  return `私は ICU の看護師です。「${k.t}」について質問します。\n\n【前提（自分の学習メモの要点）】\n${keys||'（要点なし）'}\n\n【質問】\n${q}\n\n【お願い】\n・一般的な医学知識として、根拠（ガイドライン名など）を添えて答えてください\n・数値は目安として示し、施設の基準や医師の指示が優先されることを前提にしてください\n・不確かな点はそう明記してください`;}
+(function(){
+  const s=$('aiSheet');
+  $('aiClose').onclick=()=>s.style.display='none';s.onclick=e=>{if(e.target===s)s.style.display='none';};
+  const go=url=>{const w=window.open(url,'_blank','noopener');if(!w)location.href=url;s.style.display='none';};
+  $('aiGPT').onclick=()=>go('https://chatgpt.com/?q='+encodeURIComponent(aiPrompt()));
+  $('aiClaude').onclick=()=>go('https://claude.ai/new?q='+encodeURIComponent(aiPrompt()));
+  $('aiPplx').onclick=()=>go('https://www.perplexity.ai/search?q='+encodeURIComponent(aiPrompt()));
+  $('aiCopy').onclick=async()=>{try{await navigator.clipboard.writeText(aiPrompt());toast('コピーしました');}catch(e){const t=document.createElement('textarea');t.value=aiPrompt();document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();toast('コピーしました');}};
 })();
 
 loadDrugs(); loadKnow(); calc();
