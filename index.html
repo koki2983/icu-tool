@@ -133,7 +133,7 @@ nav button.on{color:var(--teal);font-weight:700}
     <select id="drugSel"><option value="">手入力</option></select>
 
     <div class="row">
-      <div><label>薬剤量</label><div class="unit"><input type="number" inputmode="decimal" id="mg" placeholder="例 3"><span>mg</span></div></div>
+      <div><label>薬剤量</label><div class="unit"><input type="number" inputmode="decimal" id="mg" placeholder="例 3"><span class="amtU">mg</span></div></div>
       <div><label>溶液量（総量）</label><div class="unit"><input type="number" inputmode="decimal" id="ml" placeholder="例 50"><span>mL</span></div></div>
     </div>
     <p class="muted" id="concTxt">濃度：－</p>
@@ -144,6 +144,8 @@ nav button.on{color:var(--teal);font-weight:700}
       <option value="gkh">μg/kg/h</option>
       <option value="mkh">mg/kg/h</option>
       <option value="mh">mg/h</option>
+      <option value="umin">単位/min（バソプレシン等）</option>
+      <option value="uh">単位/h</option>
     </select>
 
     <div class="seg">
@@ -181,7 +183,7 @@ nav button.on{color:var(--teal);font-weight:700}
     <label>薬剤名</label>
     <input type="text" id="dName" placeholder="例 ノルアドレナリン">
     <div class="row">
-      <div><label>薬剤量</label><div class="unit"><input type="number" inputmode="decimal" id="dMg"><span>mg</span></div></div>
+      <div><label>薬剤量（mg または 単位）</label><div class="unit"><input type="number" inputmode="decimal" id="dMg"><span id="dAmtU">mg</span></div></div>
       <div><label>溶液量（総量）</label><div class="unit"><input type="number" inputmode="decimal" id="dMl"><span>mL</span></div></div>
     </div>
     <label>よく使う単位</label>
@@ -190,6 +192,8 @@ nav button.on{color:var(--teal);font-weight:700}
       <option value="gkh">μg/kg/h</option>
       <option value="mkh">mg/kg/h</option>
       <option value="mh">mg/h</option>
+      <option value="umin">単位/min（バソプレシン等）</option>
+      <option value="uh">単位/h</option>
     </select>
     <label>メモ（自院の目安量・注意点など）</label>
     <textarea id="dNote" placeholder="例 0.05〜0.3γ。中心静脈から。"></textarea>
@@ -260,7 +264,8 @@ const store={
 };
 const $=id=>document.getElementById(id);
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400);}
-const UNITS={gkm:'μg/kg/min',gkh:'μg/kg/h',mkh:'mg/kg/h',mh:'mg/h'};
+const UNITS={gkm:'μg/kg/min',gkh:'μg/kg/h',mkh:'mg/kg/h',mh:'mg/h',umin:'単位/min',uh:'単位/h'};
+const isU=u=>u==='umin'||u==='uh';
 const fmt=(n,d)=>{ if(!isFinite(n))return '－'; return Number(n.toFixed(d)).toLocaleString('ja-JP',{maximumFractionDigits:d}); };
 
 /* ---------- ナビ ---------- */
@@ -276,17 +281,19 @@ const PRESET=[
 {name:'ノルアドレナリン',mg:5,ml:50,unit:'gkm',note:'1mg/1mL 5A ＋ 生食 45mL（100 μg/mL）'},
 {name:'ドパミン 0.3%（DOA）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）'},
 {name:'ドパミン 0.1%（DOA）',mg:200,ml:200,unit:'gkm',note:'0.1% バッグ 200mg/200mL（1,000 μg/mL）'},
-{name:'ドブタミン 0.3%（DOB）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）'}
+{name:'ドブタミン 0.3%（DOB）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）'},
+{name:'オノアクト（ランジオロール）',mg:150,ml:50,unit:'gkm',note:'50mg 3V ＋ 生食 50mL（3,000 μg/mL）'},
+{name:'ピトレシン（バソプレシン）',mg:20,ml:20,unit:'umin',note:'20単位/1mL 1A ＋ 生食 19mL（1 単位/mL）'}
 ];
 let drugs=[]; let editIdx=-1;
 async function loadDrugs(){ drugs=(await store.get('drugs'))||[]; renderDrugs(); }
 function renderDrugs(){
   const L=$('drugList'); L.innerHTML='';
-  PRESET.forEach(d=>{const el=document.createElement('div');el.className='item preset';el.innerHTML=`<div><div class="t"><span class="tag c">共通</span>${esc(d.name)}</div><div class="d">${d.mg} mg / ${d.ml} mL（${fmt(d.mg*1000/d.ml,1)} μg/mL）・${UNITS[d.unit]}</div>${d.note?`<div class="d">${esc(d.note)}</div>`:''}</div>`;L.appendChild(el);});
+  PRESET.forEach(d=>{const el=document.createElement('div');el.className='item preset';el.innerHTML=`<div><div class="t"><span class="tag c">共通</span>${esc(d.name)}</div><div class="d">${d.mg} ${isU(d.unit)?'単位':'mg'} / ${d.ml} mL（${isU(d.unit)?fmt(d.mg/d.ml,3)+' 単位/mL':fmt(d.mg*1000/d.ml,1)+' μg/mL'}）・${UNITS[d.unit]}</div>${d.note?`<div class="d">${esc(d.note)}</div>`:''}</div>`;L.appendChild(el);});
   if(!drugs.length){const e=document.createElement('div');e.className='empty';e.textContent='自分の希釈はまだありません。上のフォームから登録できます。';L.appendChild(e);}
   drugs.forEach((d,i)=>{
     const el=document.createElement('div'); el.className='item';
-    el.innerHTML=`<div><div class="t">${esc(d.name)}</div><div class="d">${d.mg} mg / ${d.ml} mL（${fmt(d.mg*1000/d.ml,1)} μg/mL）・${UNITS[d.unit]}</div>${d.note?`<div class="d">${esc(d.note)}</div>`:''}</div>
+    el.innerHTML=`<div><div class="t">${esc(d.name)}</div><div class="d">${d.mg} ${isU(d.unit)?'単位':'mg'} / ${d.ml} mL（${isU(d.unit)?fmt(d.mg/d.ml,3)+' 単位/mL':fmt(d.mg*1000/d.ml,1)+' μg/mL'}）・${UNITS[d.unit]}</div>${d.note?`<div class="d">${esc(d.note)}</div>`:''}</div>
       <div><button class="small" data-e="${i}">編集</button> <button class="small danger" data-x="${i}">削除</button></div>`;
     L.appendChild(el);
   });
@@ -299,6 +306,7 @@ function renderDrugs(){
 }
 function resetDrugForm(){editIdx=-1;['dName','dMg','dMl','dNote'].forEach(i=>$(i).value='');$('dUnit').value='gkm';$('drugFormTtl').textContent='薬剤を登録';$('dSave').textContent='保存する';$('dCancel').style.display='none';}
 $('dCancel').onclick=resetDrugForm;
+$('dUnit').onchange=()=>{$('dAmtU').textContent=isU($('dUnit').value)?'単位':'mg';};
 $('dSave').onclick=async()=>{
   const d={name:$('dName').value.trim(),mg:+$('dMg').value,ml:+$('dMl').value,unit:$('dUnit').value,note:$('dNote').value.trim()};
   if(!d.name||!(d.mg>0)||!(d.ml>0)){toast('薬剤名・薬剤量・溶液量を入力してください');return;}
@@ -307,8 +315,8 @@ $('dSave').onclick=async()=>{
 };
 function fillDrugSel(){
   const s=$('drugSel'); const cur=s.value; s.innerHTML='<option value="">手入力</option>';
-  PRESET.forEach((d,i)=>{const o=document.createElement('option');o.value='p'+i;o.textContent=`${d.name}（${d.mg}mg/${d.ml}mL）共通`;s.appendChild(o);});
-  drugs.forEach((d,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`${d.name}（${d.mg}mg/${d.ml}mL）`;s.appendChild(o);});
+  PRESET.forEach((d,i)=>{const o=document.createElement('option');o.value='p'+i;o.textContent=`${d.name}（${d.mg}${isU(d.unit)?'単位':'mg'}/${d.ml}mL）共通`;s.appendChild(o);});
+  drugs.forEach((d,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`${d.name}（${d.mg}${isU(d.unit)?'単位':'mg'}/${d.ml}mL）`;s.appendChild(o);});
   s.value=cur;
 }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -319,13 +327,14 @@ $('modeA').onclick=()=>{mode='A';$('modeA').classList.add('on');$('modeB').class
 $('modeB').onclick=()=>{mode='B';$('modeB').classList.add('on');$('modeA').classList.remove('on');$('inB').style.display='';$('inA').style.display='none';calc();};
 $('drugSel').onchange=()=>{const v=$('drugSel').value;const d=v.startsWith('p')?PRESET[+v.slice(1)]:drugs[v]; if(d){$('mg').value=d.mg;$('ml').value=d.ml;$('unitSel').value=d.unit;} calc();};
 ['wt','mg','ml','dose','rate','unitSel'].forEach(i=>$(i).addEventListener('input',calc));
-function factor(u,kg){ return {gkm:kg*60, gkh:kg, mkh:kg*1000, mh:1000}[u]; } // 投与量1あたりの μg/h
+function factor(u,kg){ return {gkm:kg*60, gkh:kg, mkh:kg*1000, mh:1000, umin:60, uh:1}[u]; } // 投与量1あたりの μg/h（単位系は 単位/h）
 function calc(){
   const kg=+$('wt').value, mg=+$('mg').value, ml=+$('ml').value, u=$('unitSel').value;
   $('doseUnit').textContent=UNITS[u]; $('doseLbl').textContent='投与量'+(u==='gkm'?'（γ）':'');
-  const conc=(mg>0&&ml>0)?mg*1000/ml:NaN; // μg/mL
-  $('concTxt').textContent='濃度：'+(isFinite(conc)?`${fmt(conc,2)} μg/mL（${fmt(conc/1000,3)} mg/mL）`:'－');
-  const needKg=u!=='mh';
+  const U=isU(u); document.querySelectorAll('.amtU').forEach(e=>e.textContent=U?'単位':'mg');
+  const conc=(mg>0&&ml>0)?(U?mg/ml:mg*1000/ml):NaN; // μg/mL または 単位/mL
+  $('concTxt').textContent='濃度：'+(isFinite(conc)?(U?`${fmt(conc,3)} 単位/mL`:`${fmt(conc,2)} μg/mL（${fmt(conc/1000,3)} mg/mL）`):'－');
+  const needKg=u!=='mh'&&!U;
   const ok=isFinite(conc)&&(!needKg||kg>0);
   const f=needKg?factor(u,kg):factor(u,0);
   if(mode==='A'){
@@ -334,13 +343,13 @@ function calc(){
     else { $('resN').textContent='－'; $('resS').textContent=needKg?'体重・濃度・投与量を入力してください':'濃度・投与量を入力してください'; }
   }else{
     const r=+$('rate').value; $('resU').textContent=UNITS[u];
-    if(ok&&r>0){ const d=r*conc/f; $('resN').textContent=fmt(d,u==='gkm'?3:2); $('resS').textContent=`${r} mL/h${needKg?` ÷ ${kg} kg`:''}　→ 1 mL/h ＝ ${fmt(conc/f,4)} ${UNITS[u]}`; }
+    if(ok&&r>0){ const d=r*conc/f; $('resN').textContent=fmt(d,(u==='gkm'||u==='umin')?3:2); $('resS').textContent=`${r} mL/h${needKg?` ÷ ${kg} kg`:''}　→ 1 mL/h ＝ ${fmt(conc/f,4)} ${UNITS[u]}`; }
     else { $('resN').textContent='－'; $('resS').textContent='体重・濃度・流量を入力してください'; }
   }
   // 早見表
   const Q=$('quick'), C=$('quickCard');
   if(ok){
-    const steps={gkm:[0.02,0.05,0.1,0.2,0.3,0.5,1],gkh:[0.2,0.4,0.7,1,1.4,2],mkh:[0.5,1,2,3,4],mh:[1,2,5,10,20]}[u];
+    const steps={gkm:[0.02,0.05,0.1,0.2,0.3,0.5,1],gkh:[0.2,0.4,0.7,1,1.4,2],mkh:[0.5,1,2,3,4],mh:[1,2,5,10,20],umin:[0.01,0.02,0.03,0.04,0.05],uh:[0.5,1,1.5,2,3]}[u];
     Q.innerHTML=`<tr><th>${UNITS[u]}</th><th>mL/h</th></tr>`+steps.map(s=>`<tr><td>${s}</td><td>${fmt(s*f/conc,2)}</td></tr>`).join('');
     C.style.display='';
   } else C.style.display='none';
