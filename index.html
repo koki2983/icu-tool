@@ -239,12 +239,14 @@ table.o2{margin:4px 0 2px;font-size:14px}table.o2 th,table.o2 td{text-align:cent
 <section id="p-score" class="page">
   <div class="seg" id="scoreSeg">
     <button data-s="gcs" class="on">GCS</button>
+    <button data-s="jcs">JCS</button>
     <button data-s="rass">RASS</button>
-    <button data-s="sofa">SOFA</button>
+    <button data-s="cpot">CPOT</button>
   </div>
   <div id="s-gcs"></div>
+  <div id="s-jcs" style="display:none"></div>
   <div id="s-rass" style="display:none"></div>
-  <div id="s-sofa" style="display:none"></div>
+  <div id="s-cpot" style="display:none"></div>
 </section>
 
 <!-- ============ 知識 ============ -->
@@ -384,7 +386,7 @@ function calc(){
 /* ---------- スコア ---------- */
 document.querySelectorAll('#scoreSeg button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#scoreSeg button').forEach(x=>x.classList.toggle('on',x===b));
-  ['gcs','rass','sofa'].forEach(s=>$('s-'+s).style.display=s===b.dataset.s?'':'none');
+  ['gcs','jcs','rass','cpot'].forEach(s=>$('s-'+s).style.display=s===b.dataset.s?'':'none');
 });
 function optGroup(name,items,onPick){ // items:[{v,t}]
   const wrap=document.createElement('div');wrap.className='card';
@@ -422,20 +424,38 @@ function optGroup(name,items,onPick){ // items:[{v,t}]
   box.appendChild(optGroup('観察して当てはまるもの',items,v=>{$('rassN').textContent=v;const it=items.find(i=>i.v===v);$('rassD').textContent=it.t.split('：')[0];}));
   const n=document.createElement('p');n.className='muted';n.textContent='まず観察（+4〜0）。反応がなければ呼びかけ、それでもなければ身体刺激で評価。-3〜+4 で CAM-ICU のせん妄評価に進む。';box.appendChild(n);
 })();
-// SOFA
+// JCS
 (function(){
-  const box=$('s-sofa'); const s={};
-  const sc=document.createElement('div');sc.className='score';sc.innerHTML='<div><div class="muted">SOFA 合計</div><div class="n" id="sofaN">－</div></div><div class="muted" id="sofaD">6項目を選択</div>';box.appendChild(sc);
-  const upd=()=>{const k=Object.keys(s);const t=k.reduce((a,b)=>a+s[b],0);$('sofaN').textContent=t+' 点';$('sofaD').textContent=k.length<6?`${k.length}/6 項目入力`:'全項目入力済み';};
+  const box=$('s-jcs'); let base=null; const sfx=new Set();
+  const sc=document.createElement('div');sc.className='score';sc.innerHTML='<div><div class="muted">JCS</div><div class="n" id="jcsN">－</div></div><div class="muted" id="jcsD">当てはまる項目を選択</div>';box.appendChild(sc);
+  const upd=()=>{if(base===null){$('jcsN').textContent='－';return;}const s=[...sfx].sort().join('');$('jcsN').textContent=(base==='0'?'0':'JCS '+base)+(s?'-'+s:'');$('jcsD').textContent=base==='0'?'意識清明':({1:'Ⅰ桁：刺激しなくても覚醒',2:'Ⅱ桁：刺激で覚醒、やめると眠る',3:'Ⅲ桁：刺激しても覚醒しない'})[String(base).length];};
   const G=[
-    ['呼吸 PaO₂/FiO₂',[[0,'≥ 400'],[1,'< 400'],[2,'< 300'],[3,'< 200（呼吸補助あり）'],[4,'< 100（呼吸補助あり）']]],
-    ['凝固 血小板（×10³/μL）',[[0,'≥ 150'],[1,'< 150'],[2,'< 100'],[3,'< 50'],[4,'< 20']]],
-    ['肝 ビリルビン（mg/dL）',[[0,'< 1.2'],[1,'1.2〜1.9'],[2,'2.0〜5.9'],[3,'6.0〜11.9'],[4,'≥ 12.0']]],
-    ['循環',[[0,'MAP ≥ 70'],[1,'MAP < 70'],[2,'DOA ≤ 5γ または DOB（量問わず）'],[3,'DOA > 5γ または Ad ≤ 0.1γ または NA ≤ 0.1γ'],[4,'DOA > 15γ または Ad > 0.1γ または NA > 0.1γ']]],
-    ['中枢神経 GCS',[[0,'15'],[1,'13〜14'],[2,'10〜12'],[3,'6〜9'],[4,'< 6']]],
-    ['腎 クレアチニン（mg/dL）／尿量',[[0,'< 1.2'],[1,'1.2〜1.9'],[2,'2.0〜3.4'],[3,'3.5〜4.9 または 尿量 < 500 mL/日'],[4,'≥ 5.0 または 尿量 < 200 mL/日']]]];
+   ['Ⅰ 刺激しないでも覚醒している',[['1','だいたい意識清明だが、今ひとつはっきりしない'],['2','見当識障害がある（時・場所・人）'],['3','自分の名前・生年月日が言えない']]],
+   ['Ⅱ 刺激すると覚醒するが、やめると眠る',[['10','普通の呼びかけで容易に開眼する'],['20','大きな声、または体を揺さぶると開眼する'],['30','痛み刺激を加えつつ呼びかけを繰り返すと、かろうじて開眼する']]],
+   ['Ⅲ 刺激しても覚醒しない',[['100','痛み刺激に対し、払いのける動作をする'],['200','痛み刺激で少し手足を動かしたり、顔をしかめる'],['300','痛み刺激に反応しない']]]];
+  const all=[];
+  const zero=document.createElement('div');zero.className='card';zero.innerHTML='<div class="opt"><button><b>0</b><span>意識清明</span></button></div>';box.appendChild(zero);
+  const zb=zero.querySelector('button');all.push(zb);zb.onclick=()=>{all.forEach(x=>x.classList.remove('on'));zb.classList.add('on');base='0';upd();};
+  G.forEach(([n,items])=>{const w=document.createElement('div');w.className='card';w.innerHTML=`<h2>${n}</h2>`;const o=document.createElement('div');o.className='opt';
+    items.forEach(([v,t])=>{const bt=document.createElement('button');bt.innerHTML=`<b>${v}</b><span>${t}</span>`;all.push(bt);bt.onclick=()=>{all.forEach(x=>x.classList.remove('on'));bt.classList.add('on');base=v;upd();};o.appendChild(bt);});
+    w.appendChild(o);box.appendChild(w);});
+  const sx=document.createElement('div');sx.className='card';sx.innerHTML='<h2>付加記号（該当すれば）</h2><div class="opt"></div>';const so=sx.querySelector('.opt');
+  [['R','不穏（Restlessness）'],['I','失禁（Incontinence）'],['A','自発性喪失・無動性無言（Apallic state）']].forEach(([v,t])=>{const bt=document.createElement('button');bt.innerHTML=`<b>${v}</b><span>${t}</span>`;bt.onclick=()=>{bt.classList.toggle('on');bt.classList.contains('on')?sfx.add(v):sfx.delete(v);upd();};so.appendChild(bt);});
+  box.appendChild(sx);
+  const n=document.createElement('p');n.className='muted';n.textContent='桁が大きいほど重症。Ⅱ桁以上は「開眼するか」、Ⅲ桁は「痛み刺激への反応」で分ける。GCS と併記すると伝わりやすい（例 JCS 20、GCS E2V3M5）。';box.appendChild(n);
+})();
+// CPOT
+(function(){
+  const box=$('s-cpot'); const s={};
+  const sc=document.createElement('div');sc.className='score';sc.innerHTML='<div><div class="muted">CPOT 合計</div><div class="n" id="cpotN">－</div></div><div class="muted" id="cpotD">4 項目を選択</div>';box.appendChild(sc);
+  const upd=()=>{const k=Object.keys(s);const t=k.reduce((a,b)=>a+s[b],0);$('cpotN').textContent=t+' 点';$('cpotD').textContent=k.length<4?`${k.length}/4 項目入力`:(t>=3?'3 点以上：痛みあり → 鎮痛を検討':'2 点以下：痛みは少ない');};
+  const G=[
+   ['表情',[[0,'リラックス：筋の緊張がない'],[1,'緊張：しかめ面、眉をひそめる、目を固く閉じる'],[2,'顔をゆがめる：上記に加えて、まぶたを固く閉じる・歯を食いしばる']]],
+   ['身体の動き',[[0,'動かない、または正常な体位'],[1,'保護的な動き：ゆっくり慎重に動く、痛い部位をさする・かばう'],[2,'落ち着きがない：チューブを引っ張る、起き上がろうとする、指示に従わず動く']]],
+   ['筋緊張（上肢の他動屈伸で評価）',[[0,'リラックス：動きに抵抗がない'],[1,'緊張・硬い：動きに抵抗がある'],[2,'非常に硬い：動かせない、または強く抵抗する']]],
+   ['人工呼吸器との同調（挿管中）／発声（非挿管）',[[0,'同調している／普通の声で話す、または無言'],[1,'咳はあるが同調している／ため息、うめき声'],[2,'ファイティング・頻回のアラーム／泣き叫ぶ、すすり泣く']]]];
   G.forEach(([n,items],i)=>box.appendChild(optGroup(n,items.map(([v,t])=>({v,t})),v=>{s[i]=v;upd();})));
-  const n=document.createElement('p');n.className='muted';n.textContent='循環のカテコラミン量は1時間以上投与。感染疑いで SOFA がベースラインから 2 点以上上昇すれば敗血症を疑う。';box.appendChild(n);
+  const n=document.createElement('p');n.className='muted';n.textContent='0〜8 点。安静時と処置時（体位変換など）の両方で評価する。3 点以上で痛みありと判断し、鎮痛後に再評価。自己申告できる患者では NRS を優先。';box.appendChild(n);
 })();
 
 /* ---------- 知識 ---------- */
