@@ -116,6 +116,8 @@ nav button.on{color:var(--teal);font-weight:700}
 .item.preset{background:var(--teal-soft);border-color:#BFDDE3}
 .o2card{padding:0}.o2card summary{padding:12px 14px}.o2card .body{padding:0 14px 12px}
 table.o2{margin:4px 0 2px;font-size:14px}table.o2 th,table.o2 td{text-align:center;padding:6px 4px}table.o2 td:first-child,table.o2 th:first-child{text-align:left;color:var(--muted);font-size:12px}table.o2 td{font-weight:600}
+table.compat td{text-align:left;font-weight:400;font-size:13px;vertical-align:top}table.compat th{text-align:left}table.compat td:nth-child(2){white-space:nowrap;color:var(--muted);font-size:12px}table.compat td:first-child{color:var(--ink);font-weight:600;min-width:6em}
+#scoreSeg button{font-size:13px;padding:9px 2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -1740,6 +1742,150 @@ function renderKnow(){
 }
 $('overlay').onclick=()=>{const o=$('overlay');o.style.display='none';o.querySelector('.figbox').style.display='none';o.querySelector('img').style.display='';};
 renderKnow();
+
+/* ===== 追加計算ツール ===== */
+const CALC_HTML=`
+<details class="card o2card">
+  <summary>メイロン（炭酸水素 Na）の補正量</summary>
+  <div class="body">
+  <div class="row"><div><label>BE（Base Excess）</label><div class="unit"><input type="number" inputmode="decimal" id="beV" placeholder="例 -10" step="0.1"><span>mEq/L</span></div></div>
+  <div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="beW" placeholder="例 60"><span>kg</span></div></div></div>
+  <label>製剤</label><select id="beP"><option value="0.833">メイロン 7%（1 mL ＝ 0.833 mEq）</option><option value="1">8.4% 製剤（1 mL ＝ 1 mEq）</option></select>
+  <div class="result"><div class="big"><span id="beN">－</span><em>mL</em></div><div class="sub" id="beS">BE と体重を入力</div></div>
+  <p class="muted">必要 HCO₃⁻（mEq）＝ 不足 BE × 体重 × 0.2（細胞外液量）。全量を一度に入れず、まず半量を投与して血ガスで再評価するのが一般的。pH 7.15〜7.2 未満の代謝性アシドーシスで、原因治療と並行して使う。Na 負荷・CO₂ 産生・低 K・Ca 低下に注意。カテコラミンと同じルートには入れない。</p>
+  </div>
+</details>
+<details class="card o2card">
+  <summary>Na 排泄率（FENa）</summary>
+  <div class="body">
+  <div class="row"><div><label>尿 Na</label><div class="unit"><input type="number" inputmode="decimal" id="fUNa" placeholder="例 15"><span>mEq/L</span></div></div>
+  <div><label>血清 Na</label><div class="unit"><input type="number" inputmode="decimal" id="fPNa" placeholder="例 140"><span>mEq/L</span></div></div></div>
+  <div class="row"><div><label>尿 Cr</label><div class="unit"><input type="number" inputmode="decimal" id="fUCr" placeholder="例 80"><span>mg/dL</span></div></div>
+  <div><label>血清 Cr</label><div class="unit"><input type="number" inputmode="decimal" id="fPCr" placeholder="例 1.5" step="0.1"><span>mg/dL</span></div></div></div>
+  <div class="result"><div class="big"><span id="fN">－</span><em>%</em></div><div class="sub" id="fS">4 つの値を入力</div></div>
+  <p class="muted">FENa ＝（尿 Na × 血清 Cr）÷（血清 Na × 尿 Cr）× 100。1% 未満：腎前性（脱水・低灌流・心不全）、2% 超：腎性（急性尿細管壊死）。利尿薬使用中は当てにならない（FEUN：尿素の排泄率 35% 未満で腎前性、を代わりに使う）。</p>
+  </div>
+</details>
+<details class="card o2card">
+  <summary>輸血：予測 Hb 上昇と必要単位数</summary>
+  <div class="body">
+  <div class="row"><div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="tW" placeholder="例 55"><span>kg</span></div></div>
+  <div><label>現在の Hb</label><div class="unit"><input type="number" inputmode="decimal" id="tHb" placeholder="例 6.8" step="0.1"><span>g/dL</span></div></div></div>
+  <div class="row"><div><label>目標 Hb</label><div class="unit"><input type="number" inputmode="decimal" id="tTgt" placeholder="例 8" step="0.1"><span>g/dL</span></div></div>
+  <div><label>投与予定</label><div class="unit"><input type="number" inputmode="decimal" id="tU" placeholder="例 2" step="1"><span>単位</span></div></div></div>
+  <div class="result"><div class="big"><span id="tN">－</span><em>g/dL 上昇</em></div><div class="sub" id="tS">体重と投与単位数を入力</div></div>
+  <p class="muted">循環血液量（dL）＝ 70 mL/kg × 体重 ÷ 100。RBC 1 単位（約 140 mL）の Hb 量 ≒ 26〜30 g（2 単位で約 53〜60 g）。予測上昇 Hb ＝ 投与 Hb 量 ÷ 循環血液量。必要単位 ＝（目標 − 現在）× 循環血液量 ÷ 1 単位の Hb 量。出血が続いているときは当てにならない。</p>
+  <h3>投与時間の目安</h3>
+  <table class="o2"><tr><th>製剤</th><th>開始</th><th>その後</th><th>所要時間</th></tr>
+  <tr><td>RBC 2 単位</td><td>1 mL/分 × 10〜15 分</td><td>5 mL/分まで</td><td>1〜2 時間（4 時間以内）</td></tr>
+  <tr><td>FFP 2 単位</td><td>1 mL/分 × 10〜15 分</td><td>5〜10 mL/分</td><td>30〜60 分（解凍後 3 時間以内）</td></tr>
+  <tr><td>PC 10 単位</td><td>1 mL/分 × 10〜15 分</td><td>10 mL/分程度</td><td>30〜60 分</td></tr></table>
+  <p class="muted">心不全・腎不全・高齢で TACO が心配なら遅く（1 単位 2 時間程度）。大量出血では加圧・加温で急速投与。速度は施設基準を優先。</p>
+  </div>
+</details>
+<details class="card o2card">
+  <summary>血行動態の計算（CI・SVR・DO₂・SvO₂）</summary>
+  <div class="body">
+  <div class="row"><div><label>身長</label><div class="unit"><input type="number" inputmode="decimal" id="hH" placeholder="160"><span>cm</span></div></div>
+  <div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="hW" placeholder="60"><span>kg</span></div></div></div>
+  <div class="row"><div><label>CO</label><div class="unit"><input type="number" inputmode="decimal" id="hCO" placeholder="5" step="0.1"><span>L/分</span></div></div>
+  <div><label>心拍数</label><div class="unit"><input type="number" inputmode="decimal" id="hHR" placeholder="80"><span>/分</span></div></div></div>
+  <div class="row"><div><label>MAP</label><div class="unit"><input type="number" inputmode="decimal" id="hMAP" placeholder="75"><span>mmHg</span></div></div>
+  <div><label>CVP</label><div class="unit"><input type="number" inputmode="decimal" id="hCVP" placeholder="8"><span>mmHg</span></div></div></div>
+  <div class="row"><div><label>Hb</label><div class="unit"><input type="number" inputmode="decimal" id="hHb" placeholder="10" step="0.1"><span>g/dL</span></div></div>
+  <div><label>SaO₂</label><div class="unit"><input type="number" inputmode="decimal" id="hSa" placeholder="97"><span>%</span></div></div></div>
+  <div class="row"><div><label>SvO₂（あれば）</label><div class="unit"><input type="number" inputmode="decimal" id="hSv" placeholder="70"><span>%</span></div></div><div></div></div>
+  <table id="hTbl" class="o2" style="margin-top:10px"></table>
+  <p class="muted">BSA（DuBois）＝ 0.007184 × 体重^0.425 × 身長^0.725。CI ＝ CO ÷ BSA。SV ＝ CO ÷ HR × 1000。SVR ＝（MAP − CVP）÷ CO × 80。DO₂ ＝ CO × 1.34 × Hb × SaO₂ × 10。VO₂ ＝ CO × 1.34 × Hb ×（SaO₂ − SvO₂）× 10。O₂ER ＝ VO₂ ÷ DO₂。SvO₂ が低い＝供給不足（CO・Hb・SaO₂）か消費増加。</p>
+  </div>
+</details>
+<details class="card o2card">
+  <summary>配合変化の早見表（ICU でよく使う薬）</summary>
+  <div class="body">
+  <p class="muted">原則：酸性の薬とアルカリ性の薬を同じルートで混ぜると沈殿・失活する。カテコラミン・鎮静薬は専用ルートが基本。下は代表例で、網羅ではない。必ず自施設の配合変化表と薬剤師に確認する。</p>
+  <table class="o2 compat"><tr><th>薬剤</th><th>pH</th><th>同ルートで避ける相手・注意</th></tr>
+  <tr><td>ノルアドレナリン<br>アドレナリン</td><td>酸性</td><td>メイロン、フロセミド、アシクロビル、フェニトイン（アルカリ性で失活）。原則専用ルート</td></tr>
+  <tr><td>ドパミン<br>ドブタミン</td><td>酸性</td><td>メイロン、フロセミド、アシクロビル、アンピシリン。ドブタミンはヘパリンとの混合を避ける（施設で確認）</td></tr>
+  <tr><td>バソプレシン</td><td>弱酸性</td><td>フロセミド、フェニトイン。専用ルートが望ましい</td></tr>
+  <tr><td>ニカルジピン</td><td>酸性</td><td>メイロン、フロセミド、脂肪乳剤・プロポフォール。PVC に吸着（非 PVC ルート推奨）</td></tr>
+  <tr><td>ジルチアゼム</td><td>酸性</td><td>メイロン、フロセミド、アセタゾラミド、リファンピシン</td></tr>
+  <tr><td>ランジオロール</td><td>弱酸性</td><td>メイロン、強アルカリ性薬剤。フロセミドとの混合は避ける</td></tr>
+  <tr><td>アミオダロン</td><td>酸性</td><td>ヘパリン、メイロン、フロセミド、セファゾリン。5% ブドウ糖で希釈、PVC に吸着</td></tr>
+  <tr><td>ニトログリセリン</td><td>—</td><td>PVC に吸着（専用ルート・非 PVC）。アルテプラーゼと不可</td></tr>
+  <tr><td>カルペリチド（hANP）</td><td>—</td><td>ヘパリンと混ぜると沈殿。生食・5% ブドウ糖で単独ルート</td></tr>
+  <tr><td>プロポフォール</td><td>脂肪乳剤</td><td>ミダゾラム、ニカルジピン、電解質高濃度液。単独ルート、12 時間ごとにルート交換</td></tr>
+  <tr><td>ミダゾラム</td><td>酸性</td><td>プロポフォール、メイロン、フロセミド、セフタジジム、アシクロビル</td></tr>
+  <tr><td>デクスメデトミジン</td><td>—</td><td>比較的混ぜやすい。アムホテリシン B、ジアゼパム、血液製剤とは不可</td></tr>
+  <tr><td>フェンタニル</td><td>弱酸性</td><td>フェニトイン、メイロン。他は比較的可</td></tr>
+  <tr><td>ヘパリン</td><td>アルカリ性</td><td>アミオダロン、ドブタミン、カルペリチド、バンコマイシン、シプロフロキサシン</td></tr>
+  <tr><td>メイロン（炭酸水素 Na）</td><td>アルカリ性</td><td>カテコラミン全般、Ca 製剤、Mg 製剤、ミダゾラム、ニカルジピン、バンコマイシン。単独ルート</td></tr>
+  <tr><td>フロセミド</td><td>アルカリ性</td><td>カテコラミン、ミダゾラム、ニカルジピン、ジルチアゼム、アミオダロン、バンコマイシン。単独が安全</td></tr>
+  <tr><td>Ca 製剤（グルコン酸 Ca 等）</td><td>—</td><td>メイロン、リン製剤、セフトリアキソン、脂肪乳剤（沈殿）</td></tr>
+  <tr><td>K 製剤</td><td>—</td><td>脂肪乳剤・プロポフォールとは別ルート。末梢は 40 mEq/L 以下</td></tr>
+  <tr><td>インスリン</td><td>—</td><td>ルート・バッグに吸着（初回はフラッシュで飽和させる）。専用ルートが望ましい</td></tr>
+  <tr><td>フェニトイン</td><td>強アルカリ性</td><td>ブドウ糖で沈殿。生食で単独、前後にフラッシュ。ほぼすべてと不可</td></tr>
+  <tr><td>アシクロビル</td><td>アルカリ性</td><td>カテコラミン、ミダゾラム、ドブタミン。単独</td></tr>
+  <tr><td>バンコマイシン</td><td>酸性</td><td>ヘパリン、βラクタム系（セファゾリン等）、メイロン、フロセミド</td></tr>
+  <tr><td>セフトリアキソン</td><td>—</td><td>Ca 含有液（乳酸・酢酸リンゲル、Ca 製剤）で沈殿</td></tr>
+  <tr><td>脂肪乳剤</td><td>—</td><td>電解質（Ca・K 高濃度）、ニカルジピン、多くの薬剤で乳化が壊れる。単独ルート</td></tr></table>
+  <p class="muted">白濁・沈殿・変色・気泡を見たら止めて確認。三方活栓での「Y 字側管」も同じルールが当てはまる。</p>
+  </div>
+</details>`;
+document.querySelector('#p-calc .o2card').insertAdjacentHTML('afterend',CALC_HTML);
+(function(){
+  const v=id=>+$(id).value;
+  const be=()=>{const b=v('beV'),w=v('beW'),p=+$('beP').value;if(!w||!(b<0)){$('beN').textContent='－';$('beS').textContent=b>=0&&w?'BE がマイナスのときに使う':'BE と体重を入力';return;}const meq=-b*w*0.2;$('beN').textContent=fmt(meq/p,0);$('beS').textContent=`必要 HCO₃⁻ ${fmt(meq,1)} mEq（まず半量 ${fmt(meq/p/2,0)} mL を投与して再評価）`;};
+  ['beV','beW'].forEach(i=>$(i).addEventListener('input',be));$('beP').addEventListener('change',be);
+  const fe=()=>{const a=v('fUNa'),b=v('fPNa'),c=v('fUCr'),d=v('fPCr');if(!(a>=0&&b>0&&c>0&&d>0)){$('fN').textContent='－';$('fS').textContent='4 つの値を入力';return;}const r=a*d/(b*c)*100;$('fN').textContent=fmt(r,2);$('fS').textContent=r<1?'1% 未満：腎前性を示唆':r>2?'2% 超：腎性（ATN）を示唆':'1〜2%：どちらもありうる';};
+  ['fUNa','fPNa','fUCr','fPCr'].forEach(i=>$(i).addEventListener('input',fe));
+  const tf=()=>{const w=v('tW'),hb=v('tHb'),tg=v('tTgt'),u=v('tU');if(!(w>0)){$('tN').textContent='－';$('tS').textContent='体重と投与単位数を入力';return;}const bv=70*w/100;let s='';if(u>0){const rise=u*28/bv;$('tN').textContent=fmt(rise,1);s+=`${u} 単位で約 +${fmt(rise,1)} g/dL（循環血液量 ${fmt(bv,0)} dL）`;}else $('tN').textContent='－';if(hb>0&&tg>hb){const need=(tg-hb)*bv/28;s+=(s?'　／　':'')+`Hb ${hb}→${tg} には約 ${fmt(Math.ceil(need),0)} 単位`;}$('tS').textContent=s||'投与単位数か目標 Hb を入力';};
+  ['tW','tHb','tTgt','tU'].forEach(i=>$(i).addEventListener('input',tf));
+  const hd=()=>{const H=v('hH'),W=v('hW'),CO=v('hCO'),HR=v('hHR'),MAP=v('hMAP'),CVP=v('hCVP'),Hb=v('hHb'),Sa=v('hSa'),Sv=v('hSv');const rows=[];
+    const bsa=(H>0&&W>0)?0.007184*Math.pow(W,0.425)*Math.pow(H,0.725):NaN;
+    if(isFinite(bsa))rows.push(['BSA',fmt(bsa,2),'m²','']);
+    if(CO>0&&isFinite(bsa))rows.push(['CI',fmt(CO/bsa,2),'L/分/m²','2.5〜4.0']);
+    if(CO>0&&HR>0){rows.push(['SV',fmt(CO/HR*1000,0),'mL','60〜100']);if(isFinite(bsa))rows.push(['SVI',fmt(CO/HR*1000/bsa,0),'mL/m²','35〜60']);}
+    if(CO>0&&MAP>0&&$('hCVP').value!==''){const svr=(MAP-CVP)/CO*80;rows.push(['SVR',fmt(svr,0),'dyn·s/cm⁵','800〜1,200']);if(isFinite(bsa))rows.push(['SVRI',fmt(svr*bsa,0),'dyn·s/cm⁵/m²','1,600〜2,400']);}
+    if(CO>0&&Hb>0&&Sa>0){const do2=CO*1.34*Hb*Sa/100*10;rows.push(['DO₂',fmt(do2,0),'mL/分','900〜1,100']);if(isFinite(bsa))rows.push(['DO₂I',fmt(do2/bsa,0),'mL/分/m²','500〜650']);
+      if(Sv>0){const vo2=CO*1.34*Hb*(Sa-Sv)/100*10;rows.push(['VO₂',fmt(vo2,0),'mL/分','200〜250']);rows.push(['O₂ER',fmt(vo2/do2*100,0),'%','22〜30']);}}
+    $('hTbl').innerHTML=rows.length?'<tr><th>項目</th><th>値</th><th>単位</th><th>目安</th></tr>'+rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join(''):'<tr><td class="muted">身長・体重・CO などを入力すると計算します</td></tr>';};
+  ['hH','hW','hCO','hHR','hMAP','hCVP','hHb','hSa','hSv'].forEach(i=>$(i).addEventListener('input',hd));hd();
+})();
+
+/* ===== Child-Pugh ===== */
+(function(){
+  const seg=$('scoreSeg');const b=document.createElement('button');b.dataset.s='child';b.textContent='Child';seg.appendChild(b);
+  const box=document.createElement('div');box.id='s-child';box.style.display='none';$('s-cpot').insertAdjacentElement('afterend',box);
+  seg.querySelectorAll('button').forEach(x=>x.onclick=()=>{seg.querySelectorAll('button').forEach(y=>y.classList.toggle('on',y===x));['gcs','jcs','rass','cpot','child'].forEach(s=>$('s-'+s).style.display=s===x.dataset.s?'':'none');});
+  const s={};
+  const sc=document.createElement('div');sc.className='score';sc.innerHTML='<div><div class="muted">Child-Pugh</div><div class="n" id="chN">－</div></div><div class="muted" id="chD">5 項目を選択</div>';box.appendChild(sc);
+  const upd=()=>{const k=Object.keys(s);const t=k.reduce((a,b)=>a+s[b],0);if(k.length<5){$('chN').textContent=t+' 点';$('chD').textContent=`${k.length}/5 項目入力`;return;}const g=t<=6?'A':t<=9?'B':'C';$('chN').textContent=`${g}（${t} 点）`;$('chD').textContent={A:'A：5〜6 点。代償性',B:'B：7〜9 点。中等度の肝機能低下',C:'C：10〜15 点。非代償性・予後不良'}[g];};
+  const G=[
+   ['総ビリルビン（mg/dL）',[[1,'2.0 未満'],[2,'2.0〜3.0'],[3,'3.0 超']]],
+   ['アルブミン（g/dL）',[[1,'3.5 超'],[2,'2.8〜3.5'],[3,'2.8 未満']]],
+   ['プロトロンビン活性（%）／ INR',[[1,'70% 超 ／ INR 1.7 未満'],[2,'40〜70% ／ INR 1.7〜2.3'],[3,'40% 未満 ／ INR 2.3 超']]],
+   ['腹水',[[1,'なし'],[2,'軽度（利尿薬でコントロール可）'],[3,'中等度以上（コントロール困難）']]],
+   ['肝性脳症',[[1,'なし'],[2,'軽度（Ⅰ〜Ⅱ度）'],[3,'昏睡（Ⅲ度以上）']]]];
+  G.forEach(([n,items],i)=>box.appendChild(optGroup(n,items.map(([v,t])=>({v,t})),v=>{s[i]=v;upd();})));
+  const n=document.createElement('p');n.className='muted';n.textContent='肝硬変の重症度分類。肝切除の適応（A が原則）、薬剤の用量調整、予後の目安に使う。急性肝不全には使わない。';box.appendChild(n);
+})();
+
+/* ===== 知識の追加 ===== */
+FIG.dic2=`<svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="10">
+<rect x="10" y="10" width="155" height="210" rx="8" fill="#FBE9E7" stroke="#B3261E"/><text x="87" y="30" text-anchor="middle" font-weight="700" fill="#B3261E">線溶亢進型（出血が主）</text>
+<g font-size="9"><text x="18" y="52" font-weight="700">見るデータ</text><text x="18" y="66">FDP ↑↑、D ダイマー ↑↑</text><text x="18" y="79">フィブリノゲン ↓↓</text><text x="18" y="92">PIC ↑、α2PI ↓</text><text x="18" y="105">血小板 ↓</text>
+<text x="18" y="128" font-weight="700">起こしやすい疾患</text><text x="18" y="142">急性前骨髄球性白血病</text><text x="18" y="155">産科 DIC（早剥・羊水塞栓）</text><text x="18" y="168">大動脈瘤・大動脈解離</text><text x="18" y="181">前立腺がん、熱傷早期</text>
+<text x="18" y="204" font-weight="700" fill="#B3261E">症状：皮下・粘膜・創からの出血</text></g>
+<rect x="175" y="10" width="155" height="210" rx="8" fill="#E1F0F3" stroke="#0E6F80"/><text x="252" y="30" text-anchor="middle" font-weight="700" fill="#0E6F80">線溶抑制型（臓器障害が主）</text>
+<g font-size="9"><text x="183" y="52" font-weight="700">見るデータ</text><text x="183" y="66">TAT ↑、SF（可溶性フィブリン）↑</text><text x="183" y="79">PAI-1 ↑、AT 活性 ↓</text><text x="183" y="92">D ダイマー・FDP は軽度↑</text><text x="183" y="105">血小板 ↓↓、PT 延長</text>
+<text x="183" y="128" font-weight="700">起こしやすい疾患</text><text x="183" y="142">敗血症（グラム陰性桿菌）</text><text x="183" y="155">重症感染症、外傷後期</text><text x="183" y="168">熱中症、膵炎</text>
+<text x="183" y="204" font-weight="700" fill="#0E6F80">症状：微小血栓 → 腎・肺・肝の障害</text></g></svg>`;
+META['DIC と凝固管理'].extra=[...(META['DIC と凝固管理'].extra||[]),
+ {h:'線溶亢進型と線溶抑制型の見分け方',f:'dic2',b:['線溶亢進型（出血型）：凝固と同時に線溶も強く動くので、フィブリンがどんどん溶ける。FDP と D ダイマーが著明に上昇、フィブリノゲンが著明に低下。PIC（プラスミン・α2PI 複合体）上昇。急性前骨髄球性白血病、産科 DIC（常位胎盤早期剥離、羊水塞栓）、大動脈瘤・解離、前立腺がん、熱傷早期。治療は基礎疾患＋補充（FFP、フィブリノゲン、血小板）、トラネキサム酸は慎重に','線溶抑制型（凝固優位型）：敗血症では PAI-1 が上がって線溶が止まるため、できた血栓が溶けない。TAT（トロンビン・アンチトロンビン複合体）と SF が上昇、D ダイマーは軽度、血小板が急に減る、AT 活性低下。微小血栓で腎・肺・肝の臓器障害が進む。治療は感染巣コントロール＋抗凝固（アンチトロンビン製剤、トロンボモジュリン製剤）','どちらか分からないとき：FDP と D ダイマーの比（FDP/DD 比が大きいほど線溶亢進）、フィブリノゲンの値、出血しているか臓器障害が前面か','急性期 DIC 診断基準（JAAM）：SIRS 項目、血小板数と減少率、PT 比、FDP でスコア化。敗血症で使う。厚労省基準は線溶亢進型も拾える']}];
+META['輸血'].extra=[...(META['輸血'].extra||[]),
+ {h:'予測 Hb 上昇と投与時間',b:['循環血液量（dL）＝ 70 mL/kg × 体重 ÷ 100。50 kg なら 35 dL','RBC 1 単位（約 140 mL）に含まれる Hb ≒ 26〜30 g。2 単位で約 53〜60 g','予測上昇 Hb（g/dL）＝ 投与 Hb 量（g）÷ 循環血液量（dL）。50 kg に 2 単位 → 約 1.5 g/dL 上昇。70 kg なら約 1.1 g/dL','必要単位数 ＝（目標 Hb − 現在 Hb）× 循環血液量 ÷ 28。計算タブに電卓あり','投与速度：開始 10〜15 分は 1 mL/分、その後 RBC は 5 mL/分まで、FFP は 5〜10 mL/分、PC は 10 mL/分程度。RBC 2 単位で 1〜2 時間、4 時間以内に終了','FFP は解凍後 3 時間以内、PC は受け取ったらすぐ。RBC は冷蔵庫から出して 30 分以内に開始','輸血後の Hb 確認は終了 1 時間以降（急ぐなら 15 分後でも概ね平衡）。出血中は予測より上がらない']}];
+META['よく使う正常値一覧'].extra=[...(META['よく使う正常値一覧'].extra||[]),
+ {h:'よく使う式',b:['BSA（DuBois）＝ 0.007184 × 体重^0.425 × 身長^0.725（m²）','CI ＝ CO ÷ BSA（2.5〜4.0）。SV ＝ CO ÷ HR × 1000（60〜100 mL）。SVI ＝ SV ÷ BSA','SVR ＝（MAP − CVP）÷ CO × 80（800〜1,200）。PVR ＝（mPAP − PAWP）÷ CO × 80（100〜250）','酸素運搬量 DO₂ ＝ CO × 1.34 × Hb × SaO₂ × 10（900〜1,100 mL/分）','酸素消費量 VO₂ ＝ CO × 1.34 × Hb ×（SaO₂ − SvO₂）× 10（200〜250 mL/分）。酸素摂取率 O₂ER ＝ VO₂ ÷ DO₂（22〜30%）','SvO₂ ≒ SaO₂ −（VO₂ ÷（CO × Hb × 1.34 × 10））。低下の原因は CO・Hb・SaO₂ の低下か、消費の増加（発熱・シバリング・体動）','MAP ＝ 拡張期圧 ＋（収縮期圧 − 拡張期圧）÷ 3。CPP ＝ MAP − ICP','P/F ＝ PaO₂ ÷ FiO₂。A-aDO₂ ＝（FiO₂ × 713 − PaCO₂ ÷ 0.8）− PaO₂','AG ＝ Na −（Cl ＋ HCO₃⁻）。補正 HCO₃⁻ ＝ HCO₃⁻ ＋（AG − 12）','必要 HCO₃⁻（mEq）＝ 不足 BE × 体重 × 0.2。メイロン 7% は 1 mL ＝ 0.833 mEq','FENa ＝（尿 Na × 血清 Cr）÷（血清 Na × 尿 Cr）× 100。FEUN ＝（尿 UN × 血清 Cr）÷（血清 UN × 尿 Cr）× 100','理想体重（kg）：男性 50 ＋ 0.91 ×（身長 cm − 152.4）、女性 45.5 ＋ 0.91 ×（身長 − 152.4）','Na 欠乏量（mEq）＝（目標 Na − 現在 Na）× 体重 × 0.6。補正は 1 日 8〜10 mEq/L 以内','水分欠乏量（L）＝ 体重 × 0.6 ×（1 − 140 ÷ 血清 Na）（高 Na のとき）','γ → mL/h ＝ γ × 体重 × 60 ÷ 濃度（μg/mL）']}];
 
 loadDrugs(); loadKnow(); calc();
 
