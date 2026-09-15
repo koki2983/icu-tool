@@ -1903,7 +1903,7 @@ function renderKnow(){
     const keyBox=k.key&&k.key.length?`<div class="keybox"><div class="kh">まず押さえる</div><ol>${k.key.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>`:'';
     const fig=k.fig?`<div class="fig">${FIG[k.fig]}</div>`:'';
     const imgs=(kImg[key]||[]).map((src,i)=>`<div class="ph"><img src="${src}" data-full="1"><button class="small danger" data-del="${i}">削除</button></div>`).join('');
-    d.innerHTML=`<summary><span>${k.user!==undefined?'<span class="tag">自分</span>':''}${esc(k.t)}</span></summary>
+    d.innerHTML=`<summary><span>${k.user!==undefined?'<span class="tag">自分</span>':(k.cat?`<span class="tag c">${k.cat}</span>`:'')}${esc(k.t)}</span></summary>
       <div class="body">${keyBox}${fig}${secs}${photoBlock}
       <div class="memo"><label>自分のメモ</label><textarea placeholder="当院の値・ルール、覚え書き（例：目標血糖 ___、カフ圧の測定間隔 ___）">${esc(kMemo[key]||'')}</textarea>
       <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}</div>
