@@ -135,6 +135,14 @@ table.compat td{text-align:left;font-weight:400;font-size:13px;vertical-align:to
 #aiSheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:30;align-items:flex-end}#aiSheet .sheet{background:var(--card);width:100%;max-height:85vh;overflow:auto;border-radius:16px 16px 0 0;padding:12px 14px calc(16px + env(safe-area-inset-bottom))}
 .gitem{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}.gt{font-weight:700;font-size:16px}.gal{font-weight:400;font-size:12px;color:var(--muted);margin-left:8px}.gd{font-size:var(--fs);margin:4px 0 6px}
 nav button{font-size:10px}
+.rangebox{margin-top:10px;background:var(--teal-soft);border-radius:10px;padding:10px 12px;font-size:14px}
+.rangebox.low{background:#EEF2F5}
+.rangebox.high{background:var(--amber-soft);color:var(--amber)}
+.rangebox .rn{margin-top:4px;font-size:12px;color:var(--muted)}
+.rangebox.high .rn{color:var(--amber)}
+table.dose td{text-align:left;font-weight:400;font-size:13px;vertical-align:top}
+table.dose th{text-align:left}
+table.dose td small{color:var(--muted);font-size:11px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -187,6 +195,7 @@ nav button{font-size:10px}
       <div class="big"><span id="resN">－</span><em id="resU">mL/h</em></div>
       <div class="sub" id="resS">体重・濃度・投与量を入力してください</div>
     </div>
+    <div id="rangeBox" class="rangebox" style="display:none"></div>
   </div>
 
   <div class="card" id="quickCard" style="display:none">
@@ -241,8 +250,10 @@ nav button{font-size:10px}
       <option value="umin">単位/min（バソプレシン等）</option>
       <option value="uh">単位/h</option>
     </select>
-    <label>メモ（自院の目安量・注意点など）</label>
-    <textarea id="dNote" placeholder="例 0.05〜0.3γ。中心静脈から。"></textarea>
+    <label>投与量の目安（任意）</label>
+    <input type="text" id="dRange" placeholder="例 0.05〜0.3 γ">
+    <label>メモ（注意点など）</label>
+    <textarea id="dNote" placeholder="例 中心静脈から。0.5γ 超は医師に確認。"></textarea>
     <div class="row" style="margin-top:10px">
       <button class="primary" id="dSave">保存する</button>
       <button id="dCancel" style="display:none">やめる</button>
@@ -345,36 +356,36 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
 
 /* ---------- 薬剤 ---------- */
 const PRESET=[
-{name:'ノルアドレナリン',mg:5,ml:50,unit:'gkm',note:'1mg/1mL 5A ＋ 生食 45mL（100 μg/mL）'},
-{name:'ドパミン 0.3%（DOA）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）'},
-{name:'ドパミン 0.1%（DOA）',mg:200,ml:200,unit:'gkm',note:'0.1% バッグ 200mg/200mL（1,000 μg/mL）'},
-{name:'ドブタミン 0.3%（DOB）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）'},
-{name:'オノアクト（ランジオロール）',mg:150,ml:50,unit:'gkm',note:'50mg 3V ＋ 生食 50mL（3,000 μg/mL）'}
+{name:'ノルアドレナリン',mg:5,ml:50,unit:'gkm',note:'1mg/1mL 5A ＋ 生食 45mL（100 μg/mL）',lo:0.01,hi:0.3,rt:'0.01〜0.3 γ（開始 0.05 前後）',rn:'0.5 γ を超えて必要なら、輸液・アシドーシス・副腎不全・心機能を評価し、バソプレシン追加を検討'},
+{name:'ドパミン 0.3%（DOA）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）',lo:3,hi:20,rt:'3〜20 γ',rn:'〜3 γ ドパミン受容体（腎保護効果は否定）、3〜10 γ β1、10 γ 以上 α。不整脈が出やすい'},
+{name:'ドパミン 0.1%（DOA）',mg:200,ml:200,unit:'gkm',note:'0.1% バッグ 200mg/200mL（1,000 μg/mL）',lo:3,hi:20,rt:'3〜20 γ',rn:'〜3 γ ドパミン受容体、3〜10 γ β1、10 γ 以上 α。不整脈が出やすい'},
+{name:'ドブタミン 0.3%（DOB）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）',lo:2,hi:10,rt:'2〜10 γ（最大 20 γ）',rn:'β1 優位で心収縮力↑。血圧は上がらないか下がることもある。頻脈・心筋酸素消費↑に注意'},
+{name:'オノアクト（ランジオロール）',mg:150,ml:50,unit:'gkm',note:'50mg 3V ＋ 生食 50mL（3,000 μg/mL）',lo:1,hi:10,rt:'1〜10 γ（1 γ で開始）',rn:'超短時間作用型 β1 遮断薬。心機能低下例は 1 γ から。血圧低下・徐脈を見ながら 5 分ごとに調整'}
 ];
 let drugs=[]; let editIdx=-1;
 async function loadDrugs(){ drugs=(await store.get('drugs'))||[]; renderDrugs(); }
 function renderDrugs(){
   const L=$('drugList'); L.innerHTML='';
-  PRESET.forEach(d=>{const el=document.createElement('div');el.className='item preset';el.innerHTML=`<div><div class="t"><span class="tag c">共通</span>${esc(d.name)}</div><div class="d">${d.mg} ${isU(d.unit)?'単位':'mg'} / ${d.ml} mL（${isU(d.unit)?fmt(d.mg/d.ml,3)+' 単位/mL':fmt(d.mg*1000/d.ml,1)+' μg/mL'}）・${UNITS[d.unit]}</div>${d.note?`<div class="d">${esc(d.note)}</div>`:''}</div>`;L.appendChild(el);});
+  PRESET.forEach(d=>{const el=document.createElement('div');el.className='item preset';el.innerHTML=`<div><div class="t"><span class="tag c">共通</span>${esc(d.name)}</div><div class="d">${d.mg} ${isU(d.unit)?'単位':'mg'} / ${d.ml} mL（${isU(d.unit)?fmt(d.mg/d.ml,3)+' 単位/mL':fmt(d.mg*1000/d.ml,1)+' μg/mL'}）・${UNITS[d.unit]}</div>${d.rt?`<div class="d">目安：${esc(d.rt)}</div>`:''}${d.note?`<div class="d">${esc(d.note)}</div>`:''}</div>`;L.appendChild(el);});
   if(!drugs.length){const e=document.createElement('div');e.className='empty';e.textContent='自分の希釈はまだありません。上のフォームから登録できます。';L.appendChild(e);}
   drugs.forEach((d,i)=>{
     const el=document.createElement('div'); el.className='item';
-    el.innerHTML=`<div><div class="t">${esc(d.name)}</div><div class="d">${d.mg} ${isU(d.unit)?'単位':'mg'} / ${d.ml} mL（${isU(d.unit)?fmt(d.mg/d.ml,3)+' 単位/mL':fmt(d.mg*1000/d.ml,1)+' μg/mL'}）・${UNITS[d.unit]}</div>${d.note?`<div class="d">${esc(d.note)}</div>`:''}</div>
+    el.innerHTML=`<div><div class="t">${esc(d.name)}</div><div class="d">${d.mg} ${isU(d.unit)?'単位':'mg'} / ${d.ml} mL（${isU(d.unit)?fmt(d.mg/d.ml,3)+' 単位/mL':fmt(d.mg*1000/d.ml,1)+' μg/mL'}）・${UNITS[d.unit]}</div>${d.rt?`<div class="d">目安：${esc(d.rt)}</div>`:''}${d.note?`<div class="d">${esc(d.note)}</div>`:''}</div>
       <div><button class="small" data-e="${i}">編集</button> <button class="small danger" data-x="${i}">削除</button></div>`;
     L.appendChild(el);
   });
   L.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{ editIdx=+b.dataset.e; const d=drugs[editIdx];
-    $('dName').value=d.name;$('dMg').value=d.mg;$('dMl').value=d.ml;$('dUnit').value=d.unit;$('dNote').value=d.note||'';
+    $('dName').value=d.name;$('dMg').value=d.mg;$('dMl').value=d.ml;$('dUnit').value=d.unit;$('dRange').value=d.rt||'';$('dNote').value=d.note||'';
     $('drugFormTtl').textContent='薬剤を編集';$('dSave').textContent='更新する';$('dCancel').style.display='';window.scrollTo(0,0);});
   L.querySelectorAll('[data-x]').forEach(b=>b.onclick=async()=>{ if(!confirm(`「${drugs[+b.dataset.x].name}」を削除しますか？`))return;
     drugs.splice(+b.dataset.x,1); await store.set('drugs',drugs); renderDrugs(); fillDrugSel(); toast('削除しました');});
   fillDrugSel();
 }
-function resetDrugForm(){editIdx=-1;['dName','dMg','dMl','dNote'].forEach(i=>$(i).value='');$('dUnit').value='gkm';$('drugFormTtl').textContent='薬剤を登録';$('dSave').textContent='保存する';$('dCancel').style.display='none';}
+function resetDrugForm(){editIdx=-1;['dName','dMg','dMl','dNote','dRange'].forEach(i=>$(i).value='');$('dUnit').value='gkm';$('drugFormTtl').textContent='薬剤を登録';$('dSave').textContent='保存する';$('dCancel').style.display='none';}
 $('dCancel').onclick=resetDrugForm;
 $('dUnit').onchange=()=>{$('dAmtU').textContent=isU($('dUnit').value)?'単位':'mg';};
 $('dSave').onclick=async()=>{
-  const d={name:$('dName').value.trim(),mg:+$('dMg').value,ml:+$('dMl').value,unit:$('dUnit').value,note:$('dNote').value.trim()};
+  const d={name:$('dName').value.trim(),mg:+$('dMg').value,ml:+$('dMl').value,unit:$('dUnit').value,rt:$('dRange').value.trim(),note:$('dNote').value.trim()};
   if(!d.name||!(d.mg>0)||!(d.ml>0)){toast('薬剤名・薬剤量・溶液量を入力してください');return;}
   if(editIdx>=0)drugs[editIdx]=d; else drugs.push(d);
   await store.set('drugs',drugs); renderDrugs(); resetDrugForm(); toast(editIdx>=0?'更新しました':'保存しました');
@@ -388,10 +399,10 @@ function fillDrugSel(){
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
 /* ---------- 計算 ---------- */
-let mode='A';
+let mode='A'; let curDrug=null;
 $('modeA').onclick=()=>{mode='A';$('modeA').classList.add('on');$('modeB').classList.remove('on');$('inA').style.display='';$('inB').style.display='none';calc();};
 $('modeB').onclick=()=>{mode='B';$('modeB').classList.add('on');$('modeA').classList.remove('on');$('inB').style.display='';$('inA').style.display='none';calc();};
-$('drugSel').onchange=()=>{const v=$('drugSel').value;const d=v.startsWith('p')?PRESET[+v.slice(1)]:drugs[v]; if(d){$('mg').value=d.mg;$('ml').value=d.ml;$('unitSel').value=d.unit;} calc();};
+$('drugSel').onchange=()=>{const v=$('drugSel').value;const d=v.startsWith('p')?PRESET[+v.slice(1)]:drugs[v];curDrug=d&&(d.lo||d.rt)?d:null; if(d){$('mg').value=d.mg;$('ml').value=d.ml;$('unitSel').value=d.unit;} calc();};
 ['wt','mg','ml','dose','rate','unitSel'].forEach(i=>$(i).addEventListener('input',calc));
 function factor(u,kg){ return {gkm:kg*60, gkh:kg, mkh:kg*1000, mh:1000, umin:60, uh:1}[u]; } // 投与量1あたりの μg/h（単位系は 単位/h）
 function calc(){
@@ -412,6 +423,14 @@ function calc(){
     if(ok&&r>0){ const d=r*conc/f; $('resN').textContent=fmt(d,(u==='gkm'||u==='umin')?3:2); $('resS').textContent=`${r} mL/h${needKg?` ÷ ${kg} kg`:''}　→ 1 mL/h ＝ ${fmt(conc/f,4)} ${UNITS[u]}`; }
     else { $('resN').textContent='－'; $('resS').textContent='体重・濃度・流量を入力してください'; }
   }
+  // 投与量の目安
+  const RB=$('rangeBox');
+  if(curDrug&&u===curDrug.unit){const d=mode==='A'?+$('dose').value:(ok&&+$('rate').value>0?(+$('rate').value)*conc/f:NaN);
+    let cls='',msg='';
+    if(curDrug.lo&&isFinite(d)&&d>0){ if(d<curDrug.lo)cls='low',msg='目安の下限より少なめ'; else if(d>curDrug.hi)cls='high',msg='目安の上限を超えています'; else msg='目安の範囲内'; }
+    RB.style.display='';RB.className='rangebox '+cls;
+    RB.innerHTML=`<b>${esc(curDrug.name)}</b> の目安：${esc(curDrug.rt||'—')}${msg?`　→ 現在 ${fmt(d,3)} ${UNITS[u]}（${msg}）`:''}${curDrug.rn?`<div class="rn">${esc(curDrug.rn)}</div>`:''}`;
+  } else RB.style.display='none';
   // 早見表
   const Q=$('quick'), C=$('quickCard');
   if(ok){
@@ -2046,6 +2065,36 @@ renderKnow();
 
 /* ===== 追加計算ツール ===== */
 const CALC_HTML=`
+<details class="card o2card">
+  <summary>薬剤別の投与量の目安（γ 表）</summary>
+  <div class="body">
+  <p class="muted">一般的な目安です。実際の投与量は必ず医師の指示と自施設の基準に従ってください。体重 60 kg・各希釈での mL/h も併記しています。</p>
+  <h3>昇圧薬・強心薬（γ ＝ μg/kg/min）</h3>
+  <table class="o2 dose"><tr><th>薬剤</th><th>目安</th><th>60 kg での mL/h</th></tr>
+  <tr><td>ノルアドレナリン<br><small>5mg/50mL</small></td><td>0.01〜0.3 γ<br><small>開始 0.05 前後</small></td><td>0.05γ → 1.8<br>0.1γ → 3.6／0.3γ → 10.8</td></tr>
+  <tr><td>アドレナリン<br><small>1mg/50mL（20 μg/mL）</small></td><td>0.01〜0.3 γ<br><small>低用量は β 優位</small></td><td>0.05γ → 9／0.1γ → 18</td></tr>
+  <tr><td>ドパミン 0.3%<br><small>150mg/50mL</small></td><td>3〜20 γ</td><td>3γ → 3.6／5γ → 6／10γ → 12</td></tr>
+  <tr><td>ドパミン 0.1%<br><small>200mg/200mL</small></td><td>3〜20 γ</td><td>3γ → 10.8／5γ → 18／10γ → 36</td></tr>
+  <tr><td>ドブタミン 0.3%<br><small>150mg/50mL</small></td><td>2〜10 γ<br><small>最大 20 γ</small></td><td>3γ → 3.6／5γ → 6／10γ → 12</td></tr>
+  <tr><td>バソプレシン<br><small>20単位/20mL</small></td><td>0.01〜0.04 単位/分<br><small>体重で調整しない</small></td><td>0.03単位/分 → 1.8</td></tr>
+  </table>
+  <h3>血管拡張薬・抗不整脈薬</h3>
+  <table class="o2 dose"><tr><th>薬剤</th><th>目安</th><th>60 kg での mL/h</th></tr>
+  <tr><td>オノアクト<br><small>150mg/50mL</small></td><td>1〜10 γ<br><small>1 γ で開始</small></td><td>1γ → 1.2／5γ → 6／10γ → 12</td></tr>
+  <tr><td>ニカルジピン<br><small>原液 1mg/mL</small></td><td>0.5〜6 γ</td><td>1γ → 3.6／2γ → 7.2</td></tr>
+  <tr><td>ニトログリセリン<br><small>50mg/100mL（0.5mg/mL）</small></td><td>0.1〜2 γ</td><td>0.5γ → 3.6／1γ → 7.2</td></tr>
+  <tr><td>ジルチアゼム</td><td>1〜5 γ<br><small>血圧低下に注意</small></td><td>施設の希釈で計算</td></tr>
+  </table>
+  <h3>鎮痛・鎮静薬（単位が γ ではないので注意）</h3>
+  <table class="o2 dose"><tr><th>薬剤</th><th>目安</th><th>備考</th></tr>
+  <tr><td>プロポフォール</td><td>0.3〜3 mg/kg/h</td><td>長期高用量で PRIS。血圧低下</td></tr>
+  <tr><td>デクスメデトミジン</td><td>0.2〜0.7 μg/kg/h</td><td>徐脈・低血圧。深鎮静には向かない</td></tr>
+  <tr><td>ミダゾラム</td><td>0.02〜0.1 mg/kg/h</td><td>蓄積・せん妄。長期は避ける</td></tr>
+  <tr><td>フェンタニル</td><td>0.5〜2 μg/kg/h</td><td>鎮痛が先。呼吸抑制・便秘</td></tr>
+  </table>
+  <div class="warn">目安の範囲を超える指示が出ることはあります。「範囲外だから間違い」ではなく、意図を確認するきっかけとして使ってください。</div>
+  </div>
+</details>
 <details class="card o2card">
   <summary>血液ガス：予測 PaCO₂・代償の判定</summary>
   <div class="body">
