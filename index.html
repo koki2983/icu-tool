@@ -363,7 +363,16 @@ const PRESET=[
 {name:'ドパミン 0.3%（DOA）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）',lo:3,hi:20,rt:'3〜20 γ',rn:'〜3 γ ドパミン受容体（腎保護効果は否定）、3〜10 γ β1、10 γ 以上 α。不整脈が出やすい'},
 {name:'ドパミン 0.1%（DOA）',mg:200,ml:200,unit:'gkm',note:'0.1% バッグ 200mg/200mL（1,000 μg/mL）',lo:3,hi:20,rt:'3〜20 γ',rn:'〜3 γ ドパミン受容体、3〜10 γ β1、10 γ 以上 α。不整脈が出やすい'},
 {name:'ドブタミン 0.3%（DOB）',mg:150,ml:50,unit:'gkm',note:'0.3% シリンジ 150mg/50mL（3,000 μg/mL）',lo:2,hi:10,rt:'2〜10 γ（最大 20 γ）',rn:'β1 優位で心収縮力↑。血圧は上がらないか下がることもある。頻脈・心筋酸素消費↑に注意'},
-{name:'オノアクト（ランジオロール）',mg:150,ml:50,unit:'gkm',note:'50mg 3V ＋ 生食 50mL（3,000 μg/mL）',lo:1,hi:10,rt:'1〜10 γ（1 γ で開始）',rn:'超短時間作用型 β1 遮断薬。心機能低下例は 1 γ から。血圧低下・徐脈を見ながら 5 分ごとに調整'}
+{name:'オノアクト（ランジオロール）',mg:150,ml:50,unit:'gkm',note:'50mg 3V ＋ 生食 50mL（3,000 μg/mL）',lo:1,hi:10,rt:'1〜10 γ（1 γ で開始）',rn:'超短時間作用型 β1 遮断薬。心機能低下例は 1 γ から。血圧低下・徐脈を見ながら 5 分ごとに調整'},
+{name:'ノルアドレナリン 1A＋生食19mL',mg:1,ml:20,unit:'gkm',note:'1mg/1mL 1A ＋ 生食 19mL（50 μg/mL）',lo:0.01,hi:0.3,rt:'0.01〜0.3 γ（開始 0.05 前後）',rn:'0.5 γ を超えて必要なら、輸液・アシドーシス・副腎不全・心機能を評価し、バソプレシン追加を検討'},
+{name:'ノルアドレナリン 2A＋生食38mL',mg:2,ml:40,unit:'gkm',note:'1mg/1mL 2A ＋ 生食 38mL（50 μg/mL）',lo:0.01,hi:0.3,rt:'0.01〜0.3 γ（開始 0.05 前後）',rn:'1A＋19mL と同じ濃度（50 μg/mL）なので、流量は変えずに交換できる'},
+{name:'ノルアドレナリン 3A＋生食47mL',mg:3,ml:50,unit:'gkm',note:'1mg/1mL 3A ＋ 生食 47mL（60 μg/mL）',lo:0.01,hi:0.3,rt:'0.01〜0.3 γ（開始 0.05 前後）',rn:'50 μg/mL の希釈とは濃度が違う（60 μg/mL）。交換時は必ず流量を計算し直す'},
+{name:'ピトレシン（バソプレシン）',mg:20,ml:20,unit:'umin',note:'20単位/1mL 1A ＋ 生食 19mL（1 単位/mL）',lo:0.01,hi:0.04,rt:'0.01〜0.04 単位/分（体重で調整しない）',rn:'ノルアド 0.25 γ 以上のときに追加。腸管・指趾の虚血、低 Na に注意。急に止めず漸減する'},
+{name:'ニカルジピン 原液',mg:10,ml:10,unit:'gkm',note:'10mg/10mL 原液（1,000 μg/mL）',lo:0.5,hi:6,rt:'0.5〜6 γ',rn:'動脈を拡張して後負荷を下げる。反射性頻脈・血圧低下。PVC に吸着するため非 PVC ルートが望ましい'},
+{name:'ニカルジピン 2倍希釈',mg:10,ml:20,unit:'gkm',note:'10mg ＋ 生食 10mL（500 μg/mL）',lo:0.5,hi:6,rt:'0.5〜6 γ',rn:'原液の半分の濃度。原液と取り違えると倍量になるのでラベルを必ず確認する'},
+{name:'プロポフォール 1%',mg:1000,ml:100,unit:'mkh',note:'1g/100mL（10 mg/mL、1% 製剤）',lo:0.3,hi:3,rt:'0.3〜3 mg/kg/h',rn:'鎮静薬。血圧低下・徐脈、脂肪負荷。長期高用量で PRIS（乳酸上昇・徐脈・横紋筋融解）。脂肪乳剤なので 12 時間ごとにルート交換、単独ルート'},
+{name:'プレセデックス（デクスメデトミジン）',mg:0.2,ml:50,unit:'gkh',note:'200μg/50mL（4 μg/mL）',lo:0.2,hi:0.7,rt:'0.2〜0.7 μg/kg/h',rn:'呼び覚ませる浅い鎮静。呼吸抑制が少なくせん妄も少ない。徐脈・低血圧、深鎮静には向かない'},
+{name:'ドルミカム（ミダゾラム）',mg:10,ml:20,unit:'mkh',note:'10mg/2mL 1A ＋ 生食 18mL（0.5 mg/mL）',lo:0.02,hi:0.1,rt:'0.02〜0.1 mg/kg/h',rn:'蓄積しやすく、せん妄・離脱・人工呼吸期間の延長。腎不全で蓄積。長期使用は避ける'}
 ];
 let drugs=[]; let editIdx=-1;
 async function loadDrugs(){ drugs=(await store.get('drugs'))||[]; renderDrugs(); }
@@ -2075,24 +2084,27 @@ const CALC_HTML=`
   <h3>昇圧薬・強心薬（γ ＝ μg/kg/min）</h3>
   <table class="o2 dose"><tr><th>薬剤</th><th>目安</th><th>60 kg での mL/h</th></tr>
   <tr><td>ノルアドレナリン<br><small>5mg/50mL</small></td><td>0.01〜0.3 γ<br><small>開始 0.05 前後</small></td><td>0.05γ → 1.8<br>0.1γ → 3.6／0.3γ → 10.8</td></tr>
+  <tr><td>ノルアドレナリン<br><small>1A/20mL・2A/40mL（50 μg/mL）</small></td><td>0.01〜0.3 γ</td><td>0.05γ → 3.6<br>0.1γ → 7.2／0.3γ → 21.6</td></tr>
+  <tr><td>ノルアドレナリン<br><small>3A/50mL（60 μg/mL）</small></td><td>0.01〜0.3 γ</td><td>0.05γ → 3／0.1γ → 6<br>0.3γ → 18</td></tr>
   <tr><td>アドレナリン<br><small>1mg/50mL（20 μg/mL）</small></td><td>0.01〜0.3 γ<br><small>低用量は β 優位</small></td><td>0.05γ → 9／0.1γ → 18</td></tr>
   <tr><td>ドパミン 0.3%<br><small>150mg/50mL</small></td><td>3〜20 γ</td><td>3γ → 3.6／5γ → 6／10γ → 12</td></tr>
   <tr><td>ドパミン 0.1%<br><small>200mg/200mL</small></td><td>3〜20 γ</td><td>3γ → 10.8／5γ → 18／10γ → 36</td></tr>
   <tr><td>ドブタミン 0.3%<br><small>150mg/50mL</small></td><td>2〜10 γ<br><small>最大 20 γ</small></td><td>3γ → 3.6／5γ → 6／10γ → 12</td></tr>
-  <tr><td>バソプレシン<br><small>20単位/20mL</small></td><td>0.01〜0.04 単位/分<br><small>体重で調整しない</small></td><td>0.03単位/分 → 1.8</td></tr>
+  <tr><td>ピトレシン（バソプレシン）<br><small>1A＋生食19mL（1 単位/mL）</small></td><td>0.01〜0.04 単位/分<br><small>体重で調整しない</small></td><td>0.02単位/分 → 1.2<br>0.03単位/分 → 1.8</td></tr>
   </table>
   <h3>血管拡張薬・抗不整脈薬</h3>
   <table class="o2 dose"><tr><th>薬剤</th><th>目安</th><th>60 kg での mL/h</th></tr>
   <tr><td>オノアクト<br><small>150mg/50mL</small></td><td>1〜10 γ<br><small>1 γ で開始</small></td><td>1γ → 1.2／5γ → 6／10γ → 12</td></tr>
-  <tr><td>ニカルジピン<br><small>原液 1mg/mL</small></td><td>0.5〜6 γ</td><td>1γ → 3.6／2γ → 7.2</td></tr>
+  <tr><td>ニカルジピン<br><small>原液 10mg/10mL</small></td><td>0.5〜6 γ</td><td>1γ → 3.6／2γ → 7.2<br>4γ → 14.4</td></tr>
+  <tr><td>ニカルジピン<br><small>2 倍希釈 10mg/20mL</small></td><td>0.5〜6 γ</td><td>1γ → 7.2／2γ → 14.4<br><small>原液と取り違え注意</small></td></tr>
   <tr><td>ニトログリセリン<br><small>50mg/100mL（0.5mg/mL）</small></td><td>0.1〜2 γ</td><td>0.5γ → 3.6／1γ → 7.2</td></tr>
   <tr><td>ジルチアゼム</td><td>1〜5 γ<br><small>血圧低下に注意</small></td><td>施設の希釈で計算</td></tr>
   </table>
   <h3>鎮痛・鎮静薬（単位が γ ではないので注意）</h3>
   <table class="o2 dose"><tr><th>薬剤</th><th>目安</th><th>備考</th></tr>
-  <tr><td>プロポフォール</td><td>0.3〜3 mg/kg/h</td><td>長期高用量で PRIS。血圧低下</td></tr>
-  <tr><td>デクスメデトミジン</td><td>0.2〜0.7 μg/kg/h</td><td>徐脈・低血圧。深鎮静には向かない</td></tr>
-  <tr><td>ミダゾラム</td><td>0.02〜0.1 mg/kg/h</td><td>蓄積・せん妄。長期は避ける</td></tr>
+  <tr><td>プロポフォール<br><small>1g/100mL（10 mg/mL）</small></td><td>0.3〜3 mg/kg/h</td><td>60kg：1 mg/kg/h → 6 mL/h<br>範囲は 1.8〜18 mL/h。PRIS・血圧低下</td></tr>
+  <tr><td>プレセデックス<br><small>200μg/50mL（4 μg/mL）</small></td><td>0.2〜0.7 μg/kg/h</td><td>60kg：0.4 μg/kg/h → 6 mL/h<br>範囲は 3〜10.5 mL/h。徐脈・低血圧</td></tr>
+  <tr><td>ドルミカム<br><small>1A＋生食18mL（0.5 mg/mL）</small></td><td>0.02〜0.1 mg/kg/h</td><td>60kg：0.05 mg/kg/h → 6 mL/h<br>範囲は 2.4〜12 mL/h。蓄積・せん妄</td></tr>
   <tr><td>フェンタニル</td><td>0.5〜2 μg/kg/h</td><td>鎮痛が先。呼吸抑制・便秘</td></tr>
   </table>
   <div class="warn">目安の範囲を超える指示が出ることはあります。「範囲外だから間違い」ではなく、意図を確認するきっかけとして使ってください。</div>
