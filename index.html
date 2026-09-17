@@ -2889,6 +2889,74 @@ GLOSS.push(
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));
 renderGloss();
 
+/* ---------- OHAT（口腔アセスメント） ---------- */
+(function(){
+  const seg=$('scoreSeg');const b=document.createElement('button');b.dataset.s='ohat';b.textContent='OHAT';seg.appendChild(b);
+  const box=document.createElement('div');box.id='s-ohat';box.style.display='none';$('s-nihss').insertAdjacentElement('afterend',box);
+  const IDS=['gcs','jcs','rass','cpot','child','nihss','ohat'];
+  seg.querySelectorAll('button').forEach(x=>x.onclick=()=>{seg.querySelectorAll('button').forEach(y=>y.classList.toggle('on',y===x));IDS.forEach(s=>$('s-'+s).style.display=s===x.dataset.s?'':'none');});
+  const HT=t=>'<div class="howto">'+t+'</div>';
+  const s={};
+  const sc=document.createElement('div');sc.className='score';sc.innerHTML='<div><div class="muted">OHAT 合計</div><div class="n" id="ohN">－</div></div><div class="muted" id="ohD">8 項目を選択</div>';box.appendChild(sc);
+  const upd=()=>{const k=Object.keys(s);const t=k.reduce((a,b)=>a+s[b],0);const two=k.filter(x=>s[x]===2).length;
+    $('ohN').textContent=t+' 点';
+    let m='';
+    if(k.length<8)m=`${k.length}/8 項目入力（暫定 ${t} 点）`;
+    else if(two>0)m=`2 点の項目が ${two} つ → 歯科の診察を検討`;
+    else if(t>=4)m='1 点の項目が複数 → 口腔ケアの内容を見直す';
+    else m='大きな問題なし。現在のケアを継続';
+    $('ohD').textContent=m;};
+  const intro=document.createElement('div');intro.className='card';
+  intro.innerHTML='<h2>OHAT とは</h2><ul class="howlist">'+[
+   'Oral Health Assessment Tool。口腔の状態を 8 項目 × 0〜2 点で評価する（合計 0〜16 点）',
+   '0 ＝ 健全、1 ＝ やや不良、2 ＝ 病的。点数が高いほど口腔の問題が大きい',
+   '1 項目でも 2 点があれば歯科の診察を検討する。合計点は「前回と比べてどうか」を見る指標として使う',
+   '評価のタイミング：入室時、その後は週 1 回程度、状態が変わったとき。同じ人が同じ順で',
+   '準備：手袋・マスク・ペンライト・舌圧子（または柄付きブラシ）。ベッドを 30 度以上上げ、頭をやや前屈にして誤嚥を防ぐ',
+   '挿管中でも評価できる。義歯は外れているので「該当なし」として扱い、歯痛は身体的な徴候（腫脹・潰瘍）と表情で判断する'
+  ].map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  box.appendChild(intro);
+  const G=[
+   ['① 口唇'+HT('ペンライトで上下の口唇と口角を見る。乾燥・ひび割れ・出血・白いものがないか'),
+    [[0,'正常：湿っていてピンク色'],[1,'乾燥、ひび割れ、口角の発赤'],[2,'腫脹や腫瘤、白色斑、潰瘍、口角や口唇からの出血']]],
+   ['② 舌'+HT('「舌を出してください」。出せなければ舌圧子で軽く押し下げて、舌の表面と縁を見る。舌苔は白〜黄色の付着物'),
+    [[0,'正常：湿っていてピンク色'],[1,'不整、亀裂、発赤、舌苔の付着'],[2,'赤色や白色斑、潰瘍、腫脹']]],
+   ['③ 歯肉・粘膜'+HT('頬の内側、歯肉、口蓋を順に見る。歯肉は腫れ・出血・発赤、粘膜は白い付着（カンジダ）や潰瘍を確認'),
+    [[0,'正常：湿っていてピンク色'],[1,'乾燥、光沢、粗造、発赤、部分的な腫脹（歯 1〜6 本分）、義歯下の一部潰瘍'],[2,'腫脹や出血（歯 7 本分以上）、歯の動揺、潰瘍、白色斑、強い発赤、圧痛']]],
+   ['④ 唾液'+HT('手袋をした指や舌圧子を粘膜に当て、湿り気とべたつきを確かめる。乾燥は VAP と口腔トラブルの最大の要因'),
+    [[0,'湿潤している（さらさらした唾液）'],[1,'乾燥ぎみ、べたつく粘膜、唾液が少ない、口渇感が少しある'],[2,'赤く干からびた状態、唾液がほとんどない、粘性の高い唾液、強い口渇感']]],
+   ['⑤ 残存歯'+HT('本数を数え、う蝕（虫歯）・破折・残根がないか見る。歯がない場合は 0 点として扱う'),
+    [[0,'う蝕や破折した歯・歯根がない'],[1,'3 本以下のう蝕、破折、残根、強い咬耗'],[2,'4 本以上のう蝕、破折、残根、非常にすり減った歯、義歯を使っていない残存歯']]],
+   ['⑥ 義歯'+HT('装着していれば外して、破損・適合・清掃状態を見る。挿管中など義歯を使っていない場合は 0 点'),
+    [[0,'正常：破損なく、普通に装着できる'],[1,'1 か所の義歯または人工歯の破損、1 日 1〜2 時間しか装着できない'],[2,'2 か所以上の破損、義歯の紛失、不適合で未装着、接着剤が必要']]],
+   ['⑦ 口腔清掃'+HT('食渣（食べかす）、歯石、プラーク（白いねばつき）、口臭を確認する。挿管中はチューブの周囲と舌の奥に汚れがたまりやすい'),
+    [[0,'良好：食渣・歯石・プラークがない'],[1,'1〜2 か所に食渣・歯石・プラーク、わずかな口臭'],[2,'多くの部位に食渣・歯石・プラーク、強い口臭']]],
+   ['⑧ 歯痛'+HT('言葉で訴えられない患者では、表情のゆがみ、口唇を噛む、食事を拒む、触られるのを嫌がる、といった行動と、腫脹・潰瘍などの身体所見で判断する'),
+    [[0,'痛みを示す言動も身体所見もない'],[1,'痛みを示す言動がある（顔をゆがめる、口唇を噛む、食べない、攻撃的になる）'],[2,'身体的な徴候がある（頬や歯肉の腫脹、歯の破折、潰瘍、歯肉の膿瘍）。言動の徴候も伴う']]]];
+  G.forEach(([n,items],i)=>box.appendChild(optGroup(n,items.map(([v,t])=>({v,t})),v=>{s[i]=v;upd();})));
+  const care=document.createElement('div');care.className='card';
+  care.innerHTML='<h2>評価のあとにすること</h2><ul class="howlist">'+[
+   '乾燥（④が 1〜2 点）：保湿剤を使い、開口したままにしない。加湿、含嗽・清拭の回数を増やす。落ちにくい痂皮は無理に剥がさず、保湿してふやかしてから除去する',
+   '汚れ（⑦が 1〜2 点）：歯ブラシで機械的に落とすことが基本。含嗽薬やスポンジブラシだけではプラークは取れない',
+   '出血・潰瘍（①②③が 2 点）：強くこすらない。血小板・凝固の値を確認し、医師・歯科に相談',
+   '白色斑が拭っても取れない、または広がる：カンジダを疑って報告（抗真菌薬の適応）',
+   '痛み（⑧）：ケアの前に鎮痛を検討。痛いケアは拒否と誤嚥につながる',
+   '挿管中の手順：カフ圧を確認 → 頭部挙上 → カフ上部と口腔内を吸引 → ブラッシング → 拭き取り（水を流し込まない）→ 保湿 → チューブの固定位置を変える。1 日 3〜4 回',
+   'VAP 予防バンドルの一部として、口腔ケアは「回数」より「汚れが落ちているか」で評価する'
+  ].map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  box.appendChild(care);
+  const n=document.createElement('p');n.className='muted';
+  n.textContent='OHAT 日本語版（OHAT-J）に基づく。評価は歯科的な診断ではなく、ケアの必要性と変化を共有するための共通のものさしとして使う。';
+  box.appendChild(n);
+})();
+GLOSS.push(
+['OHAT','オーハット|口腔アセスメント|OHAT-J','Oral Health Assessment Tool。口唇・舌・歯肉粘膜・唾液・残存歯・義歯・口腔清掃・歯痛の 8 項目を 0〜2 点で評価（合計 0〜16 点）。1 項目でも 2 点なら歯科の診察を検討',null],
+['舌苔','ぜったい|tongue coating','舌の表面に付着する白〜黄色の苔状のもの。細菌の温床になり、口臭や誤嚥性肺炎の原因になる',null],
+['不顕性誤嚥','silent aspiration|むせない誤嚥','むせずに唾液や食物が気道に入ること。意識障害・脳卒中・挿管後に多く、肺炎の原因になる','脳梗塞（症状と急性期の看護）']
+);
+GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));
+renderGloss();
+
 (function(){const bar=$('catBar');bar.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
 
 /* 血液ガス代償計算 */
