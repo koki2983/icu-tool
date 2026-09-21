@@ -224,7 +224,7 @@ table.dose td small{color:var(--muted);font-size:11px}
     <div class="body">
     <div class="warn" style="margin-top:0">患者の氏名・ID は入力しないでください。入力はこの端末だけに保存され、24 時間で自動的に消えます。記録と確認は紙の輸液シートで行い、この計算は写し間違い・計算間違いを防ぐための補助として使います。</div>
     <label>集計の時刻</label>
-    <select id="ivB"><option value="toh">当院：14・18・22・2・6・10 時</option><option value="toh0">当院＋0 時：14・18・22・0・2・6・10 時</option><option value="q2">2 時間ごと</option><option value="q1">1 時間ごと</option></select>
+    <select id="ivB"><option value="toh">4 時間ごと（14・18・22・2・6・10 時）</option><option value="q2">2 時間ごと</option><option value="q1">1 時間ごと</option></select>
     <p class="muted" style="margin:4px 0 0">期間は 10:00〜翌 10:00。</p>
 
     <h3>① 持続（点滴・シリンジ・経管栄養の持続・CHDF 抗凝固・A ライン）</h3>
@@ -3487,7 +3487,7 @@ renderGloss();
 /* 輸液シート IN/OUT・バランス計算 */
 (function(){
   const K='ivsheet'; let S={c:Date.now(),L:[],E:[]};
-  const BK={toh:[14,18,22,2,6,10],toh0:[14,18,22,0,2,6,10],q2:[12,14,16,18,20,22,0,2,4,6,8,10],q1:[11,12,13,14,15,16,17,18,19,20,21,22,23,0,1,2,3,4,5,6,7,8,9,10]};
+  const BK={toh:[14,18,22,2,6,10],q2:[12,14,16,18,20,22,0,2,4,6,8,10],q1:[11,12,13,14,15,16,17,18,19,20,21,22,23,0,1,2,3,4,5,6,7,8,9,10]};
   const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   const pad=n=>String(n).padStart(2,'0');
   const nowT=()=>{const d=new Date();return pad(d.getHours())+':'+pad(Math.floor(d.getMinutes()/5)*5);};
@@ -3551,7 +3551,7 @@ renderGloss();
     const txt=R.map(r=>`${hh(r.b)}時（${hh(r.a)}〜${hh(r.b)}時） IN ${f1(r.wi)}/${f1(r.cw)}　OUT ${f1(r.wo)}/${f1(r.cwo)}　水分バランス ${sg(r.cw-r.cwo)}`+(blood?`　輸血IN ${f1(r.bi)}/${f1(r.cb)}　血液OUT ${f1(r.bo)}/${f1(r.cbo)}　血液バランス ${sg(r.cb-r.cbo)}　TOTAL ${sg(r.cw-r.cwo+r.cb-r.cbo)}`:'')).join('\n');
     try{await navigator.clipboard.writeText(txt);}catch(e){const a=document.createElement('textarea');a.value=txt;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();}toast('コピーしました');};
   ['ivCt','ivBt','ivOt'].forEach(i=>$(i).value=nowT());
-  (async()=>{const d=await store.get(K);if(d&&Date.now()-d.c<26*3600000){S=d;if(S.bk)$('ivB').value=(S.bk==='q4'?'toh':S.bk);if(!$('ivB').value)$('ivB').value='toh';}else if(d){store.set(K,S);}all();})();
+  (async()=>{const d=await store.get(K);if(d&&Date.now()-d.c<26*3600000){S=d;if(S.bk)$('ivB').value=(['q4','toh0'].includes(S.bk)?'toh':S.bk);if(!$('ivB').value)$('ivB').value='toh';}else if(d){store.set(K,S);}all();})();
   window.__iv={compute,get S(){return S},set S(v){S=v},all,toM};
 })();
 
