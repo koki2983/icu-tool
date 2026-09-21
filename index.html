@@ -175,6 +175,7 @@ nav button{font-size:10px}
 #p-iv[data-slot="3"] .ivp.card{border-left:4px solid #6B3FA0}
 #p-iv[data-slot="1"] .ivp.card{border-left:4px solid var(--teal)}
 .ivwho{font-weight:700;margin-bottom:8px}
+.ivtot{display:block;font-size:12px;font-weight:400;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -346,9 +347,16 @@ nav button{font-size:10px}
     <select id="ivCsel"></select>
     <div class="row"><div><label>名前（選ぶと入ります。手入力も可）</label><input type="text" id="ivCn" placeholder="例 ソルデム3A、A ライン"></div>
     <div><label>区分</label><select id="ivCk"><option value="w">水分</option><option value="b">輸血・アルブミン</option></select></div></div>
+    <label>入力のしかた</label>
+    <div class="seg" id="ivMode" style="margin-top:4px"><button data-m="r" class="on">流量（mL/h）</button><button data-m="v">投与量と時間</button></div>
     <div class="row"><div><label>開始時刻</label><input type="time" id="ivCt"></div>
-    <div><label>流量</label><div class="unit"><input type="number" inputmode="decimal" id="ivCr" step="0.1" placeholder="例 8"><span>mL/h</span></div></div></div>
-    <button class="primary" id="ivCadd" style="width:100%">点滴を追加</button>
+    <div id="ivRateBox"><label>流量</label><div class="unit"><input type="number" inputmode="decimal" id="ivCr" step="0.1" placeholder="例 8"><span>mL/h</span></div></div>
+    <div id="ivEndBox" style="display:none"><label>終了時刻</label><input type="time" id="ivCe"></div></div>
+    <div id="ivVolBox" style="display:none">
+      <div class="row"><div><label>投与量</label><div class="unit"><input type="number" inputmode="decimal" id="ivCv" step="1" placeholder="例 280"><span>mL</span></div></div><div></div></div>
+      <div class="muted" id="ivVolHint" style="font-size:13px;margin-top:4px">輸血や負荷など、量と時間で指示があるときに。終了時刻までの間に均等に入る計算です</div>
+    </div>
+    <button class="primary" id="ivCadd" style="width:100%;margin-top:8px">点滴を追加</button>
     <div id="ivClist" style="margin-top:10px"></div>
   </div></div>
 
@@ -361,6 +369,7 @@ nav button{font-size:10px}
     <div class="row"><div><label>時刻</label><input type="time" id="ivBt"></div>
     <div><label>量</label><div class="unit"><input type="number" inputmode="decimal" id="ivBv" step="0.1" placeholder="例 100"><span>mL</span></div></div></div>
     <button class="primary" id="ivBadd" style="width:100%">単回 IN を追加</button>
+    <p class="muted" style="font-size:12px;margin:6px 0 0">時間をかけて入れる輸血や負荷は、「点滴」タブの「投与量と時間」で入れると区間をまたいでも正しく分けて計算されます。</p>
     <div id="ivBlist" style="margin-top:10px"></div>
   </div></div>
 
@@ -3536,7 +3545,7 @@ renderGloss();
   const save=()=>store.set(K(),S);
   const blocks=()=>{const ends=BK[$('ivB').value].map(hr=>{const m=((hr*60-600)%1440+1440)%1440;return m===0?1440:m;});
     const out=[];let a=0;ends.forEach(b=>{out.push({a,b});a=b;});return out;};
-  const contVol=(L,a,b)=>{const seg=L.seg.map(s=>({m:toM(s.t,'in'),r:+s.r})).sort((x,y)=>x.m-y.m);let v=0;
+  const contVol=(L,a,b)=>{const seg=L.seg.map((s,i)=>{let m=toM(s.t,'in');if(i>0&&m===0)m=1440;return {m,r:+s.r};}).sort((x,y)=>x.m-y.m);let v=0;
     seg.forEach((s,i)=>{const e=i+1<seg.length?seg[i+1].m:1440;const o=Math.min(e,b)-Math.max(s.m,a);if(o>0)v+=o*s.r/60;});return v;};
   const whichBlock=(BL,m)=>BL.findIndex(k=>k.a<=m&&m<k.b);
   function compute(){
@@ -3549,9 +3558,10 @@ renderGloss();
     return R;}
   function renderLists(){
     const C=$('ivClist');
-    C.innerHTML=S.L.length?S.L.map(L=>{const seg=[...L.seg].sort((x,y)=>toM(x.t,'in')-toM(y.t,'in'));
-      return `<div class="iv"><div class="iv-h"><b>${esc(L.n||'（名前なし）')}</b>${L.k==='b'?'<span class="tag c">輸血</span>':''}<button class="small" data-dl="${L.id}">削除</button></div>
-      <div class="iv-seg">${seg.map((s,i)=>`<span class="chip">${s.t} ${+s.r===0?'OFF':f1(+s.r)+' mL/h'}${i>0?` <a data-ds="${L.id}|${i}">×</a>`:''}</span>`).join('→')}</div>
+    const sm=(s,i)=>{const m=toM(s.t,'in');return i>0&&m===0?1440:m;};
+    C.innerHTML=S.L.length?S.L.map(L=>{const seg=L.seg.map((s,i)=>({...s,_m:sm(s,i)})).sort((x,y)=>x._m-y._m);
+      return `<div class="iv"><div class="iv-h"><b>${esc(L.n||'（名前なし）')}${L.tot?`<small class="ivtot">${f1(L.tot)} mL を ${L.seg[0].t}〜${L.seg[1]?L.seg[1].t:''}</small>`:''}</b>${L.k==='b'?'<span class="tag c">輸血</span>':''}<button class="small" data-dl="${L.id}">削除</button></div>
+      <div class="iv-seg">${seg.map((s,i)=>`<span class="chip">${s.t} ${+s.r===0?(s._m===1440?'終了':'OFF'):f1(+s.r)+' mL/h'}${i>0?` <a data-ds="${L.id}|${i}">×</a>`:''}</span>`).join('→')}</div>
       <div class="row iv-chg"><div><input type="time" id="t_${L.id}" value="${nowT()}"></div><div><div class="unit"><input type="number" inputmode="decimal" step="0.1" id="r_${L.id}" placeholder="流量"><span>mL/h</span></div></div></div>
       <div class="row"><button class="small" data-ch="${L.id}">流量を変更</button><button class="small" data-off="${L.id}">この時刻で OFF</button></div></div>`;}).join(''):'<div class="muted" style="font-size:13px">まだありません</div>';
     const ev=(io,box)=>{const E=S.E.filter(e=>e.io===io).sort((a,b)=>toM(a.t,io)-toM(b.t,io));
@@ -3583,8 +3593,23 @@ renderGloss();
     document.querySelectorAll('#ivSeg button').forEach(x=>x.classList.toggle('on',x===b));
     document.querySelectorAll('#ivCard .ivp').forEach(p=>p.style.display=p.dataset.v===b.dataset.v?'':'none');
     if(b.dataset.v==='r')renderRes();}));
-  $('ivCadd').onclick=()=>{const t=$('ivCt').value,r=parseFloat($('ivCr').value);if(!t||!(r>=0)){toast('開始時刻と流量を入れてください');return;}
-    S.L.push({id:uid(),n:$('ivCn').value.trim(),k:$('ivCk').value,seg:[{t,r}]});save();$('ivCn').value='';$('ivCr').value='';all();toast('持続を追加しました');};
+  let mode='r';
+  const volHint=()=>{const t=$('ivCt').value,e=$('ivCe').value,v=parseFloat($('ivCv').value);
+    if(t&&e&&v>0){const s=toM(t,'in');let en=toM(e,'in');if(en===0)en=1440;const d=en-s;
+      $('ivVolHint').textContent=d>0?`${v} mL を ${[Math.floor(d/60)?Math.floor(d/60)+' 時間':'',d%60?d%60+' 分':''].filter(Boolean).join(' ')}で → ${f1(v/(d/60))} mL/h 相当`:'終了時刻は開始時刻より後にしてください（シートは 10:00 で区切り）';}
+    else $('ivVolHint').textContent='輸血や負荷など、量と時間で指示があるときに。終了時刻までの間に均等に入る計算です';};
+  ['ivCt','ivCe','ivCv'].forEach(i=>$(i).addEventListener('input',volHint));
+  document.querySelectorAll('#ivMode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;
+    document.querySelectorAll('#ivMode button').forEach(x=>x.classList.toggle('on',x===b));
+    $('ivRateBox').style.display=mode==='r'?'':'none';$('ivEndBox').style.display=mode==='v'?'':'none';$('ivVolBox').style.display=mode==='v'?'':'none';
+    if(mode==='v'&&!$('ivCe').value)$('ivCe').value=$('ivCt').value;volHint();});
+  $('ivCadd').onclick=()=>{const t=$('ivCt').value;const n=$('ivCn').value.trim(),k=$('ivCk').value;
+    if(mode==='r'){const r=parseFloat($('ivCr').value);if(!t||!(r>=0)){toast('開始時刻と流量を入れてください');return;}
+      S.L.push({id:uid(),n,k,seg:[{t,r}]});$('ivCr').value='';}
+    else{const e=$('ivCe').value,v=parseFloat($('ivCv').value);if(!t||!e||!(v>0)){toast('開始・終了時刻と投与量を入れてください');return;}
+      const s=toM(t,'in');let en=toM(e,'in');if(en===0)en=1440;const d=en-s;if(d<=0){toast('終了時刻は開始時刻より後にしてください');return;}
+      S.L.push({id:uid(),n,k,tot:v,seg:[{t,r:v/(d/60)},{t:e,r:0}]});$('ivCv').value='';volHint();}
+    save();$('ivCn').value='';all();toast('追加しました');};
   const addE=(io,kSel,nId,tId,vId)=>{const [k,type]=$(kSel).value.split('|');const t=$(tId).value,v=parseFloat($(vId).value);
     if(!t||!(v>0)){toast('時刻と量を入れてください');return;}
     S.E.push({id:uid(),io,k,type,n:$(nId).value.trim(),t,v});save();$(nId).value='';$(vId).value='';all();toast('追加しました');};
@@ -3631,7 +3656,7 @@ renderGloss();
       +grp('今回使った点滴',used,'w')+grp('輸液',FLUIDS,'w')+grp('シリンジ（共通薬剤）',PRESET.map(d=>d.name),'w')
       +grp('自分の薬剤',my,'w')+grp('その他の持続',OTHERS,'w')+grp('輸血（持続で入れるとき）',BLOOD,'b');
   }
-  $('ivCsel').addEventListener('change',()=>{const v=$('ivCsel').value;if(!v)return;const i=v.indexOf('|');$('ivCk').value=v.slice(0,i);$('ivCn').value=v.slice(i+1);$('ivCr').focus();});
+  $('ivCsel').addEventListener('change',()=>{const v=$('ivCsel').value;if(!v)return;const i=v.indexOf('|');$('ivCk').value=v.slice(0,i);$('ivCn').value=v.slice(i+1);(document.querySelector('#ivMode button[data-m="v"]').classList.contains('on')?$('ivCv'):$('ivCr')).focus();});
   $('ivCadd').addEventListener('click',()=>setTimeout(()=>{$('ivCsel').value='';fill();},0));
 
   const DRAINS=['心嚢','胸骨下','前縦隔','後縦隔','右胸腔','左胸腔','腹腔','ウィンスロー孔','左横隔膜下','右横隔膜下','ダグラス窩','膵管','胆管','吻合部','皮下','創部','脳室（EVD）','スパイナル'];
