@@ -258,7 +258,7 @@ table.dose td small{color:var(--muted);font-size:11px}
     <h3>集計（紙に写す値）</h3>
     <div id="ivRes"></div>
     <div class="row" style="margin-top:8px"><button class="small" id="ivCopy">集計をテキストでコピー</button><button class="small danger" id="ivClr">すべて消去</button></div>
-    <p class="muted">表示は「その区間の量／累計」。持続は流量 × 時間で計算。単回と OUT は入力した時刻の区間に入る（14:00 に測った尿は 10〜14 時の区間）。翌朝 10:00 に測った OUT は最後の区間、10:00 に始めた IN は最初の区間に入る。食事・飲水の換算（g と mL）は施設のルールに合わせる。水分バランス＝水分 IN − 水分 OUT、血液バランス＝輸血 IN − ドレーン・出血、TOTAL＝その合計。</p>
+    <p class="muted">表示は「その区間の量／累計」。持続は流量 × 時間で計算。区間は「始まりの時刻から、次の区切りの 1 分前まで」。13:59 に測った尿や入った分は 10〜14 時の区間、14:00 に投与した分は 14〜18 時の区間に入る。最後の区間の記録は 9:59。食事・飲水の換算（g と mL）は施設のルールに合わせる。水分バランス＝水分 IN − 水分 OUT、血液バランス＝輸血 IN − ドレーン・出血、TOTAL＝その合計。</p>
     </div>
   </details>
 
@@ -3491,7 +3491,7 @@ renderGloss();
   const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   const pad=n=>String(n).padStart(2,'0');
   const nowT=()=>{const d=new Date();return pad(d.getHours())+':'+pad(Math.floor(d.getMinutes()/5)*5);};
-  const toM=(t,io)=>{const [H,M]=t.split(':').map(Number);let m=((H*60+M-600)%1440+1440)%1440;if(m===0&&io==='out')m=1440;return m;};
+  const toM=(t,io)=>{const [H,M]=t.split(':').map(Number);let m=((H*60+M-600)%1440+1440)%1440;return m;};
   const f1=x=>{const v=Math.round(x*100)/100;return (Object.is(v,-0)?0:v).toLocaleString('ja-JP',{maximumFractionDigits:2});};
   const sg=x=>{const v=Math.round(x*100)/100;return (v>0?'+':'')+f1(v);};
   const hh=m=>{const t=(600+m)%1440;return Math.floor(t/60)+'';};
@@ -3500,7 +3500,7 @@ renderGloss();
     const out=[];let a=0;ends.forEach(b=>{out.push({a,b});a=b;});return out;};
   const contVol=(L,a,b)=>{const seg=L.seg.map(s=>({m:toM(s.t,'in'),r:+s.r})).sort((x,y)=>x.m-y.m);let v=0;
     seg.forEach((s,i)=>{const e=i+1<seg.length?seg[i+1].m:1440;const o=Math.min(e,b)-Math.max(s.m,a);if(o>0)v+=o*s.r/60;});return v;};
-  const whichBlock=(BL,m)=>m===0?0:BL.findIndex(k=>k.a<m&&m<=k.b);
+  const whichBlock=(BL,m)=>BL.findIndex(k=>k.a<=m&&m<k.b);
   function compute(){
     const BL=blocks();const R=BL.map(k=>({...k,wi:0,bi:0,wo:0,bo:0,det:[]}));
     S.L.forEach(L=>R.forEach(r=>{const v=contVol(L,r.a,r.b);if(v>0){if(L.k==='b')r.bi+=v;else r.wi+=v;r.det.push(`${L.n||'持続'} ${f1(v)}`);}}));
