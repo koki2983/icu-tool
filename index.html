@@ -364,7 +364,7 @@ nav button{font-size:10px}
     <h3 style="margin-top:0">単回の IN（側管 iv・内服・食事・飲水・回収生食・輸血）</h3>
     <div class="row"><div><label>種類</label><select id="ivBk">
       <option value="w|側管 iv">側管 iv（①②…）</option><option value="w|内服の水分">内服の水分</option><option value="w|食事">食事摂取量</option><option value="w|飲水">飲水量</option><option value="w|経管栄養（単回）">経管栄養（単回）</option><option value="w|回収生食（CHDF・HD）">回収生食（CHDF・HD）</option><option value="w|フラッシュ・その他">フラッシュ・その他</option>
-      <option value="b|RCC">輸血 RCC</option><option value="b|FFP">輸血 FFP</option><option value="b|PC">輸血 PC</option><option value="b|アルブミン製剤">アルブミン製剤</option><option value="b|回収血">回収血</option></select></div>
+      <option value="b|RCC">輸血 RCC</option><option value="b|FFP">輸血 FFP</option><option value="b|PC">輸血 PC</option><option value="b|5% アルブミン">5% アルブミン</option><option value="b|25% アルブミン">25% アルブミン</option><option value="b|回収血">回収血</option></select></div>
     <div><label>メモ（任意）</label><input type="text" id="ivBn" placeholder="例 ①メロペネム"></div></div>
     <div class="row"><div><label>時刻</label><input type="time" id="ivBt"></div>
     <div><label>量</label><div class="unit"><input type="number" inputmode="decimal" id="ivBv" step="0.1" placeholder="例 100"><span>mL</span></div></div></div>
@@ -3646,7 +3646,7 @@ renderGloss();
 (function(){
   const FLUIDS=['ソルデム3A','ソルアセトF','ヴィーンF','フィジオ140','KN3号','生理食塩液','5% ブドウ糖','10% ブドウ糖','ビーフリード','エルネオパ','アミノレバン','ラクテック'];
   const OTHERS=['A ライン（ヘパ生）','CHDF 抗凝固（ナファモスタット）','CHDF 抗凝固（ヘパリン）','経管栄養（持続）','フェンタニル','インスリン','ヘパリン持続','KCL 補正','アミオダロン','カルペリチド（ハンプ）'];
-  const BLOOD=['RCC','FFP','PC','アルブミン製剤'];
+  const BLOOD=['RCC','FFP','PC','5% アルブミン','25% アルブミン'];
   const clean=n=>n.replace(/（[^）]*）(?=[^（]*$)/,m=>m).trim();
   function fill(){
     const my=(typeof drugs!=='undefined'?drugs:[]).map(d=>d.name).filter(Boolean);
