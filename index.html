@@ -157,6 +157,9 @@ table.dose td small{color:var(--muted);font-size:11px}
 .ivr-g{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin-top:4px;font-size:14px}
 .ivr-g b{text-align:right;font-size:16px}.ivr-g b.pos{color:var(--teal)}.ivr-g b.neg{color:var(--red)}
 .ivd{margin-top:6px;font-size:12px;color:var(--muted)}.ivd summary{cursor:pointer;padding:4px 0;font-size:12px}.ivd>div{padding:4px 0 2px;line-height:1.7}
+.cnt{display:inline-block;min-width:18px;padding:0 5px;margin-left:2px;border-radius:9px;background:var(--teal-soft);color:var(--teal);font-size:11px;font-weight:700}
+#ivSeg button.on .cnt{background:#fff}
+nav button{font-size:10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -218,49 +221,6 @@ table.dose td small{color:var(--muted);font-size:11px}
   </div>
 
   <div class="warn">計算結果は必ず指示量・実際の希釈とダブルチェックしてください。このツールは補助であり、投与の判断はできません。</div>
-
-  <details class="card o2card" id="ivCard">
-    <summary>輸液シート：IN/OUT・バランス計算</summary>
-    <div class="body">
-    <div class="warn" style="margin-top:0">患者の氏名・ID は入力しないでください。入力はこの端末だけに保存され、24 時間で自動的に消えます。記録と確認は紙の輸液シートで行い、この計算は写し間違い・計算間違いを防ぐための補助として使います。</div>
-    <label>集計の時刻</label>
-    <select id="ivB"><option value="toh">4 時間ごと（14・18・22・2・6・10 時）</option><option value="q2">2 時間ごと</option><option value="q1">1 時間ごと</option></select>
-    <p class="muted" style="margin:4px 0 0">期間は 10:00〜翌 10:00。</p>
-
-    <h3>① 持続（点滴・シリンジ・経管栄養の持続・CHDF 抗凝固・A ライン）</h3>
-    <div class="row"><div><label>名前</label><input type="text" id="ivCn" placeholder="例 ソルデム3A、A ライン"></div>
-    <div><label>区分</label><select id="ivCk"><option value="w">水分</option><option value="b">輸血・アルブミン</option></select></div></div>
-    <div class="row"><div><label>開始時刻</label><input type="time" id="ivCt"></div>
-    <div><label>流量</label><div class="unit"><input type="number" inputmode="decimal" id="ivCr" step="0.1" placeholder="例 8"><span>mL/h</span></div></div></div>
-    <button class="primary" id="ivCadd" style="width:100%">持続を追加</button>
-    <div id="ivClist" style="margin-top:8px"></div>
-
-    <h3>② 単回の IN（側管 iv・内服・食事・飲水・回収生食・輸血）</h3>
-    <div class="row"><div><label>種類</label><select id="ivBk">
-      <option value="w|側管 iv">側管 iv（①②…）</option><option value="w|内服の水分">内服の水分</option><option value="w|食事">食事摂取量</option><option value="w|飲水">飲水量</option><option value="w|経管栄養（単回）">経管栄養（単回）</option><option value="w|回収生食（CHDF・HD）">回収生食（CHDF・HD）</option><option value="w|フラッシュ・その他">フラッシュ・その他</option>
-      <option value="b|RCC">輸血 RCC</option><option value="b|FFP">輸血 FFP</option><option value="b|PC">輸血 PC</option><option value="b|アルブミン製剤">アルブミン製剤</option><option value="b|回収血">回収血</option></select></div>
-    <div><label>メモ（任意）</label><input type="text" id="ivBn" placeholder="例 ①メロペネム"></div></div>
-    <div class="row"><div><label>時刻</label><input type="time" id="ivBt"></div>
-    <div><label>量</label><div class="unit"><input type="number" inputmode="decimal" id="ivBv" step="0.1" placeholder="例 100"><span>mL</span></div></div></div>
-    <button class="primary" id="ivBadd" style="width:100%">単回 IN を追加</button>
-    <div id="ivBlist" style="margin-top:8px"></div>
-
-    <h3>③ OUT</h3>
-    <div class="row"><div><label>種類</label><select id="ivOk">
-      <option value="w|尿">尿</option><option value="w|胃管">胃管</option><option value="w|排便">排便</option><option value="w|除水（CHDF・HD）">除水（CHDF・HD）</option><option value="w|嘔吐">嘔吐</option><option value="w|その他の OUT">その他の OUT</option>
-      <option value="b|ドレーン">ドレーン（心嚢・胸骨下・胸腔など）</option><option value="b|出血">出血</option></select></div>
-    <div><label>メモ（任意）</label><input type="text" id="ivOn" placeholder="例 心嚢"></div></div>
-    <div class="row"><div><label>時刻</label><input type="time" id="ivOt"></div>
-    <div><label>量</label><div class="unit"><input type="number" inputmode="decimal" id="ivOv" step="0.1" placeholder="例 220"><span>mL</span></div></div></div>
-    <button class="primary" id="ivOadd" style="width:100%">OUT を追加</button>
-    <div id="ivOlist" style="margin-top:8px"></div>
-
-    <h3>集計（紙に写す値）</h3>
-    <div id="ivRes"></div>
-    <div class="row" style="margin-top:8px"><button class="small" id="ivCopy">集計をテキストでコピー</button><button class="small danger" id="ivClr">すべて消去</button></div>
-    <p class="muted">表示は「その区間の量／累計」。持続は流量 × 時間で計算。区間は「始まりの時刻から、次の区切りの 1 分前まで」。13:59 に測った尿や入った分は 10〜14 時の区間、14:00 に投与した分は 14〜18 時の区間に入る。最後の区間の記録は 9:59。食事・飲水の換算（g と mL）は施設のルールに合わせる。水分バランス＝水分 IN − 水分 OUT、血液バランス＝輸血 IN − ドレーン・出血、TOTAL＝その合計。</p>
-    </div>
-  </details>
 
   <details class="card o2card" open>
     <summary>酸素流量と FiO₂ の目安</summary>
@@ -352,6 +312,60 @@ table.dose td small{color:var(--muted);font-size:11px}
   <p class="muted">組み込みの項目は一般的な知識の要点で、図は本アプリ用に描き起こしたものです。各項目の下のメモ欄に、自院のルールや自分の覚え書きを書き足せます。</p>
 </section>
 
+
+<!-- ============ 輸液シート ============ -->
+<section id="p-iv" class="page">
+<div id="ivCard">
+  <div class="warn" style="margin-top:0">患者の氏名・ID は入力しないでください。入力はこの端末だけに保存され、24 時間で自動的に消えます。記録と確認は紙の輸液シートで行い、この計算は補助として使います。</div>
+  <div class="seg" id="ivSeg" style="margin-top:10px">
+    <button data-v="c" class="on">点滴</button><button data-v="b">単回 IN</button><button data-v="o">OUT</button><button data-v="r">集計</button>
+  </div>
+
+  <div class="ivp card" data-v="c"><div class="body">
+    <h3 style="margin-top:0">点滴・持続（シリンジ・経管栄養の持続・CHDF 抗凝固・A ライン）</h3>
+    <div class="row"><div><label>名前</label><input type="text" id="ivCn" placeholder="例 ソルデム3A、A ライン"></div>
+    <div><label>区分</label><select id="ivCk"><option value="w">水分</option><option value="b">輸血・アルブミン</option></select></div></div>
+    <div class="row"><div><label>開始時刻</label><input type="time" id="ivCt"></div>
+    <div><label>流量</label><div class="unit"><input type="number" inputmode="decimal" id="ivCr" step="0.1" placeholder="例 8"><span>mL/h</span></div></div></div>
+    <button class="primary" id="ivCadd" style="width:100%">点滴を追加</button>
+    <div id="ivClist" style="margin-top:10px"></div>
+  </div></div>
+
+  <div class="ivp card" data-v="b" style="display:none"><div class="body">
+    <h3 style="margin-top:0">単回の IN（側管 iv・内服・食事・飲水・回収生食・輸血）</h3>
+    <div class="row"><div><label>種類</label><select id="ivBk">
+      <option value="w|側管 iv">側管 iv（①②…）</option><option value="w|内服の水分">内服の水分</option><option value="w|食事">食事摂取量</option><option value="w|飲水">飲水量</option><option value="w|経管栄養（単回）">経管栄養（単回）</option><option value="w|回収生食（CHDF・HD）">回収生食（CHDF・HD）</option><option value="w|フラッシュ・その他">フラッシュ・その他</option>
+      <option value="b|RCC">輸血 RCC</option><option value="b|FFP">輸血 FFP</option><option value="b|PC">輸血 PC</option><option value="b|アルブミン製剤">アルブミン製剤</option><option value="b|回収血">回収血</option></select></div>
+    <div><label>メモ（任意）</label><input type="text" id="ivBn" placeholder="例 ①メロペネム"></div></div>
+    <div class="row"><div><label>時刻</label><input type="time" id="ivBt"></div>
+    <div><label>量</label><div class="unit"><input type="number" inputmode="decimal" id="ivBv" step="0.1" placeholder="例 100"><span>mL</span></div></div></div>
+    <button class="primary" id="ivBadd" style="width:100%">単回 IN を追加</button>
+    <div id="ivBlist" style="margin-top:10px"></div>
+  </div></div>
+
+  <div class="ivp card" data-v="o" style="display:none"><div class="body">
+    <h3 style="margin-top:0">OUT</h3>
+    <div class="row"><div><label>種類</label><select id="ivOk">
+      <option value="w|尿">尿</option><option value="w|胃管">胃管</option><option value="w|排便">排便</option><option value="w|除水（CHDF・HD）">除水（CHDF・HD）</option><option value="w|嘔吐">嘔吐</option><option value="w|その他の OUT">その他の OUT</option>
+      <option value="b|ドレーン">ドレーン（心嚢・胸骨下・胸腔など）</option><option value="b|出血">出血</option></select></div>
+    <div><label>メモ（任意）</label><input type="text" id="ivOn" placeholder="例 心嚢"></div></div>
+    <div class="row"><div><label>時刻</label><input type="time" id="ivOt"></div>
+    <div><label>量</label><div class="unit"><input type="number" inputmode="decimal" id="ivOv" step="0.1" placeholder="例 220"><span>mL</span></div></div></div>
+    <button class="primary" id="ivOadd" style="width:100%">OUT を追加</button>
+    <div id="ivOlist" style="margin-top:10px"></div>
+  </div></div>
+
+  <div class="ivp card" data-v="r" style="display:none"><div class="body">
+    <label style="margin-top:0">集計の時刻</label>
+    <select id="ivB"><option value="toh">4 時間ごと（14・18・22・2・6・10 時）</option><option value="q2">2 時間ごと</option><option value="q1">1 時間ごと</option></select>
+    <div id="ivRes" style="margin-top:10px"></div>
+    <div class="row" style="margin-top:8px"><button class="small" id="ivCopy">集計をテキストでコピー</button><button class="small danger" id="ivClr">すべて消去</button></div>
+  </div></div>
+
+  <p class="muted">表示は「その区間の量／累計」。点滴は流量 × 時間で計算。区間は「始まりの時刻から、次の区切りの 1 分前まで」。13:59 に測った尿や入った分は 10〜14 時の区間、14:00 に投与した分は 14〜18 時の区間に入る。最後の区間の記録は 9:59。食事・飲水の換算（g と mL）は施設のルールに合わせる。水分バランス＝水分 IN − 水分 OUT、血液バランス＝輸血 IN − ドレーン・出血、TOTAL＝その合計。</p>
+</div>
+</section>
+
 <!-- ============ 用語 ============ -->
 <section id="p-gloss" class="page">
   <input type="text" id="gSearch" class="search" placeholder="用語を検索（例：PEEP、せん妄、楔入圧）">
@@ -364,6 +378,7 @@ table.dose td small{color:var(--muted);font-size:11px}
 
 <nav>
   <button data-p="calc" class="on"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>計算</button>
+  <button data-p="iv"><svg viewBox="0 0 24 24"><path d="M8 2h8v8a4 4 0 01-8 0z"/><path d="M8 6h8"/><path d="M12 14v4"/><path d="M12 18c0 2 2 2 2 4"/></svg>輸液</button>
   <button data-p="drug"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v4l-4 8v5a2 2 0 002 2h8a2 2 0 002-2v-5l-4-8V3"/><path d="M7 15h10"/></svg>薬剤</button>
   <button data-p="score"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>スコア</button>
   <button data-p="know"><svg viewBox="0 0 24 24"><path d="M4 4h7a3 3 0 013 3v13a2 2 0 00-2-2H4zM20 4h-7a3 3 0 00-3 3v13a2 2 0 012-2h8z"/></svg>知識</button>
@@ -404,7 +419,7 @@ const isU=u=>u==='umin'||u==='uh';
 const fmt=(n,d)=>{ if(!isFinite(n))return '－'; return Number(n.toFixed(d)).toLocaleString('ja-JP',{maximumFractionDigits:d}); };
 
 /* ---------- ナビ ---------- */
-const titles={calc:'ガンマ計算',drug:'薬剤登録',score:'スコア計算',know:'知識メモ',gloss:'用語集'};
+const titles={calc:'ガンマ計算',iv:'輸液シート',drug:'薬剤登録',score:'スコア計算',know:'知識メモ',gloss:'用語集'};
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
   document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.p));
@@ -3537,7 +3552,14 @@ renderGloss();
       ${blood?`<span>輸血 IN</span><b>${f1(r.bi)}/${f1(r.cb)}</b><span>血液 OUT</span><b>${f1(r.bo)}/${f1(r.cbo)}</b><span>血液バランス</span><b>${sg(r.cb-r.cbo)}</b><span>TOTAL バランス</span><b>${sg(r.cw-r.cwo+r.cb-r.cbo)}</b>`:''}</div>
       ${r.det.length?`<details class="ivd"><summary>内訳</summary><div>${r.det.map(esc).join('<br>')}</div></details>`:''}</div>`).join('');
   }
-  function all(){renderLists();renderRes();}
+  function counts(){const c=S.L.length,bi=S.E.filter(e=>e.io==='in').length,o=S.E.filter(e=>e.io==='out').length;
+    const lab={c:'点滴',b:'単回 IN',o:'OUT',r:'集計'},n={c,b:bi,o};
+    document.querySelectorAll('#ivSeg button').forEach(b=>{const v=b.dataset.v;b.innerHTML=lab[v]+(n[v]?` <span class="cnt">${n[v]}</span>`:'');});}
+  function all(){renderLists();renderRes();counts();}
+  document.querySelectorAll('#ivSeg button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#ivSeg button').forEach(x=>x.classList.toggle('on',x===b));
+    document.querySelectorAll('#ivCard .ivp').forEach(p=>p.style.display=p.dataset.v===b.dataset.v?'':'none');
+    if(b.dataset.v==='r')renderRes();}));
   $('ivCadd').onclick=()=>{const t=$('ivCt').value,r=parseFloat($('ivCr').value);if(!t||!(r>=0)){toast('開始時刻と流量を入れてください');return;}
     S.L.push({id:uid(),n:$('ivCn').value.trim(),k:$('ivCk').value,seg:[{t,r}]});save();$('ivCn').value='';$('ivCr').value='';all();toast('持続を追加しました');};
   const addE=(io,kSel,nId,tId,vId)=>{const [k,type]=$(kSel).value.split('|');const t=$(tId).value,v=parseFloat($(vId).value);
