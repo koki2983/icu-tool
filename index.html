@@ -31,8 +31,8 @@ main{padding:14px 14px 24px;max-width:560px;margin:0 auto}
 .page{display:none}.page.on{display:block}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
 label{display:block;font-size:13px;color:var(--muted);margin:8px 0 4px}
-input[type=text],input[type=number],select,textarea{
-  width:100%;font:inherit;font-size:17px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+input[type=text],input[type=number],input[type=time],select,textarea{
+  width:100%;min-height:44px;font:inherit;font-size:17px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
   background:#fff;color:var(--ink);appearance:none;-webkit-appearance:none}
 textarea{min-height:90px;font-size:15px;line-height:1.5}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:0;border-color:var(--teal)}
@@ -73,7 +73,7 @@ details{border:1px solid var(--line);border-radius:10px;background:#fff;margin-b
 summary{padding:11px 12px;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
 summary::-webkit-details-marker{display:none}
 summary::after{content:"＋";color:var(--muted);font-weight:400}
-details[open] summary::after{content:"－"}
+details[open]>summary::after{content:"－"}
 .body{padding:0 12px 12px;font-size:15px}
 .body ul{padding-left:18px;margin:6px 0}.body li{margin:3px 0}
 .memo{margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
@@ -146,6 +146,17 @@ table.dose td small{color:var(--muted);font-size:11px}
 .howto{font-size:12px;color:var(--muted);font-weight:400;line-height:1.5;margin:2px 0 6px;padding-left:8px;border-left:2px solid var(--line)}
 .howlist{margin:4px 0 0;padding-left:18px;font-size:13px}
 .howlist li{margin:4px 0}
+.iv{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:#fff}
+.iv-h{display:flex;align-items:center;gap:6px}.iv-h b{flex:1}
+.iv-seg{margin:6px 0;font-size:13px;line-height:2}
+.chip{display:inline-block;background:var(--teal-soft);border-radius:12px;padding:0 8px;margin:0 2px}.chip a{color:var(--red);margin-left:4px;cursor:pointer}
+.iv-chg{margin-top:0}
+.iv-row{display:grid;grid-template-columns:48px 1fr auto auto;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ivr{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:8px;background:#fff}
+.ivr-h b{font-size:18px;margin-right:6px}
+.ivr-g{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin-top:4px;font-size:14px}
+.ivr-g b{text-align:right;font-size:16px}.ivr-g b.pos{color:var(--teal)}.ivr-g b.neg{color:var(--red)}
+.ivd{margin-top:6px;font-size:12px;color:var(--muted)}.ivd summary{cursor:pointer;padding:4px 0;font-size:12px}.ivd>div{padding:4px 0 2px;line-height:1.7}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -207,6 +218,49 @@ table.dose td small{color:var(--muted);font-size:11px}
   </div>
 
   <div class="warn">計算結果は必ず指示量・実際の希釈とダブルチェックしてください。このツールは補助であり、投与の判断はできません。</div>
+
+  <details class="card o2card" id="ivCard">
+    <summary>輸液シート：IN/OUT・バランス計算</summary>
+    <div class="body">
+    <div class="warn" style="margin-top:0">患者の氏名・ID は入力しないでください。入力はこの端末だけに保存され、24 時間で自動的に消えます。記録と確認は紙の輸液シートで行い、この計算は写し間違い・計算間違いを防ぐための補助として使います。</div>
+    <label>集計の時刻</label>
+    <select id="ivB"><option value="toh">当院：13・17・21・1・5・9・10 時</option><option value="q4">4 時間ごと：14・18・22・2・6・10 時</option><option value="q2">2 時間ごと</option><option value="q1">1 時間ごと</option></select>
+    <p class="muted" style="margin:4px 0 0">期間は 10:00〜翌 10:00。</p>
+
+    <h3>① 持続（点滴・シリンジ・経管栄養の持続・CHDF 抗凝固・A ライン）</h3>
+    <div class="row"><div><label>名前</label><input type="text" id="ivCn" placeholder="例 ソルデム3A、A ライン"></div>
+    <div><label>区分</label><select id="ivCk"><option value="w">水分</option><option value="b">輸血・アルブミン</option></select></div></div>
+    <div class="row"><div><label>開始時刻</label><input type="time" id="ivCt"></div>
+    <div><label>流量</label><div class="unit"><input type="number" inputmode="decimal" id="ivCr" step="0.1" placeholder="例 8"><span>mL/h</span></div></div></div>
+    <button class="primary" id="ivCadd" style="width:100%">持続を追加</button>
+    <div id="ivClist" style="margin-top:8px"></div>
+
+    <h3>② 単回の IN（側管 iv・内服・食事・飲水・回収生食・輸血）</h3>
+    <div class="row"><div><label>種類</label><select id="ivBk">
+      <option value="w|側管 iv">側管 iv（①②…）</option><option value="w|内服の水分">内服の水分</option><option value="w|食事">食事摂取量</option><option value="w|飲水">飲水量</option><option value="w|経管栄養（単回）">経管栄養（単回）</option><option value="w|回収生食（CHDF・HD）">回収生食（CHDF・HD）</option><option value="w|フラッシュ・その他">フラッシュ・その他</option>
+      <option value="b|RCC">輸血 RCC</option><option value="b|FFP">輸血 FFP</option><option value="b|PC">輸血 PC</option><option value="b|アルブミン製剤">アルブミン製剤</option><option value="b|回収血">回収血</option></select></div>
+    <div><label>メモ（任意）</label><input type="text" id="ivBn" placeholder="例 ①メロペネム"></div></div>
+    <div class="row"><div><label>時刻</label><input type="time" id="ivBt"></div>
+    <div><label>量</label><div class="unit"><input type="number" inputmode="decimal" id="ivBv" step="0.1" placeholder="例 100"><span>mL</span></div></div></div>
+    <button class="primary" id="ivBadd" style="width:100%">単回 IN を追加</button>
+    <div id="ivBlist" style="margin-top:8px"></div>
+
+    <h3>③ OUT</h3>
+    <div class="row"><div><label>種類</label><select id="ivOk">
+      <option value="w|尿">尿</option><option value="w|胃管">胃管</option><option value="w|排便">排便</option><option value="w|除水（CHDF・HD）">除水（CHDF・HD）</option><option value="w|嘔吐">嘔吐</option><option value="w|その他の OUT">その他の OUT</option>
+      <option value="b|ドレーン">ドレーン（心嚢・胸骨下・胸腔など）</option><option value="b|出血">出血</option></select></div>
+    <div><label>メモ（任意）</label><input type="text" id="ivOn" placeholder="例 心嚢"></div></div>
+    <div class="row"><div><label>時刻</label><input type="time" id="ivOt"></div>
+    <div><label>量</label><div class="unit"><input type="number" inputmode="decimal" id="ivOv" step="0.1" placeholder="例 220"><span>mL</span></div></div></div>
+    <button class="primary" id="ivOadd" style="width:100%">OUT を追加</button>
+    <div id="ivOlist" style="margin-top:8px"></div>
+
+    <h3>集計（紙に写す値）</h3>
+    <div id="ivRes"></div>
+    <div class="row" style="margin-top:8px"><button class="small" id="ivCopy">集計をテキストでコピー</button><button class="small danger" id="ivClr">すべて消去</button></div>
+    <p class="muted">表示は「その区間の量／累計」。持続は流量 × 時間で計算。単回とOUTは入力した時刻の区間に入る（13:00 に測った尿は 10〜13 時の区間）。翌朝 10:00 に測った OUT は最後の区間、10:00 に始めた IN は最初の区間に入る。食事・飲水の換算（g と mL）は施設のルールに合わせる。水分バランス＝水分 IN − 水分 OUT、血液バランス＝輸血 IN − ドレーン・出血、TOTAL＝その合計。</p>
+    </div>
+  </details>
 
   <details class="card o2card" open>
     <summary>酸素流量と FiO₂ の目安</summary>
@@ -3428,6 +3482,78 @@ renderGloss();
 })();
 
 
+
+
+/* 輸液シート IN/OUT・バランス計算 */
+(function(){
+  const K='ivsheet'; let S={c:Date.now(),L:[],E:[]};
+  const BK={toh:[13,17,21,1,5,9,10],q4:[14,18,22,2,6,10],q2:[12,14,16,18,20,22,0,2,4,6,8,10],q1:[11,12,13,14,15,16,17,18,19,20,21,22,23,0,1,2,3,4,5,6,7,8,9,10]};
+  const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const pad=n=>String(n).padStart(2,'0');
+  const nowT=()=>{const d=new Date();return pad(d.getHours())+':'+pad(Math.floor(d.getMinutes()/5)*5);};
+  const toM=(t,io)=>{const [H,M]=t.split(':').map(Number);let m=((H*60+M-600)%1440+1440)%1440;if(m===0&&io==='out')m=1440;return m;};
+  const f1=x=>{const v=Math.round(x*100)/100;return (Object.is(v,-0)?0:v).toLocaleString('ja-JP',{maximumFractionDigits:2});};
+  const sg=x=>{const v=Math.round(x*100)/100;return (v>0?'+':'')+f1(v);};
+  const hh=m=>{const t=(600+m)%1440;return Math.floor(t/60)+'';};
+  const save=()=>store.set(K,S);
+  const blocks=()=>{const ends=BK[$('ivB').value].map(hr=>{const m=((hr*60-600)%1440+1440)%1440;return m===0?1440:m;});
+    const out=[];let a=0;ends.forEach(b=>{out.push({a,b});a=b;});return out;};
+  const contVol=(L,a,b)=>{const seg=L.seg.map(s=>({m:toM(s.t,'in'),r:+s.r})).sort((x,y)=>x.m-y.m);let v=0;
+    seg.forEach((s,i)=>{const e=i+1<seg.length?seg[i+1].m:1440;const o=Math.min(e,b)-Math.max(s.m,a);if(o>0)v+=o*s.r/60;});return v;};
+  const whichBlock=(BL,m)=>m===0?0:BL.findIndex(k=>k.a<m&&m<=k.b);
+  function compute(){
+    const BL=blocks();const R=BL.map(k=>({...k,wi:0,bi:0,wo:0,bo:0,det:[]}));
+    S.L.forEach(L=>R.forEach(r=>{const v=contVol(L,r.a,r.b);if(v>0){if(L.k==='b')r.bi+=v;else r.wi+=v;r.det.push(`${L.n||'持続'} ${f1(v)}`);}}));
+    S.E.forEach(e=>{const m=toM(e.t,e.io);const i=whichBlock(BL,m);if(i<0)return;const r=R[i];const v=+e.v;
+      if(e.io==='in'){if(e.k==='b')r.bi+=v;else r.wi+=v;r.det.push(`${e.type}${e.n?'（'+e.n+'）':''} ${f1(v)}`);}
+      else{if(e.k==='b')r.bo+=v;else r.wo+=v;r.det.push(`OUT ${e.type}${e.n?'（'+e.n+'）':''} ${f1(v)}`);}});
+    let cw=0,cb=0,cwo=0,cbo=0;R.forEach(r=>{cw+=r.wi;cb+=r.bi;cwo+=r.wo;cbo+=r.bo;Object.assign(r,{cw,cb,cwo,cbo});});
+    return R;}
+  function renderLists(){
+    const C=$('ivClist');
+    C.innerHTML=S.L.length?S.L.map(L=>{const seg=[...L.seg].sort((x,y)=>toM(x.t,'in')-toM(y.t,'in'));
+      return `<div class="iv"><div class="iv-h"><b>${esc(L.n||'（名前なし）')}</b>${L.k==='b'?'<span class="tag c">輸血</span>':''}<button class="small" data-dl="${L.id}">削除</button></div>
+      <div class="iv-seg">${seg.map((s,i)=>`<span class="chip">${s.t} ${+s.r===0?'OFF':f1(+s.r)+' mL/h'}${i>0?` <a data-ds="${L.id}|${i}">×</a>`:''}</span>`).join('→')}</div>
+      <div class="row iv-chg"><div><input type="time" id="t_${L.id}" value="${nowT()}"></div><div><div class="unit"><input type="number" inputmode="decimal" step="0.1" id="r_${L.id}" placeholder="流量"><span>mL/h</span></div></div></div>
+      <div class="row"><button class="small" data-ch="${L.id}">流量を変更</button><button class="small" data-off="${L.id}">この時刻で OFF</button></div></div>`;}).join(''):'<div class="muted" style="font-size:13px">まだありません</div>';
+    const ev=(io,box)=>{const E=S.E.filter(e=>e.io===io).sort((a,b)=>toM(a.t,io)-toM(b.t,io));
+      box.innerHTML=E.length?E.map(e=>`<div class="iv-row"><span>${e.t}</span><span>${esc(e.type)}${e.n?'（'+esc(e.n)+'）':''}${e.k==='b'?' <span class="tag c">血液</span>':''}</span><b>${f1(+e.v)} mL</b><button class="small" data-de="${e.id}">×</button></div>`).join(''):'<div class="muted" style="font-size:13px">まだありません</div>';};
+    ev('in',$('ivBlist'));ev('out',$('ivOlist'));
+    document.querySelectorAll('#ivCard [data-dl]').forEach(b=>b.onclick=()=>{if(!confirm('この持続を削除しますか？'))return;S.L=S.L.filter(x=>x.id!==b.dataset.dl);save();all();});
+    document.querySelectorAll('#ivCard [data-ds]').forEach(b=>b.onclick=()=>{const [id,i]=b.dataset.ds.split('|');const L=S.L.find(x=>x.id===id);const seg=[...L.seg].sort((x,y)=>toM(x.t,'in')-toM(y.t,'in'));seg.splice(+i,1);L.seg=seg;save();all();});
+    document.querySelectorAll('#ivCard [data-de]').forEach(b=>b.onclick=()=>{S.E=S.E.filter(x=>x.id!==b.dataset.de);save();all();});
+    const chg=(id,off)=>{const L=S.L.find(x=>x.id===id);const t=$('t_'+id).value;const r=off?0:parseFloat($('r_'+id).value);
+      if(!t){toast('時刻を入れてください');return;}if(!off&&!(r>=0)){toast('新しい流量を入れてください');return;}
+      if(toM(t,'in')<=toM([...L.seg].sort((x,y)=>toM(x.t,'in')-toM(y.t,'in'))[0].t,'in')){toast('開始時刻より後の時刻にしてください');return;}
+      L.seg.push({t,r});save();all();toast(off?'OFF を追加しました':'流量変更を追加しました');};
+    document.querySelectorAll('#ivCard [data-ch]').forEach(b=>b.onclick=()=>chg(b.dataset.ch,false));
+    document.querySelectorAll('#ivCard [data-off]').forEach(b=>b.onclick=()=>chg(b.dataset.off,true));
+  }
+  function renderRes(){
+    const R=compute();const any=S.L.length||S.E.length;const blood=R.some(r=>r.cb||r.cbo);
+    if(!any){$('ivRes').innerHTML='<div class="muted" style="font-size:13px">入力すると、集計時刻ごとの IN／OUT／バランスがここに出ます</div>';return;}
+    $('ivRes').innerHTML=R.map((r,i)=>`<div class="ivr"><div class="ivr-h"><b>${hh(r.b)}時</b><span class="muted">（${hh(r.a)}〜${hh(r.b)}時）</span></div>
+      <div class="ivr-g"><span>IN Total</span><b>${f1(r.wi)}/${f1(r.cw)}</b><span>OUT Total</span><b>${f1(r.wo)}/${f1(r.cwo)}</b><span>水分バランス</span><b class="${r.cw-r.cwo>=0?'pos':'neg'}">${sg(r.cw-r.cwo)}</b>
+      ${blood?`<span>輸血 IN</span><b>${f1(r.bi)}/${f1(r.cb)}</b><span>血液 OUT</span><b>${f1(r.bo)}/${f1(r.cbo)}</b><span>血液バランス</span><b>${sg(r.cb-r.cbo)}</b><span>TOTAL バランス</span><b>${sg(r.cw-r.cwo+r.cb-r.cbo)}</b>`:''}</div>
+      ${r.det.length?`<details class="ivd"><summary>内訳</summary><div>${r.det.map(esc).join('<br>')}</div></details>`:''}</div>`).join('');
+  }
+  function all(){renderLists();renderRes();}
+  $('ivCadd').onclick=()=>{const t=$('ivCt').value,r=parseFloat($('ivCr').value);if(!t||!(r>=0)){toast('開始時刻と流量を入れてください');return;}
+    S.L.push({id:uid(),n:$('ivCn').value.trim(),k:$('ivCk').value,seg:[{t,r}]});save();$('ivCn').value='';$('ivCr').value='';all();toast('持続を追加しました');};
+  const addE=(io,kSel,nId,tId,vId)=>{const [k,type]=$(kSel).value.split('|');const t=$(tId).value,v=parseFloat($(vId).value);
+    if(!t||!(v>0)){toast('時刻と量を入れてください');return;}
+    S.E.push({id:uid(),io,k,type,n:$(nId).value.trim(),t,v});save();$(nId).value='';$(vId).value='';all();toast('追加しました');};
+  $('ivBadd').onclick=()=>addE('in','ivBk','ivBn','ivBt','ivBv');
+  $('ivOadd').onclick=()=>addE('out','ivOk','ivOn','ivOt','ivOv');
+  $('ivB').onchange=()=>{S.bk=$('ivB').value;save();renderRes();};
+  $('ivClr').onclick=()=>{if(confirm('輸液シートの入力をすべて消しますか？')){S={c:Date.now(),L:[],E:[],bk:$('ivB').value};save();all();}};
+  $('ivCopy').onclick=async()=>{const R=compute();const blood=R.some(r=>r.cb||r.cbo);
+    const txt=R.map(r=>`${hh(r.b)}時（${hh(r.a)}〜${hh(r.b)}時） IN ${f1(r.wi)}/${f1(r.cw)}　OUT ${f1(r.wo)}/${f1(r.cwo)}　水分バランス ${sg(r.cw-r.cwo)}`+(blood?`　輸血IN ${f1(r.bi)}/${f1(r.cb)}　血液OUT ${f1(r.bo)}/${f1(r.cbo)}　血液バランス ${sg(r.cb-r.cbo)}　TOTAL ${sg(r.cw-r.cwo+r.cb-r.cbo)}`:'')).join('\n');
+    try{await navigator.clipboard.writeText(txt);}catch(e){const a=document.createElement('textarea');a.value=txt;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();}toast('コピーしました');};
+  ['ivCt','ivBt','ivOt'].forEach(i=>$(i).value=nowT());
+  (async()=>{const d=await store.get(K);if(d&&Date.now()-d.c<26*3600000){S=d;if(S.bk)$('ivB').value=S.bk;}else if(d){store.set(K,S);}all();})();
+  window.__iv={compute,get S(){return S},set S(v){S=v},all,toM};
+})();
 
 loadDrugs(); loadKnow(); calc();
 
