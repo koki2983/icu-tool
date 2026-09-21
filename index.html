@@ -2112,6 +2112,19 @@ const CALC_HTML=`
   </div>
 </details>
 <details class="card o2card">
+  <summary>人工呼吸：予測体重と理想の 1 回換気量</summary>
+  <div class="body">
+  <div class="row"><div><label>身長</label><div class="unit"><input type="number" inputmode="decimal" id="pbH" placeholder="例 165"><span>cm</span></div></div>
+  <div><label>性別</label><select id="pbS"><option value="m">男性</option><option value="f">女性</option></select></div></div>
+  <div class="row"><div><label>実体重（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="pbW" placeholder="比較用"><span>kg</span></div></div>
+  <div><label>今の設定 VT（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="pbV" placeholder="例 450"><span>mL</span></div></div></div>
+  <div class="result"><div class="big"><span id="pbN">－</span><em>kg（予測体重）</em></div><div class="sub" id="pbSub">身長と性別を入力</div></div>
+  <table id="pbTbl" class="o2" style="margin-top:10px"></table>
+  <div id="pbChk" class="rangebox" style="display:none"></div>
+  <p class="muted">予測体重（PBW）：男性 50 ＋ 0.91 ×（身長 − 152.4）、女性 45.5 ＋ 0.91 ×（身長 − 152.4）。1 回換気量は通常 6〜8 mL/kg、ARDS は 6 mL/kg から開始し、プラトー圧 30 cmH₂O 未満・駆動圧 15 cmH₂O 未満を守る。実体重ではなく身長で決めるのは、肺の大きさは身長で決まるため。</p>
+  </div>
+</details>
+<details class="card o2card">
   <summary>血液ガス：予測 PaCO₂・代償の判定</summary>
   <div class="body">
   <div class="row"><div><label>pH</label><input type="number" inputmode="decimal" id="gPH" placeholder="7.28" step="0.01"></div>
@@ -3317,6 +3330,31 @@ renderGloss();
       if(ag>14){const ch=hco+(ag-12);s+=`（上昇型）。補正 HCO₃⁻ ＝ ${f1(ch)}`+(ch>26?' → 代謝性アルカローシスも隠れている':ch<22?' → AG 正常型アシドーシスも合併':' → AG 上昇型のみ');}else s+='（正常）';L.push(s);}
     R.innerHTML='<div class="sub" style="font-size:14px;color:var(--ink);line-height:1.6">'+L.join('<br>')+'</div>';};
   ['gPH','gCO2','gHCO','gNa','gCl','gAlb'].forEach(i=>$(i).addEventListener('input',run));
+})();
+
+
+/* 予測体重と理想 VT */
+(function(){
+  const run=()=>{const H=parseFloat($('pbH').value),sx=$('pbS').value,W=parseFloat($('pbW').value),V=parseFloat($('pbV').value);
+    const T=$('pbTbl'),C=$('pbChk');
+    if(!(H>100&&H<230)){$('pbN').textContent='－';$('pbSub').textContent='身長と性別を入力';T.innerHTML='';C.style.display='none';return;}
+    const pbw=(sx==='m'?50:45.5)+0.91*(H-152.4);
+    $('pbN').textContent=fmt(pbw,1);
+    let sub=(sx==='m'?'男性':'女性')+` ${H} cm の予測体重`;
+    if(W>0){const d=W-pbw;sub+=`（実体重 ${W} kg は予測体重より ${d>=0?'+':''}${fmt(d,1)} kg）`;}
+    $('pbSub').textContent=sub;
+    const rows=[[4,'ARDS で肺保護をさらに強めるとき'],[5,''],[6,'ARDS の開始目安'],[7,''],[8,'通常の上限']];
+    T.innerHTML='<tr><th>mL/kg</th><th>1 回換気量</th><th>メモ</th></tr>'+rows.map(([k,m])=>`<tr${k===6?' style="background:var(--teal-soft)"':''}><td>${k}</td><td><b>${Math.round(pbw*k)}</b> mL</td><td style="text-align:left;font-weight:400;font-size:12px">${m}</td></tr>`).join('')
+      +(W>0?`<tr><td colspan="3" style="text-align:left;font-weight:400;font-size:12px;color:var(--amber)">参考：実体重で 8 mL/kg だと ${Math.round(W*8)} mL（${W>pbw*1.2?'予測体重より大きく、過大換気になる':'予測体重に近い'}）</td></tr>`:'');
+    if(V>0){const r=V/pbw;let cls='',msg='';
+      if(r>8){cls='high';msg='8 mL/kg を超えています。プラトー圧・駆動圧を確認し、設定の見直しを医師と相談';}
+      else if(r>=6){msg='6〜8 mL/kg の範囲内';}
+      else if(r>=4){cls='low';msg='6 mL/kg 未満（ARDS の肺保護換気の範囲）。PaCO₂・pH を確認';}
+      else {cls='high';msg='4 mL/kg 未満。換気不足の可能性';}
+      C.style.display='';C.className='rangebox '+cls;
+      C.innerHTML=`今の設定 ${V} mL ＝ <b>${fmt(r,1)} mL/kg</b>（予測体重あたり）<div class="rn">${msg}</div>`;}
+    else C.style.display='none';};
+  ['pbH','pbW','pbV'].forEach(i=>$(i).addEventListener('input',run));$('pbS').addEventListener('change',run);
 })();
 
 loadDrugs(); loadKnow(); calc();
