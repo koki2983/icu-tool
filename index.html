@@ -160,6 +160,9 @@ table.dose td small{color:var(--muted);font-size:11px}
 .cnt{display:inline-block;min-width:18px;padding:0 5px;margin-left:2px;border-radius:9px;background:var(--teal-soft);color:var(--teal);font-size:11px;font-weight:700}
 #ivSeg button.on .cnt{background:#fff}
 nav button{font-size:10px}
+.drchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+.drc{border:1px solid var(--line);background:#fff;border-radius:16px;padding:6px 12px;font-size:14px;color:var(--ink)}
+.drc.on{background:var(--teal);border-color:var(--teal);color:#fff}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -323,7 +326,9 @@ nav button{font-size:10px}
 
   <div class="ivp card" data-v="c"><div class="body">
     <h3 style="margin-top:0">点滴・持続（シリンジ・経管栄養の持続・CHDF 抗凝固・A ライン）</h3>
-    <div class="row"><div><label>名前</label><input type="text" id="ivCn" placeholder="例 ソルデム3A、A ライン"></div>
+    <label style="margin-top:0">点滴を選ぶ</label>
+    <select id="ivCsel"></select>
+    <div class="row"><div><label>名前（選ぶと入ります。手入力も可）</label><input type="text" id="ivCn" placeholder="例 ソルデム3A、A ライン"></div>
     <div><label>区分</label><select id="ivCk"><option value="w">水分</option><option value="b">輸血・アルブミン</option></select></div></div>
     <div class="row"><div><label>開始時刻</label><input type="time" id="ivCt"></div>
     <div><label>流量</label><div class="unit"><input type="number" inputmode="decimal" id="ivCr" step="0.1" placeholder="例 8"><span>mL/h</span></div></div></div>
@@ -348,7 +353,8 @@ nav button{font-size:10px}
     <div class="row"><div><label>種類</label><select id="ivOk">
       <option value="w|尿">尿</option><option value="w|胃管">胃管</option><option value="w|排便">排便</option><option value="w|除水（CHDF・HD）">除水（CHDF・HD）</option><option value="w|嘔吐">嘔吐</option><option value="w|その他の OUT">その他の OUT</option>
       <option value="b|ドレーン">ドレーン（心嚢・胸骨下・胸腔など）</option><option value="b|出血">出血</option></select></div>
-    <div><label>メモ（任意）</label><input type="text" id="ivOn" placeholder="例 心嚢"></div></div>
+    <div><label id="ivOnL">メモ（任意）</label><input type="text" id="ivOn" placeholder="例 心嚢"></div></div>
+    <div id="ivDr" class="drchips" style="display:none"></div>
     <div class="row"><div><label>時刻</label><input type="time" id="ivOt"></div>
     <div><label>量</label><div class="unit"><input type="number" inputmode="decimal" id="ivOv" step="0.1" placeholder="例 220"><span>mL</span></div></div></div>
     <button class="primary" id="ivOadd" style="width:100%">OUT を追加</button>
@@ -3575,6 +3581,44 @@ renderGloss();
   ['ivCt','ivBt','ivOt'].forEach(i=>$(i).value=nowT());
   (async()=>{const d=await store.get(K);if(d&&Date.now()-d.c<26*3600000){S=d;if(S.bk)$('ivB').value=(['q4','toh0'].includes(S.bk)?'toh':S.bk);if(!$('ivB').value)$('ivB').value='toh';}else if(d){store.set(K,S);}all();})();
   window.__iv={compute,get S(){return S},set S(v){S=v},all,toM};
+})();
+
+
+/* 輸液シート：点滴の選択リストとドレーン名のタブ */
+(function(){
+  const FLUIDS=['ソルデム3A','ソルアセトF','ヴィーンF','フィジオ140','KN3号','生理食塩液','5% ブドウ糖','10% ブドウ糖','ビーフリード','エルネオパ','アミノレバン','ラクテック'];
+  const OTHERS=['A ライン（ヘパ生）','CHDF 抗凝固（ナファモスタット）','CHDF 抗凝固（ヘパリン）','経管栄養（持続）','フェンタニル','インスリン','ヘパリン持続','KCL 補正','アミオダロン','カルペリチド（ハンプ）'];
+  const BLOOD=['RCC','FFP','PC','アルブミン製剤'];
+  const clean=n=>n.replace(/（[^）]*）(?=[^（]*$)/,m=>m).trim();
+  function fill(){
+    const my=(typeof drugs!=='undefined'?drugs:[]).map(d=>d.name).filter(Boolean);
+    const used=[...new Set((window.__iv?window.__iv.S.L:[]).map(l=>l.n).filter(Boolean))];
+    const grp=(label,arr,k)=>arr.length?`<optgroup label="${label}">${arr.map(n=>`<option value="${k}|${esc(n)}">${esc(n)}</option>`).join('')}</optgroup>`:'';
+    $('ivCsel').innerHTML='<option value="">— 選んでください（下に手入力も可）—</option>'
+      +grp('今回使った点滴',used,'w')+grp('輸液',FLUIDS,'w')+grp('シリンジ（共通薬剤）',PRESET.map(d=>d.name),'w')
+      +grp('自分の薬剤',my,'w')+grp('その他の持続',OTHERS,'w')+grp('輸血（持続で入れるとき）',BLOOD,'b');
+  }
+  $('ivCsel').addEventListener('change',()=>{const v=$('ivCsel').value;if(!v)return;const i=v.indexOf('|');$('ivCk').value=v.slice(0,i);$('ivCn').value=v.slice(i+1);$('ivCr').focus();});
+  $('ivCadd').addEventListener('click',()=>setTimeout(()=>{$('ivCsel').value='';fill();},0));
+
+  const DRAINS=['心嚢','胸骨下','前縦隔','後縦隔','右胸腔','左胸腔','腹腔','ウィンスロー孔','左横隔膜下','右横隔膜下','ダグラス窩','膵管','胆管','吻合部','皮下','創部','脳室（EVD）','スパイナル'];
+  function drainChips(){
+    const isDr=$('ivOk').value==='b|ドレーン';
+    $('ivDr').style.display=isDr?'':'none';
+    $('ivOnL').textContent=isDr?'ドレーンの名前（下から選ぶか手入力）':'メモ（任意）';
+    $('ivOn').placeholder=isDr?'例 右胸腔、心嚢':'例 心嚢';
+    if(!isDr)return;
+    const used=[...new Set((window.__iv?window.__iv.S.E:[]).filter(e=>e.io==='out'&&e.type==='ドレーン'&&e.n).map(e=>e.n))];
+    const list=[...used,...DRAINS.filter(d=>!used.includes(d))];
+    $('ivDr').innerHTML=(used.length?'<div class="muted" style="font-size:11px;width:100%">今回使った名前</div>':'')
+      +list.map((d,i)=>`${i===used.length&&used.length?'<div class="muted" style="font-size:11px;width:100%;margin-top:4px">よく使う名前</div>':''}<button type="button" class="drc${$('ivOn').value===d?' on':''}" data-d="${esc(d)}">${esc(d)}</button>`).join('');
+    $('ivDr').querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{$('ivOn').value=b.dataset.d;drainChips();$('ivOv').focus();});
+  }
+  $('ivOk').addEventListener('change',()=>{$('ivOn').value='';drainChips();});
+  $('ivOn').addEventListener('input',drainChips);
+  $('ivOadd').addEventListener('click',()=>setTimeout(drainChips,0));
+  document.querySelector('nav button[data-p=iv]').addEventListener('click',()=>{fill();drainChips();});
+  fill();drainChips();
 })();
 
 loadDrugs(); loadKnow(); calc();
