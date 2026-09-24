@@ -246,8 +246,21 @@ nav button{font-size:10px}
   <div class="warn">計算結果は必ず指示量・実際の希釈とダブルチェックしてください。このツールは補助であり、投与の判断はできません。</div>
 
   <details class="card o2card" open>
-    <summary>酸素流量と FiO₂ の目安</summary>
+    <summary>P/F 比（酸素化の評価）と 酸素流量・FiO₂ 早見表</summary>
     <div class="body">
+    <div class="row"><div><label>PaO₂</label><div class="unit"><input type="number" inputmode="decimal" id="pfO" placeholder="80"><span>mmHg</span></div></div>
+    <div><label>FiO₂（％）</label><div class="unit"><input type="number" inputmode="decimal" id="pfF" placeholder="40"><span>%</span></div></div>
+    <div><label>PEEP（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="pfP" placeholder="5"><span>cmH₂O</span></div></div></div>
+    <label>デバイスと流量から FiO₂ を入れる</label>
+    <div class="drchips" id="pfDev"></div>
+    <div class="drchips" id="pfFlow"></div>
+    <div class="result"><div class="muted" style="font-size:12px">P/F 比（PaO₂ ÷ FiO₂）</div><div class="big"><span id="pfN">－</span></div>
+    <div class="sub" id="pfSub">PaO₂ と FiO₂ を入れてください</div></div>
+    <div id="pfNote" class="rangebox" style="display:none"></div>
+    <p class="muted">ベルリン定義（ARDS）：PEEP または CPAP 5 cmH₂O 以上で、軽症 200 &lt; P/F ≦ 300、中等症 100 &lt; P/F ≦ 200、重症 P/F ≦ 100。発症は 1 週間以内、両側の陰影、心不全・溢水だけでは説明できないことが条件。<br>
+    鼻カニューラや簡易マスクでの FiO₂ は推定値なので、P/F も目安になります。正確に評価するなら人工呼吸器・NPPV・ハイフローの設定 FiO₂ で。<br>
+    血ガスが採れないときは SpO₂/FiO₂（S/F）比も使われます（S/F 315 ≒ P/F 300、S/F 235 ≒ P/F 200。SpO₂ は 97% 以下で）。</p>
+    <h3 style="margin-top:14px">酸素流量と FiO₂ の目安</h3>
     <h3>鼻カニューラ</h3>
     <table class="o2"><tr><th>流量</th><th>1 L</th><th>2 L</th><th>3 L</th><th>4 L</th><th>5 L</th><th>6 L</th></tr>
     <tr><td>FiO₂</td><td>24%</td><td>28%</td><td>32%</td><td>36%</td><td>40%</td><td>44%</td></tr></table>
@@ -267,6 +280,7 @@ nav button{font-size:10px}
     <h3>ネーザルハイフロー・人工呼吸器</h3>
     <p>FiO₂ は設定値どおり（21〜100%）。ハイフローは流量 30〜60 L/分で、患者の吸気流量を上回るため設定値に近い FiO₂ が入る。</p>
     <p class="muted">上の数値はすべて目安です。呼吸数が多い・口呼吸・一回換気量が大きい患者では室内気を多く吸い込み、実際の FiO₂ は低くなります。</p>
+    
     </div>
   </details>
 </section>
@@ -3914,6 +3928,50 @@ renderGloss();
     box.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{inp.value=b.dataset.f;inp.dispatchEvent(new Event('input'));draw();});};
   inp.addEventListener('input',draw);
   draw();
+})();
+
+
+/* P/F 比 */
+(function(){
+  const DEV={
+    'room air':{fixed:21},
+    '鼻カニューラ':{flows:[[1,24],[2,28],[3,32],[4,36],[5,40],[6,44]]},
+    '簡易マスク':{flows:[[5,40],[6,45],[7,50],[8,60]]},
+    'リザーバー':{flows:[[6,60],[7,70],[8,80],[9,90],[10,95]]},
+    'ベンチュリー':{fio2:[24,28,31,35,40,50]},
+    'ハイフロー':{setting:true},
+    '人工呼吸器':{setting:true}
+  };
+  let dev='鼻カニューラ';
+  const devBox=$('pfDev'), flowBox=$('pfFlow'), inp=$('pfF');
+  const drawDev=()=>{devBox.innerHTML=Object.keys(DEV).map(d=>`<button type="button" class="drc${d===dev?' on':''}" data-d="${d}">${d}</button>`).join('');
+    devBox.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{dev=b.dataset.d;const D=DEV[dev];
+      if(D.fixed){inp.value=D.fixed;run();}
+      drawDev();drawFlow();});};
+  const drawFlow=()=>{const D=DEV[dev];
+    if(D.flows)flowBox.innerHTML='<div class="muted" style="font-size:11px;width:100%">流量（L/分）</div>'+D.flows.map(([l,f])=>`<button type="button" class="drc${+inp.value===f?' on':''}" data-f="${f}">${l} L<small style="color:var(--muted)"> ${f}%</small></button>`).join('');
+    else if(D.fio2)flowBox.innerHTML='<div class="muted" style="font-size:11px;width:100%">アダプターの FiO₂</div>'+D.fio2.map(f=>`<button type="button" class="drc${+inp.value===f?' on':''}" data-f="${f}">${f}%</button>`).join('');
+    else if(D.setting)flowBox.innerHTML='<div class="muted" style="font-size:11px;width:100%">設定 FiO₂</div>'+[21,30,35,40,45,50,60,70,80,90,100].map(f=>`<button type="button" class="drc${+inp.value===f?' on':''}" data-f="${f}">${f}%</button>`).join('');
+    else flowBox.innerHTML='<div class="muted" style="font-size:11px;width:100%">FiO₂ 21%</div>';
+    flowBox.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{inp.value=b.dataset.f;run();drawFlow();});};
+  const run=()=>{let f=parseFloat(inp.value); const o=parseFloat($('pfO').value), pe=parseFloat($('pfP').value);
+    if(f>0&&f<=1)f=f*100;
+    const N=$('pfNote');
+    if(!(o>0)||!(f>=21&&f<=100)){$('pfN').textContent='－';$('pfSub').textContent='PaO₂ と FiO₂ を入れてください';N.style.display='none';return;}
+    const pf=o/(f/100);
+    $('pfN').textContent=Math.round(pf);
+    $('pfSub').innerHTML=`PaO₂ ${o} ÷ FiO₂ ${fmt(f,0)}%　＝ <b>${Math.round(pf)}</b>　（${dev}）`;
+    let msg='', cls='';
+    if(pf>300)msg='300 を超えています（ARDS の基準は満たしません）';
+    else if(pf>200){msg='200 < P/F ≦ 300：軽症 ARDS の範囲';cls='low';}
+    else if(pf>100){msg='100 < P/F ≦ 200：中等症 ARDS の範囲';cls='high';}
+    else {msg='P/F ≦ 100：重症 ARDS の範囲';cls='high';}
+    let sub='ベルリン定義は PEEP または CPAP 5 cmH₂O 以上での評価が前提。';
+    if(isFinite(pe)&&pe>0)sub=pe>=5?`PEEP ${pe} cmH₂O（5 以上）で評価できます。`:`PEEP ${pe} cmH₂O は 5 未満。ベルリン定義では 5 以上が条件です。`;
+    if(DEV[dev]&&(DEV[dev].flows||DEV[dev].fio2))sub+='このデバイスの FiO₂ は推定値なので、P/F も目安です。';
+    N.style.display='';N.className='rangebox '+cls;N.innerHTML=msg+`<div class="rn">${sub}</div>`;};
+  ['pfO','pfF','pfP'].forEach(i=>$(i).addEventListener('input',()=>{run();drawFlow();}));
+  drawDev();drawFlow();
 })();
 
 loadDrugs(); loadKnow(); calc();
