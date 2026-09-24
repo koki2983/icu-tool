@@ -2234,6 +2234,7 @@ const CALC_HTML=`
   <div class="row"><div><label>SpO₂</label><div class="unit"><input type="number" inputmode="decimal" id="rxS" placeholder="94"><span>%</span></div></div>
   <div><label>FiO₂</label><div class="unit"><input type="number" inputmode="decimal" id="rxF" placeholder="0.5" step="0.05"><span>（0.21〜1.0）</span></div></div>
   <div><label>呼吸数</label><div class="unit"><input type="number" inputmode="decimal" id="rxR" placeholder="28"><span>/分</span></div></div></div>
+  <div class="drchips" id="rxChips"></div>
   <div class="row"><div><label>開始からの時間</label><select id="rxT"><option value="2">2 時間</option><option value="6">6 時間</option><option value="12" selected>12 時間以降</option></select></div><div></div></div>
   <div class="result"><div class="big"><span id="rxN">－</span></div><div class="sub" id="rxD">3 つの値を入力</div></div>
   <p class="muted">ROX ＝（SpO₂ ÷ FiO₂）÷ 呼吸数。ハイフロー開始後の成功・失敗の予測に使う。4.88 以上は成功しやすい。2 時間で 2.85 未満、6 時間で 3.47 未満、12 時間で 3.85 未満は失敗（挿管）のリスクが高い。単回の値より推移を見る。判断は医師と。</p>
@@ -3900,6 +3901,19 @@ renderGloss();
   $('hbUse').onclick=()=>{const H=$('nuH').value,W=$('nuW').value,s=$('nuS').value;
     if(!H||!W){toast('栄養ツールに身長と体重を入れてください');return;}
     $('hbH').value=H;$('hbW').value=W;$('hbS').value=s;run();toast('取り込みました');};
+})();
+
+
+/* ROX：FiO2 をタップで選べるように */
+(function(){
+  const box=$('rxChips'), inp=$('rxF');
+  const vals=[0.21,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0];
+  const draw=()=>{let cur=parseFloat(inp.value); if(cur>1&&cur<=100)cur=cur/100;
+    box.innerHTML='<div class="muted" style="font-size:11px;width:100%">FiO₂ を選ぶ（％でも入力できます）</div>'
+      +vals.map(v=>`<button type="button" class="drc${Math.abs(cur-v)<0.001?' on':''}" data-f="${v}">${Math.round(v*100)}%</button>`).join('');
+    box.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{inp.value=b.dataset.f;inp.dispatchEvent(new Event('input'));draw();});};
+  inp.addEventListener('input',draw);
+  draw();
 })();
 
 loadDrugs(); loadKnow(); calc();
