@@ -2248,6 +2248,41 @@ const CALC_HTML=`
   </div>
 </details>
 <details class="card o2card">
+  <summary>栄養：必要エネルギー・蛋白・水分</summary>
+  <div class="body">
+  <div class="row"><div><label>身長</label><div class="unit"><input type="number" inputmode="decimal" id="nuH" placeholder="165"><span>cm</span></div></div>
+  <div><label>性別</label><select id="nuS"><option value="m">男性</option><option value="f">女性</option></select></div>
+  <div><label>実体重</label><div class="unit"><input type="number" inputmode="decimal" id="nuW" placeholder="60"><span>kg</span></div></div></div>
+  <div class="row"><div><label>時期</label><select id="nuP"><option value="acute">急性期（およそ 1 週以内）</option><option value="post">回復期（1 週以降）</option></select></div>
+  <div><label>経腸栄養剤</label><select id="nuK"><option value="1">1.0 kcal/mL</option><option value="1.5">1.5 kcal/mL</option><option value="2">2.0 kcal/mL</option></select></div>
+  <div><label>投与時間</label><select id="nuT"><option value="24">24 時間</option><option value="20">20 時間</option><option value="16">16 時間</option><option value="12">12 時間</option></select></div></div>
+  <div class="result"><div class="sub" id="nuHead">身長・性別・実体重を入力</div></div>
+  <table id="nuTbl" class="o2" style="margin-top:10px"></table>
+  <div id="nuNote" class="rangebox" style="display:none"></div>
+  <p class="muted">予測体重（PBW）＝ 男性 50 ＋ 0.91 ×（身長 − 152.4）、女性 45.5 ＋ 0.91 ×（身長 − 152.4）。BMI 30 以上は調整体重（PBW ＋ 0.4 ×（実体重 − PBW））で計算。<br>
+  エネルギーは 20〜30 kcal/kg/日。ESPEN 2023 は急性期の最初の 1 週間は消費量の 70% 以下に抑える（入れすぎない）ことを勧めており、間接熱量計があれば実測を優先。<br>
+  蛋白は 1.2〜1.5 g/kg/日から。EFFORT Protein 試験（2023）以降、2.0 g/kg/日を超える高用量は勧められず、腎障害や多臓器不全では特に慎重に。<br>
+  水分は 25〜35 mL/kg/日が目安。発熱・下痢・ドレーンの喪失は加算、心不全・腎不全・浮腫では制限。実際は体重と in/out で調整する。<br>
+  リフィーディング症候群のリスク（低栄養、5〜10 日以上の絶食、アルコール、BMI 16 未満など）があれば、目標の 25〜50% から始め、P・K・Mg とビタミン B1 を先に補う。</p>
+  </div>
+</details>
+<details class="card o2card">
+  <summary>不感蒸泄・代謝水</summary>
+  <div class="body">
+  <div class="row"><div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="ivsW" placeholder="60"><span>kg</span></div></div>
+  <div><label>体温</label><div class="unit"><input type="number" inputmode="decimal" id="ivsT" step="0.1" placeholder="37.0"><span>℃</span></div></div></div>
+  <div class="row"><div><label>呼吸</label><select id="ivsR"><option value="spont">自発呼吸（room air・鼻カニューラ）</option><option value="hme">人工呼吸・人工鼻</option><option value="heated">人工呼吸・加温加湿器</option><option value="hfnc">ハイフロー（加温加湿）</option></select></div>
+  <div><label>発汗</label><select id="ivsS"><option value="0">なし</option><option value="200">軽度（寝衣が湿る）</option><option value="500">中等度（寝衣・シーツが濡れる）</option><option value="1000">多量（何度も交換が必要）</option></select></div></div>
+  <div class="row"><div><label>室温・環境</label><select id="ivsE"><option value="0">ふつう（24〜26℃）</option><option value="0.15">高め・乾燥（30℃前後、保育器・電気毛布など）</option></select></div><div></div></div>
+  <div class="result"><div class="muted" style="font-size:12px">不感蒸泄（1 日）</div><div class="big"><span id="ivsN">－</span><em>mL/日</em></div><div class="sub" id="ivsSub">体重と体温を入力</div></div>
+  <table id="ivsTbl" class="o2" style="margin-top:10px"></table>
+  <p class="muted">目安：皮膚から 10 mL/kg/日、呼気から 5 mL/kg/日（合わせて 15 mL/kg/日）。体温が 37℃ を超えると 1℃ ごとに約 15% 増える。<br>
+  人工呼吸で加温加湿していれば呼気からの喪失はほぼ無くなる（人工鼻では半分程度残る）。ハイフローも加温加湿されるため呼気分は少ない。<br>
+  代謝水（体内で作られる水）は 5 mL/kg/日。水分出納では「不感蒸泄 − 代謝水」を目に見えない喪失として扱う。<br>
+  発汗は不感蒸泄に含めない（見える喪失）ので、別に加算している。数字はあくまで推定で、実際は体重の増減と in/out で評価する。</p>
+  </div>
+</details>
+<details class="card o2card">
   <summary>血液ガス：予測 PaCO₂・代償の判定</summary>
   <div class="body">
   <div class="row"><div><label>pH</label><input type="number" inputmode="decimal" id="gPH" placeholder="7.28" step="0.01"></div>
@@ -3730,6 +3765,74 @@ renderGloss();
   document.querySelector('nav button[data-p=iv]').addEventListener('click',()=>{fill();drainChips();});
   window.__ivFill=()=>{fill();drainChips();};
   fill();drainChips();
+})();
+
+
+/* 栄養 */
+(function(){
+  const v=id=>parseFloat($(id).value);
+  const run=()=>{const H=v('nuH'),W=v('nuW'),sx=$('nuS').value,ph=$('nuP').value,kc=+$('nuK').value,hrs=+$('nuT').value;
+    const T=$('nuTbl'),N=$('nuNote');
+    if(!(H>100&&H<230)||!(W>0)){$('nuHead').textContent='身長・性別・実体重を入力';T.innerHTML='';N.style.display='none';return;}
+    const pbw=(sx==='m'?50:45.5)+0.91*(H-152.4);
+    const bmi=W/Math.pow(H/100,2);
+    const adj=pbw+0.4*(W-pbw);
+    const use=bmi>=30?adj:W;
+    const label=bmi>=30?'調整体重':'実体重';
+    $('nuHead').innerHTML=`予測体重 <b>${fmt(pbw,1)} kg</b>　BMI <b>${fmt(bmi,1)}</b>　→ 計算に使う体重 <b>${fmt(use,1)} kg</b>（${label}）`;
+    const rows=[];
+    const kcal=k=>Math.round(use*k);
+    rows.push(['エネルギー','20 kcal/kg',kcal(20)+' kcal/日','']);
+    rows.push(['','25 kcal/kg（目安）',kcal(25)+' kcal/日','']);
+    rows.push(['','30 kcal/kg',kcal(30)+' kcal/日','']);
+    const tgt=ph==='acute'?Math.round(kcal(25)*0.7):kcal(25);
+    rows.push(['当面の目標',ph==='acute'?'急性期：25 kcal/kg の 70%':'回復期：25 kcal/kg',`<b>${tgt} kcal/日</b>`,ph==='acute'?'入れすぎない（ESPEN 2023）':'ここから 100% を目指す']);
+    const pr=g=>fmt(use*g,0)+' g/日';
+    rows.push(['蛋白','1.2 g/kg',pr(1.2),'']);
+    rows.push(['','1.5 g/kg（目安）',pr(1.5),'']);
+    rows.push(['','2.0 g/kg',pr(2.0),'これ以上は勧められない']);
+    rows.push(['水分','25 mL/kg',Math.round(W*25)+' mL/日',fmt(W*25/24,1)+' mL/h']);
+    rows.push(['','30 mL/kg（目安）',Math.round(W*30)+' mL/日',fmt(W*30/24,1)+' mL/h']);
+    rows.push(['','35 mL/kg',Math.round(W*35)+' mL/日',fmt(W*35/24,1)+' mL/h']);
+    const ml=tgt/kc;
+    rows.push(['経腸栄養',`${kc} kcal/mL で ${tgt} kcal`,`${Math.round(ml)} mL/日`,`${hrs} 時間なら <b>${fmt(ml/hrs,1)} mL/h</b>`]);
+    T.innerHTML='<tr><th style="width:58px">項目</th><th>係数</th><th>1 日量</th><th>メモ</th></tr>'+rows.map(r=>`<tr><td style="text-align:left">${r[0]}</td><td style="text-align:left;font-weight:400;font-size:12px">${r[1]}</td><td>${r[2]}</td><td style="text-align:left;font-weight:400;font-size:12px">${r[3]}</td></tr>`).join('');
+    let msg='';
+    if(bmi>=30)msg='BMI 30 以上。調整体重で計算しています。実体重で計算すると過剰になります';
+    else if(bmi<18.5)msg='BMI 18.5 未満。リフィーディング症候群に注意し、目標の 25〜50% から始めて P・K・Mg とビタミン B1 を確認';
+    if(ph==='acute')msg=(msg?msg+'　／　':'')+'急性期は目標の 70% 以下。経腸栄養は 10〜20 mL/h から始めて数日で上げる';
+    N.style.display=msg?'':'none';N.className='rangebox'+(bmi>=30||bmi<18.5?' high':'');N.innerHTML=msg;};
+  ['nuH','nuW'].forEach(i=>$(i).addEventListener('input',run));
+  ['nuS','nuP','nuK','nuT'].forEach(i=>$(i).addEventListener('change',run));
+})();
+/* 不感蒸泄 */
+(function(){
+  const v=id=>parseFloat($(id).value);
+  const run=()=>{const W=v('ivsW'),T=v('ivsT'),R=$('ivsR').value,S=+$('ivsS').value,E=+$('ivsE').value;
+    const B=$('ivsTbl');
+    if(!(W>0)){$('ivsN').textContent='－';$('ivsSub').textContent='体重と体温を入力';B.innerHTML='';return;}
+    const t=isFinite(T)&&T>0?T:37;
+    const skin=W*10, resp0=W*5;
+    const rf={spont:1,hme:0.5,heated:0.05,hfnc:0.2}[R];
+    const resp=resp0*rf;
+    const fev=Math.max(0,t-37)*0.15;
+    const base=(skin+resp)*(1+fev)*(1+E);
+    const total=base+S;
+    const meta=W*5;
+    $('ivsN').textContent=Math.round(total).toLocaleString('ja-JP');
+    $('ivsSub').textContent=`1 時間あたり 約 ${fmt(total/24,1)} mL　／　代謝水を引いた見えない喪失 約 ${Math.round(total-meta).toLocaleString('ja-JP')} mL/日（${fmt((total-meta)/24,1)} mL/h）`;
+    const r=[];
+    r.push(['皮膚から','10 mL/kg/日',Math.round(skin)+' mL']);
+    r.push(['呼気から','5 mL/kg/日 × '+({spont:'自発呼吸 100%',hme:'人工鼻 50%',heated:'加温加湿 5%',hfnc:'ハイフロー 20%'}[R]),Math.round(resp)+' mL']);
+    if(fev>0)r.push(['発熱の分',`37℃ から ${fmt(t-37,1)}℃ 高い（1℃ ごとに 15%）`,'＋'+Math.round((skin+resp)*fev)+' mL']);
+    if(E>0)r.push(['室温・環境','高温・乾燥で 15% 増','＋'+Math.round((skin+resp)*(1+fev)*E)+' mL']);
+    if(S>0)r.push(['発汗（別枠）',$('ivsS').options[$('ivsS').selectedIndex].text,'＋'+S+' mL']);
+    r.push(['<b>不感蒸泄 合計</b>','','<b>'+Math.round(total)+' mL/日</b>']);
+    r.push(['代謝水','5 mL/kg/日','− '+Math.round(meta)+' mL']);
+    r.push(['<b>差引（見えない喪失）</b>','','<b>'+Math.round(total-meta)+' mL/日</b>']);
+    B.innerHTML='<tr><th>内訳</th><th>計算</th><th>量</th></tr>'+r.map(x=>`<tr><td style="text-align:left">${x[0]}</td><td style="text-align:left;font-weight:400;font-size:12px">${x[1]}</td><td>${x[2]}</td></tr>`).join('');};
+  ['ivsW','ivsT'].forEach(i=>$(i).addEventListener('input',run));
+  ['ivsR','ivsS','ivsE'].forEach(i=>$(i).addEventListener('change',run));
 })();
 
 loadDrugs(); loadKnow(); calc();
