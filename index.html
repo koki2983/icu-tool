@@ -2272,6 +2272,31 @@ const CALC_HTML=`
   </div>
 </details>
 <details class="card o2card">
+  <summary>ハリス・ベネディクトの式（BEE・必要エネルギー）</summary>
+  <div class="body">
+  <div class="row"><div><label>身長</label><div class="unit"><input type="number" inputmode="decimal" id="hbH" placeholder="165"><span>cm</span></div></div>
+  <div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="hbW" placeholder="60"><span>kg</span></div></div>
+  <div><label>年齢</label><div class="unit"><input type="number" inputmode="decimal" id="hbA" placeholder="70"><span>歳</span></div></div>
+  <div><label>性別</label><select id="hbS"><option value="m">男性</option><option value="f">女性</option></select></div></div>
+  <div class="row"><div><label>式</label><select id="hbE"><option value="orig">原法（1919）</option><option value="rev">改訂版（Roza 1984）</option></select></div>
+  <div><label>活動係数</label><select id="hbAF">
+    <option value="1.0">1.0　寝たきり・鎮静中</option><option value="1.1" selected>1.1　ベッド上安静</option><option value="1.2">1.2　ベッド外で少し動く</option><option value="1.3">1.3　歩行・リハビリ中</option></select></div>
+  <div><label>ストレス係数</label><select id="hbSF">
+    <option value="0.9">0.9　飢餓・低栄養</option><option value="1.0" selected>1.0　侵襲なし</option><option value="1.1">1.1　小手術・軽い炎症</option><option value="1.2">1.2　中等度の手術・感染</option><option value="1.3">1.3　大手術（開心・開腹）</option><option value="1.4">1.4　多発外傷・重症感染</option><option value="1.5">1.5　敗血症・重症例</option><option value="1.6">1.6　広範囲熱傷</option></select></div></div>
+  <div class="row"><div><label>発熱の補正</label><select id="hbF"><option value="0">なし（37℃ 以下）</option><option value="1">38℃（＋0.13）</option><option value="2">39℃（＋0.26）</option><option value="3">40℃（＋0.39）</option></select></div>
+  <div style="display:flex;align-items:flex-end"><button class="small" id="hbUse" style="width:100%">上の栄養ツールの値を使う</button></div></div>
+  <div class="result"><div class="muted" style="font-size:12px">基礎エネルギー消費量（BEE）</div><div class="big"><span id="hbBEE">－</span><em>kcal/日</em></div>
+  <div class="sub" id="hbSub">身長・体重・年齢を入力</div></div>
+  <table id="hbTbl" class="o2" style="margin-top:10px"></table>
+  <div id="hbNote" class="rangebox" style="display:none"></div>
+  <p class="muted">原法：男性 66.47 ＋ 13.75 × 体重 ＋ 5.0 × 身長 − 6.76 × 年齢／女性 655.1 ＋ 9.56 × 体重 ＋ 1.85 × 身長 − 4.68 × 年齢。<br>
+  改訂版（Roza 1984）：男性 88.362 ＋ 13.397 × 体重 ＋ 4.799 × 身長 − 5.677 × 年齢／女性 447.593 ＋ 9.247 × 体重 ＋ 3.098 × 身長 − 4.330 × 年齢。<br>
+  必要エネルギー ＝ BEE × 活動係数 × ストレス係数（発熱は 1℃ ごとにストレス係数へ ＋0.13 として加算）。<br>
+  ICU では実測（間接熱量計）とずれやすく、鎮静・人工呼吸中は過大評価になりがち。ESPEN 2023 は間接熱量計を優先し、なければ体重あたり 20〜25 kcal/kg/日での見積もりを勧めています。急性期の最初の 1 週間は目標の 70% 以下に抑える点も同じ。<br>
+  BMI 30 以上は体重をそのまま入れると過大になるため、調整体重（栄養ツールが自動で出します）で計算してください。</p>
+  </div>
+</details>
+<details class="card o2card">
   <summary>不感蒸泄・代謝水</summary>
   <div class="body">
   <div class="row"><div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="ivsW" placeholder="60"><span>kg</span></div></div>
@@ -3838,6 +3863,43 @@ renderGloss();
     B.innerHTML='<tr><th>内訳</th><th>計算</th><th>量</th></tr>'+r.map(x=>`<tr><td style="text-align:left">${x[0]}</td><td style="text-align:left;font-weight:400;font-size:12px">${x[1]}</td><td>${x[2]}</td></tr>`).join('');};
   ['ivsW','ivsT'].forEach(i=>$(i).addEventListener('input',run));
   ['ivsR','ivsS','ivsE'].forEach(i=>$(i).addEventListener('change',run));
+})();
+
+
+/* ハリス・ベネディクト */
+(function(){
+  const v=id=>parseFloat($(id).value);
+  const run=()=>{const H=v('hbH'),W=v('hbW'),A=v('hbA'),sx=$('hbS').value,eq=$('hbE').value;
+    const T=$('hbTbl'),N=$('hbNote');
+    if(!(H>100&&H<230)||!(W>0)||!(A>0&&A<120)){$('hbBEE').textContent='－';$('hbSub').textContent='身長・体重・年齢を入力';T.innerHTML='';N.style.display='none';return;}
+    const bee=eq==='orig'
+      ? (sx==='m'? 66.47+13.75*W+5.0*H-6.76*A : 655.1+9.56*W+1.85*H-4.68*A)
+      : (sx==='m'? 88.362+13.397*W+4.799*H-5.677*A : 447.593+9.247*W+3.098*H-4.330*A);
+    const af=+$('hbAF').value, sfBase=+$('hbSF').value, fv=+$('hbF').value*0.13;
+    const sf=sfBase+fv;
+    const tee=bee*af*sf;
+    const perkg=tee/W;
+    $('hbBEE').textContent=Math.round(bee).toLocaleString('ja-JP');
+    $('hbSub').innerHTML=`必要エネルギー ＝ BEE × 活動 ${fmt(af,2)} × ストレス ${fmt(sf,2)} ＝ <b>${Math.round(tee).toLocaleString('ja-JP')} kcal/日</b>（体重あたり ${fmt(perkg,1)} kcal/kg）`;
+    const rows=[['BEE（基礎）','',Math.round(bee)+' kcal/日'],
+      ['× 活動係数',$('hbAF').options[$('hbAF').selectedIndex].text,''],
+      ['× ストレス係数',$('hbSF').options[$('hbSF').selectedIndex].text+(fv?`＋発熱 ${fmt(fv,2)}`:''),''],
+      ['<b>必要エネルギー</b>','',`<b>${Math.round(tee)} kcal/日</b>`],
+      ['体重あたり','',fmt(perkg,1)+' kcal/kg/日'],
+      ['体重あたりの目安（20〜25〜30）','',`${Math.round(W*20)} / ${Math.round(W*25)} / ${Math.round(W*30)} kcal/日`],
+      ['急性期の当面の目標','この式の 70%',Math.round(tee*0.7)+' kcal/日']];
+    T.innerHTML='<tr><th style="width:96px">項目</th><th>内容</th><th>値</th></tr>'+rows.map(r=>`<tr><td style="text-align:left">${r[0]}</td><td style="text-align:left;font-weight:400;font-size:12px">${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+    let msg='', cls='';
+    if(perkg>30){msg='体重あたり 30 kcal/kg を超えています。係数が高すぎないか、体重が適切か（BMI 30 以上なら調整体重）を確認してください';cls='high';}
+    else if(perkg<18){msg='体重あたり 18 kcal/kg を下回っています。低栄養やリフィーディングのリスクも含めて見直してください';cls='low';}
+    else msg='体重あたりの目安（20〜30 kcal/kg）の範囲内です';
+    N.style.display='';N.className='rangebox '+cls;
+    N.innerHTML=msg+'<div class="rn">ICU では間接熱量計での実測が第一。式はあくまで推定で、鎮静・人工呼吸中は過大になりがちです（ESPEN 2023）。</div>';};
+  ['hbH','hbW','hbA'].forEach(i=>$(i).addEventListener('input',run));
+  ['hbS','hbE','hbAF','hbSF','hbF'].forEach(i=>$(i).addEventListener('change',run));
+  $('hbUse').onclick=()=>{const H=$('nuH').value,W=$('nuW').value,s=$('nuS').value;
+    if(!H||!W){toast('栄養ツールに身長と体重を入れてください');return;}
+    $('hbH').value=H;$('hbW').value=W;$('hbS').value=s;run();toast('取り込みました');};
 })();
 
 loadDrugs(); loadKnow(); calc();
