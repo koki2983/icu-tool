@@ -183,6 +183,10 @@ nav button{font-size:10px}
 .ivr-g b.warnv{color:var(--amber)}
 .ivr-g b.nd{color:var(--muted);font-weight:400;font-size:13px}
 .ivr-g b small{font-size:11px;font-weight:400;margin-left:2px}
+.stepper{margin-top:6px}
+.stepper .drc{padding:4px 10px;font-size:13px}
+.kstart{margin-bottom:10px}
+.kst-h{font-weight:700;font-size:13px;color:var(--teal)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -194,9 +198,11 @@ nav button{font-size:10px}
 
 <!-- ============ 計算 ============ -->
 <section id="p-calc" class="page on">
-  <div class="card">
+  <div class="drchips" id="calcFav" style="margin-bottom:10px"></div>
+  <div class="card" id="calcTop">
     <label>体重</label>
     <div class="unit"><input type="number" inputmode="decimal" id="wt" placeholder="例 60" step="0.1"><span>kg</span></div>
+    <div class="drchips stepper" data-for="wt"></div>
 
     <label>薬剤（登録済みから選択）</label>
     <select id="drugSel"><option value="">手入力</option></select>
@@ -251,6 +257,7 @@ nav button{font-size:10px}
     <div class="row"><div><label>PaO₂</label><div class="unit"><input type="number" inputmode="decimal" id="pfO" placeholder="80"><span>mmHg</span></div></div>
     <div><label>FiO₂（％）</label><div class="unit"><input type="number" inputmode="decimal" id="pfF" placeholder="40"><span>%</span></div></div>
     <div><label>PEEP（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="pfP" placeholder="5"><span>cmH₂O</span></div></div></div>
+    <div class="drchips" id="pfPchips"></div>
     <label>デバイスと流量から FiO₂ を入れる</label>
     <div class="drchips" id="pfDev"></div>
     <div class="drchips" id="pfFlow"></div>
@@ -335,6 +342,14 @@ nav button{font-size:10px}
 
 <!-- ============ 知識 ============ -->
 <section id="p-know" class="page">
+  <div class="card kstart"><div class="body" style="padding-top:10px">
+    <div class="kst-h">受け持ったら、まずここ</div>
+    <div class="drchips" id="kType"></div>
+    <div class="kst-h" style="margin-top:10px">気になる所見・異常値から</div>
+    <div class="drchips" id="kFind"></div>
+    <div id="kPick" class="drchips" style="display:none"></div>
+    <p class="muted" id="kRev" style="margin:8px 0 0;font-size:11px"></p>
+  </div></div>
   <input type="text" id="kSearch" class="search" placeholder="検索（例：血液ガス、IABP）">
   <div class="cats" id="catBar"></div>
   <div id="kList"></div>
@@ -2259,7 +2274,7 @@ const CALC_HTML=`
   <div class="body">
   <div class="row"><div><label>身長</label><div class="unit"><input type="number" inputmode="decimal" id="pbH" placeholder="例 165"><span>cm</span></div></div>
   <div><label>性別</label><select id="pbS"><option value="m">男性</option><option value="f">女性</option></select></div></div>
-  <div class="row"><div><label>実体重（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="pbW" placeholder="比較用"><span>kg</span></div></div>
+  <div class="row"><div><label>実体重（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="pbW" placeholder="比較用"><span>kg</span></div><div class="drchips stepper" data-for="pbW"></div></div>
   <div><label>今の設定 VT（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="pbV" placeholder="例 450"><span>mL</span></div></div></div>
   <div class="result"><div class="big"><span id="pbN">－</span><em>kg（予測体重）</em></div><div class="sub" id="pbSub">身長と性別を入力</div></div>
   <table id="pbTbl" class="o2" style="margin-top:10px"></table>
@@ -2272,7 +2287,7 @@ const CALC_HTML=`
   <div class="body">
   <div class="row"><div><label>身長</label><div class="unit"><input type="number" inputmode="decimal" id="nuH" placeholder="165"><span>cm</span></div></div>
   <div><label>性別</label><select id="nuS"><option value="m">男性</option><option value="f">女性</option></select></div>
-  <div><label>実体重</label><div class="unit"><input type="number" inputmode="decimal" id="nuW" placeholder="60"><span>kg</span></div></div></div>
+  <div><label>実体重</label><div class="unit"><input type="number" inputmode="decimal" id="nuW" placeholder="60"><span>kg</span></div><div class="drchips stepper" data-for="nuW"></div></div></div>
   <div class="row"><div><label>時期</label><select id="nuP"><option value="acute">急性期（およそ 1 週以内）</option><option value="post">回復期（1 週以降）</option></select></div>
   <div><label>経腸栄養剤</label><select id="nuK"><option value="1">1.0 kcal/mL</option><option value="1.5">1.5 kcal/mL</option><option value="2">2.0 kcal/mL</option></select></div>
   <div><label>投与時間</label><select id="nuT"><option value="24">24 時間</option><option value="20">20 時間</option><option value="16">16 時間</option><option value="12">12 時間</option></select></div></div>
@@ -2290,7 +2305,7 @@ const CALC_HTML=`
   <summary>ハリス・ベネディクトの式（BEE・必要エネルギー）</summary>
   <div class="body">
   <div class="row"><div><label>身長</label><div class="unit"><input type="number" inputmode="decimal" id="hbH" placeholder="165"><span>cm</span></div></div>
-  <div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="hbW" placeholder="60"><span>kg</span></div></div>
+  <div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="hbW" placeholder="60"><span>kg</span></div><div class="drchips stepper" data-for="hbW"></div></div>
   <div><label>年齢</label><div class="unit"><input type="number" inputmode="decimal" id="hbA" placeholder="70"><span>歳</span></div></div>
   <div><label>性別</label><select id="hbS"><option value="m">男性</option><option value="f">女性</option></select></div></div>
   <div class="row"><div><label>式</label><select id="hbE"><option value="orig">原法（1919）</option><option value="rev">改訂版（Roza 1984）</option></select></div>
@@ -2314,8 +2329,9 @@ const CALC_HTML=`
 <details class="card o2card">
   <summary>不感蒸泄・代謝水</summary>
   <div class="body">
-  <div class="row"><div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="ivsW" placeholder="60"><span>kg</span></div></div>
+  <div class="row"><div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="ivsW" placeholder="60"><span>kg</span></div><div class="drchips stepper" data-for="ivsW"></div></div>
   <div><label>体温</label><div class="unit"><input type="number" inputmode="decimal" id="ivsT" step="0.1" placeholder="37.0"><span>℃</span></div></div></div>
+  <div class="drchips" id="ivsTchips"></div>
   <div class="row"><div><label>呼吸</label><select id="ivsR"><option value="spont">自発呼吸（room air・鼻カニューラ）</option><option value="hme">人工呼吸・人工鼻</option><option value="heated">人工呼吸・加温加湿器</option><option value="hfnc">ハイフロー（加温加湿）</option></select></div>
   <div><label>発汗</label><select id="ivsS"><option value="0">なし</option><option value="200">軽度（寝衣が湿る）</option><option value="500">中等度（寝衣・シーツが濡れる）</option><option value="1000">多量（何度も交換が必要）</option></select></div></div>
   <div class="row"><div><label>室温・環境</label><select id="ivsE"><option value="0">ふつう（24〜26℃）</option><option value="0.15">高め・乾燥（30℃前後、保育器・電気毛布など）</option></select></div><div></div></div>
@@ -3972,6 +3988,72 @@ renderGloss();
     N.style.display='';N.className='rangebox '+cls;N.innerHTML=msg+`<div class="rn">${sub}</div>`;};
   ['pfO','pfF','pfP'].forEach(i=>$(i).addEventListener('input',()=>{run();drawFlow();}));
   drawDev();drawFlow();
+})();
+
+
+/* よく使う・入口・ステッパー（すべて軽い処理） */
+const KNOW_REV='2026 年 9 月';
+(function(){
+  /* --- 計算タブ：よく使う --- */
+  const SHORT=[['P/F','P/F 比'],['ROX','ROX'],['予測体重','予測体重'],
+    ['血ガス','血液ガス：予測'],['栄養','必要エネルギー'],['ハリス','ハリス'],['不感蒸泄','不感蒸泄'],
+    ['メイロン','メイロン'],['FENa','FENa'],['輸血','輸血：予測'],['血行動態','血行動態'],['配合変化','配合変化'],['薬剤の目安','投与量の目安']];
+  const box=$('calcFav'); let use={};
+  const cards=()=>[...document.querySelectorAll('#p-calc details')];
+  const draw=()=>{
+    const list=[['ガンマ計算',null],...SHORT.filter(([lab,key])=>key&&cards().some(d=>d.querySelector('summary').textContent.includes(key)))];
+    list.sort((a,b)=>(use[b[0]]||0)-(use[a[0]]||0));
+    box.innerHTML=list.slice(0,8).map(([lab])=>`<button type="button" class="drc" data-c="${esc(lab)}">${esc(lab)}</button>`).join('');
+    box.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const lab=b.dataset.c;
+      use[lab]=(use[lab]||0)+1;store.set('calcuse',use);
+      if(lab==='ガンマ計算'){$('calcTop').scrollIntoView({behavior:'smooth',block:'start'});$('wt').focus();}
+      else{const key=(SHORT.find(x=>x[0]===lab)||[])[1];const d=cards().find(x=>x.querySelector('summary').textContent.includes(key));
+        if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});}}
+      draw();});};
+  (async()=>{use=(await store.get('calcuse'))||{};draw();})();
+
+  /* --- ステッパーとチップ --- */
+  document.querySelectorAll('.stepper').forEach(s=>{const inp=$(s.dataset.for);if(!inp)return;
+    s.innerHTML=[-5,-1,1,5].map(n=>`<button type="button" class="drc" data-s="${n}">${n>0?'＋':'−'}${Math.abs(n)}</button>`).join('');
+    s.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const v=(parseFloat(inp.value)||0)+(+b.dataset.s);
+      inp.value=Math.max(0,Math.round(v*10)/10);inp.dispatchEvent(new Event('input'));});});
+  const chipRow=(boxId,inpId,vals,fmtLab)=>{const bx=$(boxId),inp=$(inpId);if(!bx||!inp)return;
+    const d=()=>{bx.innerHTML=vals.map(v=>`<button type="button" class="drc${parseFloat(inp.value)===v?' on':''}" data-v="${v}">${fmtLab(v)}</button>`).join('');
+      bx.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{inp.value=b.dataset.v;inp.dispatchEvent(new Event('input'));d();});};
+    inp.addEventListener('input',d);d();};
+  chipRow('ivsTchips','ivsT',[36,36.5,37,37.5,38,38.5,39,39.5,40],v=>v.toFixed(1)+'℃');
+  chipRow('pfPchips','pfP',[0,3,5,8,10,12,15],v=>'PEEP '+v);
+
+  /* --- 知識タブ：入口 --- */
+  const TYPES={
+    '心臓外科術後':['冠動脈バイパス術後','心臓弁置換・弁形成術後','当院：心外術後の受け入れ準備（ベッド作成〜帰室時）','ペースメーカー（一時・恒久）','術後鎮痛（多角的鎮痛と神経ブロック）'],
+    '脳外科・脳卒中':['脳の解剖と脳ドレーン','脳梗塞（症状と急性期の看護）','脳の解剖（葉・脳幹・脳室）','CT の見方（ICU で必要な範囲）'],
+    '呼吸不全・人工呼吸':['呼吸の生理と人工呼吸管理','P-SILI（患者自身の呼吸による肺損傷）','酸素療法','血液ガスの読み方','胸部X線の見方'],
+    '敗血症':['敗血症','ショックの分類と初期対応','循環作動薬と身体の相互作用','抗菌薬の基本','DIC と凝固管理'],
+    'PCPS・IABP':['PCPS / VA-ECMO','IABP','カテーテル管理とモニタリング','体液量の評価'],
+    'CHDF':['CHDF（持続的血液濾過透析）','急性腎障害（AKI）と電解質','体液量の評価'],
+    '大動脈・消化器術後':['胸部・腹部大動脈瘤術後','消化器術後のドレーン管理','脊椎・脊髄と体表の目安','術後鎮痛（多角的鎮痛と神経ブロック）'],
+    '急変・当直':['急変の察知と初期対応（ABCDE）','心肺蘇生（ACLS の要点）','電気的除細動とカルディオバージョン','心電図の読み方']
+  };
+  const FIND={'高 K':'急性腎障害（AKI）と電解質','低 Na':'急性腎障害（AKI）と電解質','乏尿':'急性腎障害（AKI）と電解質',
+    'アシドーシス':'血液ガスの読み方','低酸素':'酸素療法','呼吸が苦しそう':'P-SILI（患者自身の呼吸による肺損傷）',
+    '血圧が低い':'ショックの分類と初期対応','頻脈・不整脈':'心電図の読み方','徐脈':'ペースメーカー（一時・恒久）',
+    '発熱':'敗血症','出血傾向':'DIC と凝固管理','痛がっている':'術後鎮痛（多角的鎮痛と神経ブロック）',
+    '落ち着かない':'鎮痛・鎮静・せん妄（PADIS）','麻痺が出た':'脳梗塞（症状と急性期の看護）','ドレーンの排液が変':'消化器術後のドレーン管理'};
+  const t=$('kType'), f=$('kFind'), pick=$('kPick');
+  if(t){
+    t.innerHTML=Object.keys(TYPES).map(k=>`<button type="button" class="drc" data-t="${esc(k)}">${esc(k)}</button>`).join('');
+    f.innerHTML=Object.keys(FIND).map(k=>`<button type="button" class="drc" data-f="${esc(k)}">${esc(k)}</button>`).join('');
+    t.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
+      t.querySelectorAll('.drc').forEach(x=>x.classList.toggle('on',x===b));
+      const list=TYPES[b.dataset.t]||[];
+      pick.style.display='';
+      pick.innerHTML='<div class="muted" style="font-size:11px;width:100%">この順に読むと早い</div>'
+        +list.map((n,i)=>`<button type="button" class="drc" data-go2="${esc(n)}">${i+1}. ${esc(n.replace(/（.*?）/g,''))}</button>`).join('');
+      pick.querySelectorAll('[data-go2]').forEach(x=>x.onclick=()=>goTopic(x.dataset.go2,null));});
+    f.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{f.querySelectorAll('.drc').forEach(x=>x.classList.toggle('on',x===b));goTopic(FIND[b.dataset.f],null);});
+    $('kRev').textContent='内容の最終確認：'+KNOW_REV+'（出典・参考ガイドラインは「基準値」カテゴリの最後にあります）';
+  }
 })();
 
 loadDrugs(); loadKnow(); calc();
