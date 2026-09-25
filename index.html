@@ -2367,6 +2367,26 @@ const CALC_HTML=`
   </div>
 </details>
 <details class="card o2card">
+  <summary>電解質の補正（補正 Ca・補正 Na・浸透圧）</summary>
+  <div class="body">
+  <div class="row"><div><label>Ca</label><div class="unit"><input type="number" inputmode="decimal" id="elCa" step="0.1" placeholder="8.0"><span>mg/dL</span></div></div>
+  <div><label>アルブミン</label><div class="unit"><input type="number" inputmode="decimal" id="elAlb" step="0.1" placeholder="2.5"><span>g/dL</span></div></div></div>
+  <div class="row"><div><label>Na</label><div class="unit"><input type="number" inputmode="decimal" id="elNa" placeholder="135"><span>mEq/L</span></div></div>
+  <div><label>血糖</label><div class="unit"><input type="number" inputmode="decimal" id="elBs" placeholder="400"><span>mg/dL</span></div></div></div>
+  <div class="row"><div><label>K</label><div class="unit"><input type="number" inputmode="decimal" id="elK" step="0.1" placeholder="4.0"><span>mEq/L</span></div></div>
+  <div><label>pH</label><div class="unit"><input type="number" inputmode="decimal" id="elPh" step="0.01" placeholder="7.20"><span></span></div></div></div>
+  <div class="row"><div><label>BUN（浸透圧用）</label><div class="unit"><input type="number" inputmode="decimal" id="elBun" placeholder="20"><span>mg/dL</span></div></div>
+  <div><label>実測浸透圧（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="elOsm" placeholder="300"><span>mOsm/kg</span></div></div></div>
+  <div class="result"><div class="sub" id="elRes">入れた項目だけ計算します</div></div>
+  <div id="elNote" class="rangebox" style="display:none"></div>
+  <p class="muted">補正 Ca（Payne）＝ 測定 Ca ＋（4 − Alb）。アルブミンが 4.0 g/dL 未満のときに使う。基準 8.5〜10.2 mg/dL。<br>
+  ICU ではこの式の精度が落ちる（アシドーシスでイオン化 Ca が増える、大量輸血のクエン酸、腎不全、体液の急な動き）。CHDF・大量輸血・肝移植後などは血ガスのイオン化 Ca（1.1〜1.3 mmol/L）で見るのが原則。<br>
+  高血糖時の補正 Na ＝ 測定 Na ＋ 1.6 ×（血糖 − 100）÷ 100（係数 2.4 の式もあり、血糖 400 以上では 2.4 が近いとされる）。高血糖で見かけ上の低 Na になる分を戻す。<br>
+  血漿浸透圧 ＝ 2 × Na ＋ 血糖 ÷ 18 ＋ BUN ÷ 2.8（基準 275〜295 mOsm/kg）。実測を入れると浸透圧ギャップ（実測 − 計算、正常 10 未満）も出る。10 を超えたらアルコール・中毒・マンニトールなどを考える。<br>
+  K は pH が 0.1 下がると約 0.6 mEq/L 上がる（細胞内から出る）。アシドーシスのときの見かけの高 K に注意し、補正後に K が低ければ本当は不足している。</p>
+  </div>
+</details>
+<details class="card o2card">
   <summary>Na 排泄率（FENa）</summary>
   <div class="body">
   <div class="row"><div><label>尿 Na</label><div class="unit"><input type="number" inputmode="decimal" id="fUNa" placeholder="例 15"><span>mEq/L</span></div></div>
@@ -4005,7 +4025,7 @@ renderGloss();
 const KNOW_REV='2026 年 9 月';
 (function(){
   /* --- 計算タブ：よく使う --- */
-  const SHORT=[['P/F','P/F 比'],['ROX','ROX'],['予測体重','予測体重'],
+  const SHORT=[['P/F','P/F 比'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
     ['血ガス','血液ガス：予測'],['栄養','必要エネルギー'],['ハリス','ハリス'],['不感蒸泄','不感蒸泄'],
     ['メイロン','メイロン'],['FENa','FENa'],['輸血','輸血：予測'],['血行動態','血行動態'],['配合変化','配合変化'],['薬剤の目安','投与量の目安']];
   const box=$('calcFav'); let use={};
@@ -4100,6 +4120,42 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
     const notes=[a,b].filter(d=>d.note).map(d=>`<div class="muted" style="font-size:12px">・${esc(d.n)}：${esc(d.note)}</div>`).join('');
     L.innerHTML=notes;};
   A.onchange=run;B.onchange=run;
+})();
+
+
+/* 電解質の補正 */
+(function(){
+  const v=id=>parseFloat($(id).value);
+  const run=()=>{const ca=v('elCa'),alb=v('elAlb'),na=v('elNa'),bs=v('elBs'),k=v('elK'),ph=v('elPh'),bun=v('elBun'),osm=v('elOsm');
+    const L=[],W=[];
+    if(ca>0&&alb>0){
+      const cor=alb<4?ca+(4-alb):ca;
+      L.push(`<b>補正 Ca ${fmt(cor,1)} mg/dL</b>（測定 ${ca}、Alb ${alb}）`);
+      if(alb>=4)L.push('<span class="muted">Alb 4.0 以上なので補正はしません</span>');
+      if(cor<8.5)W.push('補正後も低 Ca（8.5 未満）。テタニー・しびれ・QT 延長・けいれんに注意し、イオン化 Ca の確認を');
+      else if(cor>10.2)W.push('補正後は高 Ca（10.2 超）。意識障害・多尿・不整脈に注意');
+      else L.push('<span class="muted">補正 Ca は基準内（8.5〜10.2）</span>');}
+    if(na>0&&bs>0){
+      const c16=na+1.6*(bs-100)/100, c24=na+2.4*(bs-100)/100;
+      if(bs>100){L.push(`<b>補正 Na ${fmt(c16,1)} mEq/L</b>（係数 1.6）／ ${fmt(c24,1)}（係数 2.4）`);
+        if(c16>145)W.push('補正すると高 Na。高血糖による脱水が進んでいる可能性');
+        else if(c16<135)W.push('補正しても低 Na。低 Na の原因検索を（補正は 1 日 8〜10 mEq/L 以内）');}
+      else L.push('<span class="muted">血糖 100 以下なので Na の補正は不要</span>');}
+    if(na>0&&bs>0&&bun>0){
+      const calc=2*na+bs/18+bun/2.8;
+      L.push(`<b>計算浸透圧 ${fmt(calc,0)} mOsm/kg</b>（基準 275〜295）`);
+      if(osm>0){const gap=osm-calc;L.push(`浸透圧ギャップ <b>${fmt(gap,1)}</b>（実測 ${osm} − 計算）`);
+        if(gap>=10)W.push('浸透圧ギャップ 10 以上。アルコール・メタノール・エチレングリコール・マンニトール・造影剤などを考える');}}
+    if(k>0&&ph>0){
+      const kAt74=k-((7.4-ph)/0.1)*0.6;
+      L.push(`<b>pH 7.40 だったときの K ≒ ${fmt(kAt74,1)} mEq/L</b>（測定 ${k}、pH ${ph}）`);
+      if(ph<7.35&&kAt74<3.5)W.push('アシドーシスで K が高く見えていますが、補正すると低 K です。アシドーシスを治すと K がさらに下がります');
+      if(ph>7.45&&kAt74>5.0)W.push('アルカローシスで K が低く見えていますが、補正すると高 K です');}
+    $('elRes').innerHTML=L.length?L.join('<br>'):'入れた項目だけ計算します';
+    const N=$('elNote');
+    if(W.length){N.style.display='';N.className='rangebox high';N.innerHTML=W.map(x=>'・'+x).join('<br>');}
+    else N.style.display='none';};
+  ['elCa','elAlb','elNa','elBs','elK','elPh','elBun','elOsm'].forEach(i=>$(i).addEventListener('input',run));
 })();
 
 loadDrugs(); loadKnow(); calc();
