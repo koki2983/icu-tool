@@ -290,6 +290,8 @@ nav button{font-size:10px}
     
     </div>
   </details>
+  
+  
 </section>
 
 <!-- ============ 薬剤 ============ -->
@@ -2224,6 +2226,21 @@ renderKnow();
 /* ===== 追加計算ツール ===== */
 const CALC_HTML=`
 <details class="card o2card">
+    <summary>RSBI（浅速呼吸指数）</summary>
+    <div class="body">
+    <div class="row"><div><label>呼吸回数</label><div class="unit"><input type="number" inputmode="decimal" id="rsR" placeholder="25"><span>回/分</span></div></div>
+    <div><label>1 回換気量</label><div class="unit"><input type="number" inputmode="decimal" id="rsV" placeholder="350"><span>mL</span></div></div></div>
+    <div class="drchips" id="rsVchips"></div>
+    <div class="result"><div class="muted" style="font-size:12px">RSBI ＝ 呼吸回数 ÷ 1 回換気量（L）</div><div class="big"><span id="rsN">－</span></div>
+    <div class="sub" id="rsSub">呼吸回数と 1 回換気量を入力</div></div>
+    <div id="rsNote" class="rangebox" style="display:none"></div>
+    <p class="muted">測り方：CPAP 0〜5 cmH₂O・プレッシャーサポートなし（または最小）の自発呼吸で、開始から 1 分ほどの値を使う。PS をかけたまま測ると数字が良く出すぎる。<br>
+    105 未満なら抜管できる可能性が高い、105 以上なら難しいことが多い、という目安。女性や細い気管チューブでは高めに出やすく、心不全・腹部膨満・痛み・不安でも上がる。<br>
+    RSBI が良くても、SBT が通るか、気道が守れるか（咳の強さ、痰の量、意識）は別の判断。抜管の可否は院内プロトコルと医師の判断で。<br>
+    1 回換気量は mL で入れれば自動で L に直します（350 mL → 0.35 L）。</p>
+    </div>
+  </details>
+  <details class="card o2card">
   <summary>薬剤別の投与量の目安（γ 表）</summary>
   <div class="body">
   <p class="muted">一般的な目安です。実際の投与量は必ず医師の指示と自施設の基準に従ってください。体重 60 kg・各希釈での mL/h も併記しています。</p>
@@ -2366,7 +2383,8 @@ const CALC_HTML=`
   <p class="muted">必要 HCO₃⁻（mEq）＝ 不足 BE × 体重 × 0.2（細胞外液量）。全量を一度に入れず、まず半量を投与して血ガスで再評価するのが一般的。pH 7.15〜7.2 未満の代謝性アシドーシスで、原因治療と並行して使う。Na 負荷・CO₂ 産生・低 K・Ca 低下に注意。カテコラミンと同じルートには入れない。</p>
   </div>
 </details>
-<details class="card o2card">
+
+  <details class="card o2card">
   <summary>電解質の補正（補正 Ca・補正 Na・浸透圧）</summary>
   <div class="body">
   <div class="row"><div><label>Ca</label><div class="unit"><input type="number" inputmode="decimal" id="elCa" step="0.1" placeholder="8.0"><span>mg/dL</span></div></div>
@@ -4025,7 +4043,7 @@ renderGloss();
 const KNOW_REV='2026 年 9 月';
 (function(){
   /* --- 計算タブ：よく使う --- */
-  const SHORT=[['P/F','P/F 比'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
+  const SHORT=[['P/F','P/F 比'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
     ['血ガス','血液ガス：予測'],['栄養','必要エネルギー'],['ハリス','ハリス'],['不感蒸泄','不感蒸泄'],
     ['メイロン','メイロン'],['FENa','FENa'],['輸血','輸血：予測'],['血行動態','血行動態'],['配合変化','配合変化'],['薬剤の目安','投与量の目安']];
   const box=$('calcFav'); let use={};
@@ -4156,6 +4174,32 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
     if(W.length){N.style.display='';N.className='rangebox high';N.innerHTML=W.map(x=>'・'+x).join('<br>');}
     else N.style.display='none';};
   ['elCa','elAlb','elNa','elBs','elK','elPh','elBun','elOsm'].forEach(i=>$(i).addEventListener('input',run));
+})();
+
+
+/* RSBI */
+(function(){
+  const run=()=>{const r=parseFloat($('rsR').value); let v=parseFloat($('rsV').value);
+    const N=$('rsNote');
+    if(!(r>0)||!(v>0)){$('rsN').textContent='－';$('rsSub').textContent='呼吸回数と 1 回換気量を入力';N.style.display='none';return;}
+    const L=v>10?v/1000:v;                       // mL でも L でも受ける
+    const rsbi=r/L;
+    $('rsN').textContent=Math.round(rsbi);
+    $('rsSub').innerHTML=`${r} 回/分 ÷ ${fmt(L,2)} L ＝ <b>${Math.round(rsbi)}</b>`;
+    let cls,msg;
+    if(rsbi<80){cls='';msg='80 未満：抜管できる可能性が高い';}
+    else if(rsbi<105){cls='';msg='80〜105：抜管できる可能性はあるが、呼吸努力と痰・意識も見る';}
+    else if(rsbi<150){cls='high';msg='105 以上：まだ厳しいことが多い。原因（痛み・不安・心不全・腹部膨満・痰）を探す';}
+    else {cls='high';msg='150 以上：浅く速い呼吸が強い。抜管は見送りが妥当';}
+    N.style.display='';N.className='rangebox '+cls;
+    N.innerHTML=msg+'<div class="rn">PS をかけたまま測っていないか確認。最終判断は院内プロトコルと医師と。</div>';};
+  ['rsR','rsV'].forEach(i=>$(i).addEventListener('input',()=>{run();draw();}));
+  const bx=$('rsVchips'), inp=$('rsV');
+  const vals=[250,300,350,400,450,500,550,600];
+  const draw=()=>{bx.innerHTML='<div class="muted" style="font-size:11px;width:100%">1 回換気量（mL）を選ぶ</div>'
+      +vals.map(v=>`<button type="button" class="drc${parseFloat(inp.value)===v?' on':''}" data-v="${v}">${v}</button>`).join('');
+    bx.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{inp.value=b.dataset.v;run();draw();});};
+  draw();
 })();
 
 loadDrugs(); loadKnow(); calc();
