@@ -199,6 +199,7 @@ nav button{font-size:10px}
 <!-- ============ 計算 ============ -->
 <section id="p-calc" class="page on">
   <div class="drchips" id="calcFav" style="margin-bottom:10px"></div>
+  <div class="seg" id="calcSeg" style="margin-bottom:10px"></div>
   <div class="card" id="calcTop">
     <label>体重</label>
     <div class="unit"><input type="number" inputmode="decimal" id="wt" placeholder="例 60" step="0.1"><span>kg</span></div>
@@ -4054,9 +4055,9 @@ const KNOW_REV='2026 年 9 月';
     box.innerHTML=list.slice(0,8).map(([lab])=>`<button type="button" class="drc" data-c="${esc(lab)}">${esc(lab)}</button>`).join('');
     box.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const lab=b.dataset.c;
       use[lab]=(use[lab]||0)+1;store.set('calcuse',use);
-      if(lab==='ガンマ計算'){$('calcTop').scrollIntoView({behavior:'smooth',block:'start'});$('wt').focus();}
+      if(lab==='ガンマ計算'){if(window.__calcShow)window.__calcShow($('calcTop'));$('calcTop').scrollIntoView({behavior:'smooth',block:'start'});$('wt').focus();}
       else{const key=(SHORT.find(x=>x[0]===lab)||[])[1];const d=cards().find(x=>x.querySelector('summary').textContent.includes(key));
-        if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});}}
+        if(d){if(window.__calcShow)window.__calcShow(d);d.open=true;setTimeout(()=>d.scrollIntoView({behavior:'smooth',block:'start'}),30);}}
       draw();});};
   (async()=>{use=(await store.get('calcuse'))||{};draw();})();
 
@@ -4200,6 +4201,35 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
       +vals.map(v=>`<button type="button" class="drc${parseFloat(inp.value)===v?' on':''}" data-v="${v}">${v}</button>`).join('');
     bx.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{inp.value=b.dataset.v;run();draw();});};
   draw();
+})();
+
+
+/* 計算タブ：ジャンル分け */
+(function(){
+  const GROUPS={
+    '呼吸':['P/F 比','RSBI','ROX','予測体重','血液ガス'],
+    '薬剤':['__gamma','投与量の目安','配合変化'],
+    '循環':['血行動態','輸血：予測'],
+    '電解質':['電解質の補正','メイロン','FENa'],
+    '栄養':['栄養：必要','ハリス','不感蒸泄']
+  };
+  const seg=$('calcSeg'), top=$('calcTop');
+  const cards=[...document.querySelectorAll('#p-calc > details')];
+  const groupOf=el=>{const t=el===top?'__gamma':el.querySelector('summary').textContent;
+    for(const [g,keys] of Object.entries(GROUPS)) if(keys.some(k=>t.includes(k))) return g;
+    return 'その他';};
+  const map=new Map();
+  [top,...cards].forEach(el=>{const g=groupOf(el);el.dataset.g=g;map.set(el,g);});
+  const names=[...Object.keys(GROUPS)].filter(g=>[...map.values()].includes(g));
+  if([...map.values()].includes('その他'))names.push('その他');
+  let cur=names.includes('薬剤')?'薬剤':names[0];
+  const show=g=>{cur=g;store.set('calcgrp',g);
+    map.forEach((gg,el)=>{el.style.display=gg===g?'':'none';});
+    seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.g===g));};
+  seg.innerHTML=names.map(g=>`<button data-g="${esc(g)}">${esc(g)}</button>`).join('');
+  seg.querySelectorAll('button').forEach(b=>b.onclick=()=>{show(b.dataset.g);window.scrollTo({top:0,behavior:'smooth'});});
+  window.__calcShow=(el)=>{const g=map.get(el);if(g&&g!==cur)show(g);};
+  (async()=>{const last=await store.get('calcgrp');show(names.includes(last)?last:cur);})();
 })();
 
 loadDrugs(); loadKnow(); calc();
