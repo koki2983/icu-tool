@@ -259,8 +259,9 @@ nav button{font-size:10px}
     <div><label>FiO₂（％）</label><div class="unit"><input type="number" inputmode="decimal" id="pfF" placeholder="40"><span>%</span></div></div>
     <div><label>PEEP（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="pfP" placeholder="5"><span>cmH₂O</span></div></div></div>
     <div class="drchips" id="pfPchips"></div>
-    <div class="row"><div><label>PaCO₂（A-aDO₂ 用）</label><div class="unit"><input type="number" inputmode="decimal" id="pfC" placeholder="40"><span>mmHg</span></div></div>
-    <div><label>年齢（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="pfAge" placeholder="70"><span>歳</span></div></div></div>
+    <details style="margin-top:6px"><summary style="padding:6px 0;font-size:13px;color:var(--muted)">A-aDO₂ も出す（低酸素が肺か換気かを分けたいとき）</summary>
+    <div class="row"><div><label>PaCO₂</label><div class="unit"><input type="number" inputmode="decimal" id="pfC" placeholder="40"><span>mmHg</span></div></div>
+    <div><label>年齢（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="pfAge" placeholder="70"><span>歳</span></div></div></div></details>
     <label>デバイスと流量から FiO₂ を入れる</label>
     <div class="drchips" id="pfDev"></div>
     <div class="drchips" id="pfFlow"></div>
@@ -4342,7 +4343,7 @@ PHOTOS['不整脈の管理（ICU で出会う順に）']=[{"id": "ecg_af", "t": 
 const KNOW_REV='2026 年 9 月（25 日：疾患 15 項目を追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
-  const SHORT=[['P/F','P/F 比'],['A-aDO₂','A-aDO₂'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
+  const SHORT=[['P/F','P/F 比'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
     ['血ガス','血液ガス：予測'],['栄養','必要エネルギー'],['ハリス','ハリス'],['不感蒸泄','不感蒸泄'],
     ['メイロン','メイロン'],['FENa','FENa'],['輸血','輸血：予測'],['血行動態','血行動態'],['配合変化','配合変化'],['薬剤の目安','投与量の目安']];
   const box=$('calcFav'); let use={};
