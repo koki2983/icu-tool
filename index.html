@@ -270,7 +270,7 @@ nav button{font-size:10px}
     <div class="result" id="aaBox" style="display:none;margin-top:8px"><div class="muted" style="font-size:12px">A-aDO₂（肺胞気-動脈血酸素分圧較差）</div><div class="big"><span id="aaN">－</span><em>mmHg</em></div><div class="sub" id="aaSub"></div></div>
     <div id="aaNote" class="rangebox" style="display:none"></div>
     <p class="muted">A-aDO₂ ＝ PAO₂ − PaO₂。PAO₂（肺胞気酸素分圧）＝ FiO₂ ×（大気圧 760 − 水蒸気圧 47）− PaCO₂ ÷ 0.8 ＝ FiO₂ × 713 − PaCO₂ × 1.25。<br>
-    正常：room air で 5〜15 mmHg、年齢で上がる（上限の目安 ＝ 年齢 ÷ 4 ＋ 4）。FiO₂ を上げると正常でも大きくなるので、酸素投与中は絶対値より推移で見る（FiO₂ 1.0 では 100 前後まで正常）。<br>
+    基準値の考え方：正常な肺でも A-aDO₂ はゼロではなく、① 年齢が上がるほど、② 吸っている酸素濃度が高いほど大きくなる。だから「上限」は状況で変わる。room air なら年齢 ÷ 4 ＋ 4（40 歳で 14、80 歳で 24）、酸素投与中は FiO₂ の％の数字くらいまでが正常の目安（FiO₂ 60% なら 60 前後、100% なら 100 前後）。上限を超えていれば肺の問題。<br>
     読み方：A-aDO₂ が正常なのに PaO₂ が低い → 肺は正常で換気が足りない（低換気：鎮静・神経筋疾患・CO₂ 貯留）。A-aDO₂ が開大 → 肺の中でガス交換ができていない（換気血流不均衡・シャント・拡散障害：肺炎・ARDS・肺水腫・肺塞栓・無気肺）。<br>
     P/F 比は簡単で ARDS の重症度に、A-aDO₂ は「低酸素の原因が肺か換気か」を分けるときに使う。<br>
     ベルリン定義（ARDS）：PEEP または CPAP 5 cmH₂O 以上で、軽症 200 &lt; P/F ≦ 300、中等症 100 &lt; P/F ≦ 200、重症 P/F ≦ 100。発症は 1 週間以内、両側の陰影、心不全・溢水だけでは説明できないことが条件。<br>2023〜2024 年の新しい国際定義では、ハイフロー 30 L/分以上での P/F 300 以下や、SpO₂ 97% 以下での S/F 比 315 以下も基準に含められ、挿管前でも ARDS と判断できるようになった。<br>
@@ -4322,12 +4322,16 @@ PHOTOS['不整脈の管理（ICU で出会う順に）']=[{"id": "ecg_af", "t": 
     B.style.display='';$('aaN').textContent=fmt(aa,0);
     $('aaSub').innerHTML=`PAO₂ ＝ ${fmt(f,0)}% × 713 − ${c} × 1.25 ＝ <b>${fmt(pao2,0)}</b>　→ ${fmt(pao2,0)} − ${o} ＝ <b>${fmt(aa,0)}</b>`;
     let msg='',cls='';
-    if(f<=21){const lim=age>0?age/4+4:15;
-      if(aa<=lim){msg=`room air で ${fmt(aa,0)}：正常範囲（上限の目安 ${fmt(lim,0)}）`;if(o<60)msg+='。PaO₂ が低いのは肺ではなく換気の問題（低換気）を考える';}
-      else{cls='high';msg=`room air で ${fmt(aa,0)}：開大（上限の目安 ${fmt(lim,0)}）。肺の中のガス交換障害（V/Q 不均衡・シャント・拡散障害）`;}}
-    else{const est=f;  // FiO₂% ≒ 正常 A-aDO₂ の上限（おおまかな目安：FiO₂ 100% で約 100）
-      if(aa<=est)msg=`FiO₂ ${fmt(f,0)}% で ${fmt(aa,0)}：酸素投与中としては大きくない（目安：FiO₂ の %値 ≒ 正常上限）`;
-      else{cls='high';msg=`FiO₂ ${fmt(f,0)}% で ${fmt(aa,0)}：開大。肺の中のガス交換障害。FiO₂ を変えたら値も変わるので、同じ FiO₂ での推移で見る`;}}
+    const lim=f<=21?(age>0?age/4+4:15):f;
+    const how=f<=21?(age>0?`room air・${age} 歳の上限 ＝ ${age} ÷ 4 ＋ 4 ＝ ${fmt(lim,0)}`:'room air の上限 ＝ 15（年齢を入れると年齢で補正）'):`FiO₂ ${fmt(f,0)}% のときの上限の目安 ≒ ${fmt(lim,0)}（FiO₂ の％の数字と同じくらい）`;
+    if(aa<=lim){msg=`<b>${fmt(aa,0)} ≦ 上限 ${fmt(lim,0)} → 正常範囲</b>`;
+      if(o<60)msg+='<div class="rn">A-aDO₂ は正常なのに PaO₂ が低い → 肺ではなく「換気が足りない」（低換気：鎮静・神経筋疾患・CO₂ 貯留）を考える</div>';
+      else msg+='<div class="rn">肺のガス交換は保たれていると考えてよい</div>';}
+    else{cls='high';msg=`<b>${fmt(aa,0)} ＞ 上限 ${fmt(lim,0)} → 開大</b><div class="rn">肺の中でガス交換ができていない（換気血流不均衡・シャント・拡散障害：肺炎・ARDS・肺水腫・肺塞栓・無気肺）。${f>21?'FiO₂ を変えると値も変わるので、同じ FiO₂ での推移で見る':''}</div>`;}
+    msg+=`<div class="muted" style="font-size:11px;margin-top:4px">上限の求め方：${how}</div>`;
+    msg+=`<table class="o2" style="margin-top:6px;font-size:12px"><tr><th>状況</th><th>正常の上限（目安）</th></tr>
+      <tr><td>room air・若い人</td><td>15</td></tr><tr><td>room air・40 歳／60 歳／80 歳</td><td>14／19／24</td></tr>
+      <tr><td>酸素 FiO₂ 40%</td><td>約 40</td></tr><tr><td>酸素 FiO₂ 60%</td><td>約 60</td></tr><tr><td>酸素 FiO₂ 100%</td><td>約 100</td></tr></table>`;
     AN.style.display='';AN.className='rangebox '+cls;AN.innerHTML=msg;};
   ['pfO','pfF','pfP','pfC','pfAge'].forEach(i=>$(i).addEventListener('input',()=>{run();drawFlow();}));
   drawDev();drawFlow();
