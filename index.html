@@ -253,19 +253,27 @@ nav button{font-size:10px}
   <div class="warn">計算結果は必ず指示量・実際の希釈とダブルチェックしてください。このツールは補助であり、投与の判断はできません。</div>
 
   <details class="card o2card" open>
-    <summary>P/F 比（酸素化の評価）と 酸素流量・FiO₂ 早見表</summary>
+    <summary>P/F 比・A-aDO₂（酸素化の評価）と 酸素流量・FiO₂ 早見表</summary>
     <div class="body">
     <div class="row"><div><label>PaO₂</label><div class="unit"><input type="number" inputmode="decimal" id="pfO" placeholder="80"><span>mmHg</span></div></div>
     <div><label>FiO₂（％）</label><div class="unit"><input type="number" inputmode="decimal" id="pfF" placeholder="40"><span>%</span></div></div>
     <div><label>PEEP（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="pfP" placeholder="5"><span>cmH₂O</span></div></div></div>
     <div class="drchips" id="pfPchips"></div>
+    <div class="row"><div><label>PaCO₂（A-aDO₂ 用）</label><div class="unit"><input type="number" inputmode="decimal" id="pfC" placeholder="40"><span>mmHg</span></div></div>
+    <div><label>年齢（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="pfAge" placeholder="70"><span>歳</span></div></div></div>
     <label>デバイスと流量から FiO₂ を入れる</label>
     <div class="drchips" id="pfDev"></div>
     <div class="drchips" id="pfFlow"></div>
     <div class="result"><div class="muted" style="font-size:12px">P/F 比（PaO₂ ÷ FiO₂）</div><div class="big"><span id="pfN">－</span></div>
     <div class="sub" id="pfSub">PaO₂ と FiO₂ を入れてください</div></div>
     <div id="pfNote" class="rangebox" style="display:none"></div>
-    <p class="muted">ベルリン定義（ARDS）：PEEP または CPAP 5 cmH₂O 以上で、軽症 200 &lt; P/F ≦ 300、中等症 100 &lt; P/F ≦ 200、重症 P/F ≦ 100。発症は 1 週間以内、両側の陰影、心不全・溢水だけでは説明できないことが条件。<br>2023〜2024 年の新しい国際定義では、ハイフロー 30 L/分以上での P/F 300 以下や、SpO₂ 97% 以下での S/F 比 315 以下も基準に含められ、挿管前でも ARDS と判断できるようになった。<br>
+    <div class="result" id="aaBox" style="display:none;margin-top:8px"><div class="muted" style="font-size:12px">A-aDO₂（肺胞気-動脈血酸素分圧較差）</div><div class="big"><span id="aaN">－</span><em>mmHg</em></div><div class="sub" id="aaSub"></div></div>
+    <div id="aaNote" class="rangebox" style="display:none"></div>
+    <p class="muted">A-aDO₂ ＝ PAO₂ − PaO₂。PAO₂（肺胞気酸素分圧）＝ FiO₂ ×（大気圧 760 − 水蒸気圧 47）− PaCO₂ ÷ 0.8 ＝ FiO₂ × 713 − PaCO₂ × 1.25。<br>
+    正常：room air で 5〜15 mmHg、年齢で上がる（上限の目安 ＝ 年齢 ÷ 4 ＋ 4）。FiO₂ を上げると正常でも大きくなるので、酸素投与中は絶対値より推移で見る（FiO₂ 1.0 では 100 前後まで正常）。<br>
+    読み方：A-aDO₂ が正常なのに PaO₂ が低い → 肺は正常で換気が足りない（低換気：鎮静・神経筋疾患・CO₂ 貯留）。A-aDO₂ が開大 → 肺の中でガス交換ができていない（換気血流不均衡・シャント・拡散障害：肺炎・ARDS・肺水腫・肺塞栓・無気肺）。<br>
+    P/F 比は簡単で ARDS の重症度に、A-aDO₂ は「低酸素の原因が肺か換気か」を分けるときに使う。<br>
+    ベルリン定義（ARDS）：PEEP または CPAP 5 cmH₂O 以上で、軽症 200 &lt; P/F ≦ 300、中等症 100 &lt; P/F ≦ 200、重症 P/F ≦ 100。発症は 1 週間以内、両側の陰影、心不全・溢水だけでは説明できないことが条件。<br>2023〜2024 年の新しい国際定義では、ハイフロー 30 L/分以上での P/F 300 以下や、SpO₂ 97% 以下での S/F 比 315 以下も基準に含められ、挿管前でも ARDS と判断できるようになった。<br>
     鼻カニューラや簡易マスクでの FiO₂ は推定値なので、P/F も目安になります。正確に評価するなら人工呼吸器・NPPV・ハイフローの設定 FiO₂ で。<br>
     血ガスが採れないときは SpO₂/FiO₂（S/F）比も使われます（S/F 315 ≒ P/F 300、S/F 235 ≒ P/F 200。SpO₂ は 97% 以下で）。</p>
     <h3 style="margin-top:14px">酸素流量と FiO₂ の目安</h3>
@@ -4306,8 +4314,22 @@ PHOTOS['不整脈の管理（ICU で出会う順に）']=[{"id": "ecg_af", "t": 
     let sub='ベルリン定義は PEEP または CPAP 5 cmH₂O 以上での評価が前提。';
     if(isFinite(pe)&&pe>0)sub=pe>=5?`PEEP ${pe} cmH₂O（5 以上）で評価できます。`:`PEEP ${pe} cmH₂O は 5 未満。ベルリン定義では 5 以上が条件です。`;
     if(DEV[dev]&&(DEV[dev].flows||DEV[dev].fio2))sub+='このデバイスの FiO₂ は推定値なので、P/F も目安です。';
-    N.style.display='';N.className='rangebox '+cls;N.innerHTML=msg+`<div class="rn">${sub}</div>`;};
-  ['pfO','pfF','pfP'].forEach(i=>$(i).addEventListener('input',()=>{run();drawFlow();}));
+    N.style.display='';N.className='rangebox '+cls;N.innerHTML=msg+`<div class="rn">${sub}</div>`;
+    aado2(o,f);};
+  const aado2=(o,f)=>{const c=parseFloat($('pfC').value),age=parseFloat($('pfAge').value);const B=$('aaBox'),AN=$('aaNote');
+    if(!(c>0)||!(o>0)||!(f>=21&&f<=100)){B.style.display='none';AN.style.display='none';return;}
+    const pao2=(f/100)*713-c/0.8; const aa=pao2-o;
+    B.style.display='';$('aaN').textContent=fmt(aa,0);
+    $('aaSub').innerHTML=`PAO₂ ＝ ${fmt(f,0)}% × 713 − ${c} × 1.25 ＝ <b>${fmt(pao2,0)}</b>　→ ${fmt(pao2,0)} − ${o} ＝ <b>${fmt(aa,0)}</b>`;
+    let msg='',cls='';
+    if(f<=21){const lim=age>0?age/4+4:15;
+      if(aa<=lim){msg=`room air で ${fmt(aa,0)}：正常範囲（上限の目安 ${fmt(lim,0)}）`;if(o<60)msg+='。PaO₂ が低いのは肺ではなく換気の問題（低換気）を考える';}
+      else{cls='high';msg=`room air で ${fmt(aa,0)}：開大（上限の目安 ${fmt(lim,0)}）。肺の中のガス交換障害（V/Q 不均衡・シャント・拡散障害）`;}}
+    else{const est=f;  // FiO₂% ≒ 正常 A-aDO₂ の上限（おおまかな目安：FiO₂ 100% で約 100）
+      if(aa<=est)msg=`FiO₂ ${fmt(f,0)}% で ${fmt(aa,0)}：酸素投与中としては大きくない（目安：FiO₂ の %値 ≒ 正常上限）`;
+      else{cls='high';msg=`FiO₂ ${fmt(f,0)}% で ${fmt(aa,0)}：開大。肺の中のガス交換障害。FiO₂ を変えたら値も変わるので、同じ FiO₂ での推移で見る`;}}
+    AN.style.display='';AN.className='rangebox '+cls;AN.innerHTML=msg;};
+  ['pfO','pfF','pfP','pfC','pfAge'].forEach(i=>$(i).addEventListener('input',()=>{run();drawFlow();}));
   drawDev();drawFlow();
 })();
 
@@ -4316,7 +4338,7 @@ PHOTOS['不整脈の管理（ICU で出会う順に）']=[{"id": "ecg_af", "t": 
 const KNOW_REV='2026 年 9 月（25 日：疾患 15 項目を追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
-  const SHORT=[['P/F','P/F 比'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
+  const SHORT=[['P/F','P/F 比'],['A-aDO₂','A-aDO₂'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
     ['血ガス','血液ガス：予測'],['栄養','必要エネルギー'],['ハリス','ハリス'],['不感蒸泄','不感蒸泄'],
     ['メイロン','メイロン'],['FENa','FENa'],['輸血','輸血：予測'],['血行動態','血行動態'],['配合変化','配合変化'],['薬剤の目安','投与量の目安']];
   const box=$('calcFav'); let use={};
