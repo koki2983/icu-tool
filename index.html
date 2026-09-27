@@ -478,7 +478,15 @@ nav button{font-size:10px}
   <label class="addph" style="margin:0"><input type="file" id="aiImgFile" accept="image/*" hidden>📷 写真を選ぶ／撮る</label>
   <div id="aiImgPrev" style="display:none;margin-top:8px"><img id="aiImgEl" style="max-width:100%;max-height:180px;border-radius:8px;border:1px solid var(--line)"><div class="muted" style="font-size:11px;margin-top:4px">氏名・ID・日付が写っていないか確認</div></div>
   <button class="primary" id="aiShare" style="width:100%;margin-top:8px" disabled>写真と質問文をまとめて送る（共有）</button>
-  <div class="muted" style="font-size:11px;margin-top:6px;line-height:1.6">・iPhone・iPad・Android：共有画面が開くので、ChatGPT や Claude のアプリを選ぶ。質問文は自動でコピーされるので、本文に付かなかったら長押しで貼り付け<br>・パソコン：共有機能がない場合は質問文だけコピーされる。下の ChatGPT／Claude ボタンでチャットを開き、写真をドラッグして添付する</div>
+  <div class="muted" style="font-size:11px;margin-top:6px;line-height:1.6">共有画面が開いたら ChatGPT や Claude のアプリを選ぶ。質問文は自動でコピーされるので、本文に付いていなければ長押しで貼り付け。</div>
+  <details id="aiNoApp" style="margin-top:8px"><summary style="padding:6px 0;font-size:13px;color:var(--teal);font-weight:700">アプリが入っていない・共有がうまくいかない場合（ブラウザで送る）</summary>
+    <div class="muted" style="font-size:12px;line-height:1.7;padding:4px 0 2px">
+    1. 上の写真を長押しして「写真に保存」（撮った写真ならもう保存されています）<br>
+    2. 下の <b>ChatGPT</b> または <b>Claude</b> ボタンを押す → ブラウザでチャットが開き、質問文が入った状態になる（ログインが必要。無料アカウントで可）<br>
+    3. 入力欄の「＋」（クリップ）から写真を選んで添付し、送信<br>
+    4. 質問文が入っていなければ「質問文をコピー」を押して貼り付け</div>
+    <div class="muted" style="font-size:11px">Gemini など他のサービスを使うときは「質問文をコピー」→ そのサービスで写真を添付して貼り付け。</div>
+  </details>
 </div>
 <label>質問</label><textarea id="aiQ" placeholder="例：この項目の観察ポイントを新人向けに3つに絞ると？"></textarea>
 <div class="warn" style="margin-top:8px">患者の氏名・ID・具体的な症例情報は入力しないでください（外部サービスに送信されます）。回答は必ず施設のルールと医師の判断で確認を。</div>
@@ -2612,13 +2620,13 @@ function aiPrompt(){const k=aiCtx;
   $('aiClaude').onclick=()=>go('https://claude.ai/new?q='+encodeURIComponent(aiPrompt()));
   $('aiPplx').onclick=()=>go('https://www.perplexity.ai/search?q='+encodeURIComponent(aiPrompt()));
   $('aiImgFile').onchange=e=>{const f=e.target.files[0];if(!f)return;aiFile=f;$('aiImgEl').src=URL.createObjectURL(f);$('aiImgPrev').style.display='';$('aiShare').disabled=false;};
-  $('aiShare').onclick=async()=>{if(!aiFile){toast('先に写真を選んでください');return;}
+  $('aiShare').onclick=()=>{if(!aiFile){toast('先に写真を選んでください');return;}
     const text=aiPrompt();
-    try{await navigator.clipboard.writeText(text);}catch(e){}
+    const copy=()=>{try{navigator.clipboard.writeText(text).catch(()=>{});}catch(e){}};
     if(navigator.canShare&&navigator.canShare({files:[aiFile]})){
-      try{await navigator.share({files:[aiFile],title:'モニター心電図の読み方',text});s.style.display='none';toast('共有しました。質問文はコピー済みです');}
-      catch(err){if(err&&err.name!=='AbortError')toast('共有できませんでした。写真を保存して、チャットで添付してください');}}
-    else toast('この端末では共有画面が開けません。質問文はコピーしたので、下の ChatGPT／Claude ボタンでチャットを開き、写真を添付してください');};
+      navigator.share({files:[aiFile],title:'モニター心電図の読み方',text}).then(()=>{copy();toast('共有しました。質問文はコピー済みなので、本文に付いていなければ貼り付けてください');})
+        .catch(err=>{copy();if(err&&err.name!=='AbortError'){toast('共有画面が開けませんでした。下の「アプリがない場合」の手順で送ってください');$('aiNoApp').open=true;}});}
+    else{copy();toast('この端末では共有画面が開けません。下の「アプリがない場合」の手順で送ってください');$('aiNoApp').open=true;}};
   $('aiCopy').onclick=async()=>{try{await navigator.clipboard.writeText(aiPrompt());toast('コピーしました');}catch(e){const t=document.createElement('textarea');t.value=aiPrompt();document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();toast('コピーしました');}};
 })();
 
