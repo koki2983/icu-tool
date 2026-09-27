@@ -480,11 +480,12 @@ nav button{font-size:10px}
   <button class="primary" id="aiShare" style="width:100%;margin-top:8px" disabled>写真と質問文をまとめて送る（共有）</button>
   <div class="muted" style="font-size:11px;margin-top:6px;line-height:1.6">共有画面が開いたら ChatGPT や Claude のアプリを選ぶ。質問文は自動でコピーされるので、本文に付いていなければ長押しで貼り付け。</div>
   <details id="aiNoApp" style="margin-top:8px"><summary style="padding:6px 0;font-size:13px;color:var(--teal);font-weight:700">アプリが入っていない・共有がうまくいかない場合（ブラウザで送る）</summary>
-    <button class="small primary" id="aiCopyImg" style="width:100%;margin:6px 0">写真をコピー（保存せずに貼り付けで送る）</button>
     <div class="muted" style="font-size:12px;line-height:1.7;padding:4px 0 2px">
-    <b>保存しない方法</b>：1. 上の「写真をコピー」を押す → 2. 下の <b>ChatGPT</b> か <b>Claude</b> を押してブラウザで開く（質問文は入った状態）→ 3. 入力欄を長押しして「ペースト」すると写真が付く → 送信<br>
-    <b>貼り付けがうまくいかないとき</b>：写真を長押しして「写真に保存」→ 入力欄の「＋」から添付。質問文が入っていなければ「質問文をコピー」を押して貼り付け<br>
-    ログインが必要です（無料アカウントで可）。</div>
+    1. 上の写真を長押しして「写真に保存」（撮った写真ならもう保存されています）<br>
+    2. 下の <b>ChatGPT</b> か <b>Claude</b> を押す → ブラウザでチャットが開き、質問文が入った状態になる<br>
+    3. <b>ログインする</b>（無料アカウントで可。ログインしないと写真を添付できません）<br>
+    4. 入力欄の「＋」から写真を選んで添付し、送信。質問文が消えていたら「質問文をコピー」を押して貼り付け<br>
+    <span style="color:var(--amber)">写真をコピーして貼り付ける方法は、iPhone のブラウザでは写真ではなくリンクが貼られてしまい使えません。</span></div>
     <div class="muted" style="font-size:11px">Gemini など他のサービスを使うときは「質問文をコピー」→ そのサービスで写真を添付して貼り付け。</div>
   </details>
 </div>
@@ -2620,10 +2621,6 @@ function aiPrompt(){const k=aiCtx;
   $('aiClaude').onclick=()=>go('https://claude.ai/new?q='+encodeURIComponent(aiPrompt()));
   $('aiPplx').onclick=()=>go('https://www.perplexity.ai/search?q='+encodeURIComponent(aiPrompt()));
   $('aiImgFile').onchange=e=>{const f=e.target.files[0];if(!f)return;aiFile=f;$('aiImgEl').src=URL.createObjectURL(f);$('aiImgPrev').style.display='';$('aiShare').disabled=false;};
-  $('aiCopyImg').onclick=()=>{if(!aiFile){toast('先に写真を選んでください');return;}
-    if(!(navigator.clipboard&&window.ClipboardItem)){toast('この端末は写真のコピーに対応していません。写真を保存して添付してください');return;}
-    const png=new Promise((res,rej)=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');const s=Math.min(1,1600/Math.max(im.width,im.height));c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);c.toBlob(b=>b?res(b):rej(new Error('blob')),'image/png');};im.onerror=rej;im.src=URL.createObjectURL(aiFile);});
-    navigator.clipboard.write([new ClipboardItem({'image/png':png})]).then(()=>toast('写真をコピーしました。ChatGPT か Claude を開いて、入力欄を長押し → ペースト')).catch(()=>toast('コピーできませんでした。写真を保存して添付してください'));};
   $('aiShare').onclick=()=>{if(!aiFile){toast('先に写真を選んでください');return;}
     const text=aiPrompt();
     const copy=()=>{try{navigator.clipboard.writeText(text).catch(()=>{});}catch(e){}};
