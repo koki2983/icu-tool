@@ -473,7 +473,7 @@ nav button{font-size:10px}
 <button id="backBtn" class="fab back" style="display:none">← 戻る</button>
 <div id="tocSheet"><div class="sheet"><div class="sheet-h"><b>知識メモ 目次</b><button class="small" id="tocClose">閉じる</button></div><div id="tocList"></div></div></div>
 <div id="aiSheet"><div class="sheet"><div class="sheet-h"><b>AI に聞く</b><button class="small" id="aiClose">閉じる</button></div>
-<p class="muted" id="aiTopic"></p>
+<p class="muted" id="aiTopic"></p><div id="aiImgNote" class="warn" style="display:none;margin:8px 0;font-size:12px;line-height:1.6"><b>写真を添付するときの約束</b><br>1. 撮る前に、氏名・ID・ベッド番号・日付が画面に入らないようにする（写ったらトリミングで消す）<br>2. 下のボタンでチャットを開いたら、写真を添付して送る（このアプリは写真を扱いません）<br>3. 返答は学習用の参考意見。判断は必ず 12 誘導心電図と医師で<br>4. 個人のアカウントで外部サービスに送ることになるので、院内のルールを確認してから使う</div>
 <label>質問</label><textarea id="aiQ" placeholder="例：この項目の観察ポイントを新人向けに3つに絞ると？"></textarea>
 <div class="warn" style="margin-top:8px">患者の氏名・ID・具体的な症例情報は入力しないでください（外部サービスに送信されます）。回答は必ず施設のルールと医師の判断で確認を。</div>
 <div class="row" style="margin-top:10px"><button class="primary" id="aiGPT">ChatGPT</button><button class="primary" id="aiClaude">Claude</button><button class="primary" id="aiPplx">Perplexity</button></div>
@@ -2247,7 +2247,7 @@ const CALC_HTML=`
     <div class="rq" data-k="rr"><div class="rq-h">4. RR 間隔は？</div><div class="drchips"><button class="drc" data-v="reg">規則的</button><button class="drc" data-v="irreg">ばらばら</button><button class="drc" data-v="drop">規則的だがときどき抜ける</button></div></div>
     <div class="rq" data-k="p"><div class="rq-h">5. P 波は？</div><div class="drchips"><button class="drc" data-v="yes">あり、毎回 QRS の前にある</button><button class="drc" data-v="none">ない・分からない</button><button class="drc" data-v="saw">鋸歯状の波が続く</button><button class="drc" data-v="more">P が QRS より多い</button><button class="drc" data-v="prlong">PR が徐々に延びて抜ける</button><button class="drc" data-v="indep">P と QRS が無関係</button></div></div>
     <div id="rhyRes" class="rangebox" style="display:none;margin-top:10px"></div>
-    <div class="row" style="margin-top:8px"><button class="small" id="rhyClr">最初から</button></div>
+    <div class="row" style="margin-top:8px"><button class="small" id="rhyClr">最初から</button><button class="small ai" id="rhyImg">写真で AI に聞く</button></div>
     <p class="muted">これは学習用の目安です。同じ見え方でも別の不整脈のことがあり、モニタ 1 誘導では判断を誤ります。必ず 12 誘導心電図を記録し、医師に確認してください。</p>
     </div>
   </details>
@@ -2590,8 +2590,12 @@ META['よく使う正常値一覧'].extra=[...(META['よく使う正常値一覧
 
 /* AI に聞く（外部サービスへ質問を渡す） */
 let aiCtx=null;
-function openAI(k){aiCtx=k;$('aiTopic').textContent='項目：'+k.t;$('aiQ').value='';$('aiSheet').style.display='flex';setTimeout(()=>$('aiQ').focus(),100);}
-function aiPrompt(){const k=aiCtx;const q=$('aiQ').value.trim()||'この項目の要点と、看護師が特に注意すべき点を教えてください。';const m=META[k.t]||{};const keys=(m.key||[]).map(x=>'・'+x).join('\n');
+function openAI(k){aiCtx=k;$('aiTopic').textContent='項目：'+k.t;$('aiQ').value='';
+  const n=$('aiImgNote');if(n)n.style.display=k.img?'':'none';
+  $('aiSheet').style.display='flex';setTimeout(()=>$('aiQ').focus(),100);}
+function aiPrompt(){const k=aiCtx;
+  if(k&&k.img){const q=$('aiQ').value.trim();
+    return `私は ICU の看護師です。この後に添付するモニター心電図（またはモニタ画面）の写真について、学習のために読み方を教えてください。写真には患者の氏名・ID・日付は写っていません（写り込みがあれば無視してください）。\n\n【読んでほしい順番】\n1. 心拍数（おおよそ）とリズムの規則性（RR は一定か）\n2. QRS の幅（狭いか広いか）\n3. P 波の有無と QRS との関係（PR 間隔、脱落の有無）\n4. ST・T・QT で気になる点\n5. 以上から考えられる候補を、可能性の高い順に 2〜3 個。それぞれ「なぜそう考えるか」と「見分けるために次に確認すること（12 誘導・脈・血圧・K・Mg など）」\n6. 看護師として今すぐ確認・準備すべきこと\n\n【お願い】\n・これは診断ではなく学習用の参考意見です。最終判断は 12 誘導心電図と医師が行う前提で答えてください\n・写真の質（モアレ・角度・1 誘導のみ）で判断が不確かな場合は、はっきりそう書いてください\n・断定的な表現は避け、「〜の可能性」「〜を疑う」で書いてください${q?'\n\n【追加の質問】\n'+q:''}`;}const q=$('aiQ').value.trim()||'この項目の要点と、看護師が特に注意すべき点を教えてください。';const m=META[k.t]||{};const keys=(m.key||[]).map(x=>'・'+x).join('\n');
   return `私は ICU の看護師です。「${k.t}」について質問します。\n\n【前提（自分の学習メモの要点）】\n${keys||'（要点なし）'}\n\n【質問】\n${q}\n\n【お願い】\n・一般的な医学知識として、根拠（ガイドライン名など）を添えて答えてください\n・数値は目安として示し、施設の基準や医師の指示が優先されることを前提にしてください\n・不確かな点はそう明記してください`;}
 (function(){
   const s=$('aiSheet');
@@ -4553,6 +4557,7 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
   const R=$('rhyRes');
   const set=(k,v,btn)=>{A[k]=v;btn.parentElement.querySelectorAll('.drc').forEach(b=>b.classList.toggle('on',b===btn));judge();};
   document.querySelectorAll('#p-calc .rq').forEach(q=>q.querySelectorAll('.drc').forEach(b=>b.onclick=()=>set(q.dataset.k,b.dataset.v,b)));
+  $('rhyImg').onclick=()=>openAI({t:'モニター心電図の写真の読み方',img:true});
   $('rhyClr').onclick=()=>{for(const k in A)delete A[k];document.querySelectorAll('#p-calc .rq .drc').forEach(b=>b.classList.remove('on'));R.style.display='none';};
   const go=t=>`<button class="small" data-rgo="${esc(t)}">${esc(t.replace(/（.*?）/g,''))} を読む</button>`;
   function judge(){
