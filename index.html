@@ -3731,7 +3731,7 @@ KNOW.push({t:'心停止後（ROSC）の管理と体温管理療法（TTM）',s:[
 META['心停止後（ROSC）の管理と体温管理療法（TTM）']={cat:'全身管理',key:['ROSC 後 72 時間：酸素・CO₂・血圧・体温・血糖・けいれんの 6 つを目標範囲に','体温は 32〜37.5℃ で一定に保ち、発熱（37.7℃ 超）を 72 時間防ぐ。復温は 0.5℃/時以下','神経学的予後は 72 時間以降に、複数の所見で判断する']};
 ORDER['全身管理'].unshift('心停止後（ROSC）の管理と体温管理療法（TTM）');
 
-XLINK.push(['心筋梗塞','急性心筋梗塞（STEMI・NSTEMI）'],['STEMI','急性心筋梗塞（STEMI・NSTEMI）'],['肺塞栓','肺血栓塞栓症（PE）と深部静脈血栓症'],['肺血栓塞栓症','肺血栓塞栓症（PE）と深部静脈血栓症'],['DVT','肺血栓塞栓症（PE）と深部静脈血栓症'],['TTM','心停止後（ROSC）の管理と体温管理療法（TTM）'],['体温管理療法','心停止後（ROSC）の管理と体温管理療法（TTM）'],['ROSC','心停止後（ROSC）の管理と体温管理療法（TTM）'],['トルサード','不整脈の管理（ICU で出会う順に）'],['心房細動','不整脈の管理（ICU で出会う順に）']);
+XLINK.push(['右側誘導','急性心筋梗塞（STEMI・NSTEMI）'],['V4R','急性心筋梗塞（STEMI・NSTEMI）'],['右室梗塞','急性心筋梗塞（STEMI・NSTEMI）'],['心筋梗塞','急性心筋梗塞（STEMI・NSTEMI）'],['STEMI','急性心筋梗塞（STEMI・NSTEMI）'],['肺塞栓','肺血栓塞栓症（PE）と深部静脈血栓症'],['肺血栓塞栓症','肺血栓塞栓症（PE）と深部静脈血栓症'],['DVT','肺血栓塞栓症（PE）と深部静脈血栓症'],['TTM','心停止後（ROSC）の管理と体温管理療法（TTM）'],['体温管理療法','心停止後（ROSC）の管理と体温管理療法（TTM）'],['ROSC','心停止後（ROSC）の管理と体温管理療法（TTM）'],['トルサード','不整脈の管理（ICU で出会う順に）'],['心房細動','不整脈の管理（ICU で出会う順に）']);
 GLOSS.push(
 ['door-to-balloon','ドア・トゥ・バルーン|D2B','病院到着から PCI でバルーンを広げるまでの時間。STEMI では 90 分以内が目標','急性心筋梗塞（STEMI・NSTEMI）'],
 ['DAPT','抗血小板薬 2 剤併用|dual antiplatelet therapy','アスピリン（バイアスピリン）と P2Y12 阻害薬（プラスグレル・クロピドグレル（プラビックス））の併用。PCI 後は原則 1 年','急性心筋梗塞（STEMI・NSTEMI）'],
@@ -3942,6 +3942,86 @@ Object.assign(FIG,{arr_sv:`<svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2
 Object.assign(PHOTO,{"ecg_af": "img/ecg_af.jpg", "ecg_afl": "img/ecg_afl.jpg", "ecg_svt": "img/ecg_svt.jpg", "ecg_vt2": "img/ecg_vt2.jpg", "ecg_tdp2": "img/ecg_tdp2.jpg", "ecg_vf": "img/ecg_vf.jpg", "ecg_m1": "img/ecg_m1.jpg", "ecg_m2": "img/ecg_m2.jpg", "ecg_cavb": "img/ecg_cavb.jpg"});
 Object.assign(PHOTOCRED,{"ecg_af": {"a": "Meddoc13", "l": "CC BY-SA 3.0", "u": "https://commons.wikimedia.org/wiki/File:Atrial_fibrillation_01.jpg"}, "ecg_afl": {"a": "Ciernik M", "l": "CC BY-SA 4.0", "u": "https://commons.wikimedia.org/wiki/File:ECG-atrial_flutter.jpg"}, "ecg_svt": {"a": "SVT_Lead_II.JPG: Displaced\nderivative work: James Heilman, M", "l": "Public domain", "u": "https://commons.wikimedia.org/wiki/File:SVT_Lead_II-2.JPG"}, "ecg_vt2": {"a": "The original uploader was Ksheka at English Wikipedia.", "l": "CC BY-SA 2.5", "u": "https://commons.wikimedia.org/wiki/File:Electrocardiogram_of_Ventricular_Tachycardia.png"}, "ecg_tdp2": {"a": "CardioNetworks: [ ]", "l": "CC BY-SA 3.0", "u": "https://commons.wikimedia.org/wiki/File:Rhythm_torsade_(CardioNetworks_ECGpedia).png"}, "ecg_vf": {"a": "CardioNetworks: Googletrans", "l": "CC BY-SA 3.0", "u": "https://commons.wikimedia.org/wiki/File:De-Rhythm_ventricular_fibrillation_(CardioNetworks_ECGpedia).png"}, "ecg_m1": {"a": "CardioNetworks: Googletrans", "l": "CC BY-SA 3.0", "u": "https://commons.wikimedia.org/wiki/File:De-Wenckebach_(CardioNetworks_ECGpedia).png"}, "ecg_m2": {"a": "James Heilman, MD", "l": "CC BY-SA 3.0", "u": "https://commons.wikimedia.org/wiki/File:2ndDegreeType2.jpg"}, "ecg_cavb": {"a": "James Heilman, MD", "l": "CC BY-SA 3.0", "u": "https://commons.wikimedia.org/wiki/File:CompleteHeartBlock.jpg"}});
 PHOTOS['不整脈の管理（ICU で出会う順に）']=[{"id": "ecg_af", "t": "心房細動（12 誘導）", "b": ["RR 間隔がばらばらで、はっきりした P 波がない。基線が細かく揺れている（f 波）", "心拍数が速いと「規則的に見える」ことがあるので、定規で RR を測る", "V1 で f 波が最も見やすい"]}, {"id": "ecg_afl", "t": "心房粗動（12 誘導）", "b": ["Ⅱ・Ⅲ・aVF に鋸歯状の F 波（赤で示された部分）が規則的に続く", "心室のレートは F 波の 2 回に 1 回（2:1）で 150 前後になりやすい。150 の規則的な頻拍を見たら粗動を疑う", "薬でレートを下げにくく、カルディオバージョンは低エネルギーで効く"]}, {"id": "ecg_svt", "t": "発作性上室頻拍（Ⅱ誘導）", "b": ["規則的で狭い QRS の頻拍。P 波は QRS に隠れて見えない", "突然始まり突然終わる。この例では途中で洞調律に戻っている（右半分）", "まず迷走神経刺激、次にアデノシン（ATP）"]}, {"id": "ecg_vt2", "t": "単形性心室頻拍（12 誘導）", "b": ["幅広い QRS（0.12 秒以上）が規則的に続く。全誘導で形が同じ（単形性）", "上室性の変行伝導との鑑別は後回しにして、まず VT として扱う", "脈があれば同期下カルディオバージョンかアミオダロン、脈がなければ除細動"]}, {"id": "ecg_tdp2", "t": "トルサード・ド・ポアンツの始まり（モニタ）", "b": ["「短い-長い-短い」の RR の並び（short-long-short）から始まるのが典型。QT が延びた状態で期外収縮が T 波に重なる", "QRS の高さと向きがねじれるように変わる", "硫酸マグネシウム、原因薬の中止、K 補正、徐脈なら心拍数を上げる"]}, {"id": "ecg_vf", "t": "心室細動（モニタ）", "b": ["形も間隔もない不規則な波。P 波も QRS も区別できない", "脈は触れない。ただちに胸骨圧迫と除細動", "細かい VF は心静止と見間違えやすい。ゲインを上げて確認"]}, {"id": "ecg_m1", "t": "2 度房室ブロック Mobitz Ⅰ型（ウェンケバッハ）", "b": ["PR 間隔が拍ごとに少しずつ延び、最後に QRS が脱落する。脱落のあとは PR が短く戻る", "房室結節のブロックで、下壁梗塞や薬剤で起こる。多くは経過観察でよく、アトロピンが効く", "「PR が延びていく」ことを、脱落の前の 3〜4 拍で確認する"]}, {"id": "ecg_m2", "t": "2 度房室ブロック Mobitz Ⅱ型（12 誘導）", "b": ["PR 間隔は一定のまま、突然 QRS が脱落する（P 波が続いているのに QRS がない）", "ヒス束以下のブロックで、完全房室ブロックに進みやすい。症状がなくてもペーシングの準備", "アトロピンは効かず、心房レートだけ上がって悪化することがある"]}, {"id": "ecg_cavb", "t": "完全房室ブロック（12 誘導）", "b": ["P 波と QRS が無関係に出ている（房室解離）。P 波は規則的、QRS も規則的だが互いに関係がない", "QRS が幅広く遅い（補充調律 30〜40/分）。脈が触れにくく、失神・心不全になる", "緊急でペーシング（経皮 → 経静脈）。アトロピンは効かない"]}];
+Object.assign(FIG,{rlead:`<svg viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="9">
+<text x="170" y="14" text-anchor="middle" font-weight="700" font-size="10">右側胸部誘導（V3R〜V6R）と後壁誘導（V7〜V9）の貼る位置</text>
+<text x="90" y="34" text-anchor="middle" font-weight="700" fill="#0E6F80">前面（患者を正面から見る）</text>
+<g fill="#FBE9E7" stroke="#B3261E" stroke-width="1.2"><path d="M40 60 C60 44 120 44 140 60 L150 150 C150 190 140 210 130 220 L50 220 C40 210 30 190 30 150z"/>
+<path d="M78 42 L102 42 L104 60 L76 60z"/></g>
+<line x1="90" y1="60" x2="90" y2="220" stroke="#D5DDE2" stroke-dasharray="3 2"/>
+<text x="90" y="232" text-anchor="middle" font-size="8" fill="#5F6E79">胸骨</text>
+<text x="20" y="130" font-size="8" fill="#5F6E79">右</text><text x="152" y="130" font-size="8" fill="#5F6E79">左</text>
+<!-- 通常の V1〜V6（左）-->
+<g fill="#5F6E79"><circle cx="98" cy="120" r="5"/><text x="98" y="112" text-anchor="middle" font-size="7">V1</text>
+<circle cx="112" cy="130" r="5"/><text x="115" y="123" text-anchor="middle" font-size="7">V3</text>
+<circle cx="120" cy="150" r="5"/><text x="128" y="145" text-anchor="middle" font-size="7">V4</text>
+<circle cx="133" cy="158" r="5"/><text x="141" y="153" text-anchor="middle" font-size="7">V5</text>
+<circle cx="146" cy="162" r="5"/><text x="154" y="160" text-anchor="middle" font-size="7">V6</text></g>
+<!-- 右側誘導 -->
+<g fill="#B3261E"><circle cx="82" cy="120" r="5"/><text x="82" y="112" text-anchor="middle" font-size="7">V2R</text>
+<circle cx="68" cy="130" r="5"/><text x="64" y="123" text-anchor="middle" font-size="7">V3R</text>
+<circle cx="60" cy="150" r="6" stroke="#fff" stroke-width="1"/><text x="52" y="144" text-anchor="middle" font-size="8" font-weight="700">V4R</text>
+<circle cx="47" cy="158" r="5"/><text x="39" y="153" text-anchor="middle" font-size="7">V5R</text>
+<circle cx="34" cy="162" r="5"/><text x="26" y="160" text-anchor="middle" font-size="7">V6R</text></g>
+<text x="90" y="252" text-anchor="middle" font-size="8" fill="#B3261E">V1・V2 はそのまま。V3〜V6 を左右対称に右へ移す</text>
+<text x="90" y="264" text-anchor="middle" font-size="8" fill="#B3261E">V4R ＝ 右の鎖骨中線・第 5 肋間。ここだけでもよい</text>
+<!-- 後面 -->
+<text x="255" y="34" text-anchor="middle" font-weight="700" fill="#0E6F80">後面（背中）</text>
+<g fill="#FBE9E7" stroke="#B3261E" stroke-width="1.2"><path d="M205 60 C225 44 285 44 305 60 L315 150 C315 190 305 210 295 220 L215 220 C205 210 195 190 195 150z"/>
+<path d="M243 42 L267 42 L269 60 L241 60z"/></g>
+<line x1="255" y1="60" x2="255" y2="220" stroke="#D5DDE2" stroke-dasharray="3 2"/>
+<text x="255" y="232" text-anchor="middle" font-size="8" fill="#5F6E79">脊柱</text>
+<text x="185" y="130" font-size="8" fill="#5F6E79">左</text><text x="317" y="130" font-size="8" fill="#5F6E79">右</text>
+<g fill="#0E6F80"><circle cx="215" cy="160" r="5"/><text x="207" y="153" text-anchor="middle" font-size="7">V7</text>
+<circle cx="232" cy="160" r="5"/><text x="232" y="151" text-anchor="middle" font-size="7">V8</text>
+<circle cx="248" cy="160" r="5"/><text x="248" y="151" text-anchor="middle" font-size="7">V9</text></g>
+<text x="255" y="252" text-anchor="middle" font-size="8" fill="#0E6F80">V6 と同じ高さ（第 5 肋間）で背中側へ</text>
+<text x="255" y="264" text-anchor="middle" font-size="8" fill="#0E6F80">V7 後腋窩線、V8 肩甲骨の下端、V9 脊柱の左縁</text>
+<rect x="8" y="274" width="324" height="22" rx="5" fill="#FFF1E0"/>
+<text x="170" y="288" text-anchor="middle" font-size="8" fill="#B25E00">記録した紙には「V4R」「V7〜V9」と誘導名を必ず書き込む（機械は V4・V7 と印字しない）</text></svg>`,rlead2:`<svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="9">
+<text x="170" y="14" text-anchor="middle" font-weight="700" font-size="10">下壁梗塞で V4R を見る理由</text>
+<text x="10" y="36" font-weight="700" fill="#0E6F80">Ⅱ・Ⅲ・aVF で ST 上昇（下壁梗塞）</text>
+<line x1="12" y1="74" x2="160" y2="74" stroke="#E3E9EC"/>
+<path d="M12 74 L26 74 Q30 68 34 74 L42 74 L44 78 L48 50 L52 82 L54 68 L70 68 Q78 60 86 74 L110 74 Q114 68 118 74 L126 74 L128 78 L132 50 L136 82 L138 68 L154 68 Q160 62 160 74" fill="none" stroke="#B3261E" stroke-width="1.4"/>
+<text x="86" y="96" text-anchor="middle" font-size="8" fill="#5F6E79">ST が基線より上がる</text>
+<text x="180" y="36" font-weight="700" fill="#0E6F80">↓ 右室梗塞を合併しているか？</text>
+<text x="180" y="60" font-weight="700" fill="#B3261E">V4R でも ST 上昇（1 mm 以上）</text>
+<line x1="182" y1="96" x2="330" y2="96" stroke="#E3E9EC"/>
+<path d="M182 96 L196 96 Q200 90 204 96 L212 96 L214 100 L218 72 L222 104 L224 90 L240 90 Q248 82 256 96 L280 96 Q284 90 288 96 L296 96 L298 100 L302 72 L306 104 L308 90 L324 90 Q330 84 330 96" fill="none" stroke="#B3261E" stroke-width="1.4"/>
+<text x="256" y="112" text-anchor="middle" font-size="8" fill="#B3261E">→ 右室梗塞あり</text>
+<text x="180" y="138" font-weight="700" fill="#5F6E79">V4R で ST 上昇なし</text>
+<line x1="182" y1="174" x2="330" y2="174" stroke="#E3E9EC"/>
+<path d="M182 174 L196 174 Q200 168 204 174 L212 174 L214 178 L218 150 L222 182 L224 174 L240 174 Q248 166 256 174 L280 174 Q284 168 288 174 L296 174 L298 178 L302 150 L306 182 L308 174 L324 174 Q330 166 330 174" fill="none" stroke="#5F6E79" stroke-width="1.4"/>
+<text x="256" y="190" text-anchor="middle" font-size="8" fill="#5F6E79">→ 右室は無事</text>
+<rect x="8" y="204" width="324" height="40" rx="6" fill="#FFF1E0"/>
+<text x="170" y="218" text-anchor="middle" font-size="8" fill="#B25E00">右室梗塞なら：硝酸薬・利尿薬・モルヒネで血圧が落ちる。輸液で前負荷を保つ</text>
+<text x="170" y="230" text-anchor="middle" font-size="8" fill="#B25E00">V4R の ST 上昇は発症から数時間で消えることがある。来院時に早く記録する</text>
+<text x="170" y="241" text-anchor="middle" font-size="8" fill="#5F6E79">後壁梗塞：V1〜V3 の ST 低下＋高い R（鏡像）→ V7〜V9 で ST 上昇（0.5 mm 以上）を確認</text></svg>`});
+(function(){const k=KNOW.find(x=>x.t==='急性心筋梗塞（STEMI・NSTEMI）');if(!k)return;
+  const i=k.s.findIndex(s=>s.h==='診断の流れ');
+  k.s.splice(i+1,0,{h:'右側誘導（V4R）と後壁誘導（V7〜V9）の取り方',f:'rlead',b:[
+   'いつ取るか：!下壁梗塞（Ⅱ・Ⅲ・aVF の ST 上昇）を見たら、必ず右側誘導を追加する。右室梗塞は下壁梗塞の 30〜50% に合併し、治療が変わる（硝酸薬が禁忌になり、輸液が必要になる）',
+   '貼り方：V1・V2 はそのまま。V3〜V6 の電極を、胸骨を軸に左右対称の位置へ右胸に移す（V3R〜V6R）。時間がなければ V4R（右の鎖骨中線・第 5 肋間）だけでもよい',
+   '判定：V4R で ST 上昇 1 mm 以上なら右室梗塞。感度・特異度とも 80〜90% で、右室梗塞の診断に最も役立つ誘導',
+   '!V4R の ST 上昇は発症から数時間〜10 時間ほどで消えることがある。来院時・胸痛のあるうちに早く記録する',
+   '後壁誘導：V1〜V3 で ST 低下と高い R 波（後壁の変化が前から見ると鏡像になる）を見たら、V7〜V9 を追加する。V6 と同じ高さ（第 5 肋間）で、V7 後腋窩線、V8 肩甲骨の下端、V9 脊柱の左縁。ST 上昇 0.5 mm 以上で後壁梗塞',
+   '記録した紙には「V4R」「V7」などと誘導名を手書きで必ず書く。機械は V4・V7 とは印字しないので、そのままだと後で分からなくなる',
+   '電極を戻すときは、通常の 12 誘導に戻したことも確認する（右側のまま次の記録をすると誤読の原因）'
+  ]});
+  k.s.splice(i+2,0,{h:'右室梗塞を疑ったら（V4R が陽性）',f:'rlead2',b:[
+   '三徴：低血圧、頸静脈怒張、肺野はきれい（左心不全の所見がない）。右室が血を送れず、左室に血が届かない状態',
+   '!硝酸薬・利尿薬・モルヒネは前負荷を下げて血圧を急落させる。使わない。すでに使っていたら止めて報告',
+   '輸液で前負荷を保つ（生食 500 mL 程度を反復し、エコーや CVP で反応を見る）。それでも低血圧ならドブタミン',
+   '徐脈・房室ブロックを合併しやすい（RCA が洞結節・房室結節を養う）。アトロピン、ペーシングの準備',
+   '心房細動になると心房の収縮が失われ、右室の充満がさらに落ちる。早めのカルディオバージョンを考える',
+   '再灌流（PCI）で右室機能は回復しやすい。急ぐ理由がもう一つ増える'
+  ]});
+})();
+GLOSS.push(
+['右側誘導','V4R|右側胸部誘導|right-sided leads','V3〜V6 の電極を右胸の左右対称の位置に貼った誘導。下壁梗塞で右室梗塞の合併を見るために取る。V4R の ST 上昇 1 mm 以上で右室梗塞','急性心筋梗塞（STEMI・NSTEMI）'],
+['後壁誘導','V7|V8|V9|posterior leads','V6 と同じ高さで背中側に貼る誘導（V7 後腋窩線、V8 肩甲骨下端、V9 脊柱左縁）。V1〜V3 の ST 低下と高い R 波を見たら追加し、ST 上昇 0.5 mm 以上で後壁梗塞','急性心筋梗塞（STEMI・NSTEMI）'],
+['右室梗塞','RV infarction','下壁梗塞の 30〜50% に合併。低血圧・頸静脈怒張・肺野はきれい、が三徴。硝酸薬・利尿薬は禁忌で、輸液で前負荷を保つ','急性心筋梗塞（STEMI・NSTEMI）']
+);
+GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 (function(){const bar=$('catBar');bar.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
 
 /* 血液ガス代償計算 */
