@@ -187,6 +187,7 @@ nav button{font-size:10px}
 .stepper .drc{padding:4px 10px;font-size:13px}
 .kstart{margin-bottom:10px}
 .kst-h{font-weight:700;font-size:13px;color:var(--teal)}
+.rq{margin-top:8px}.rq-h{font-weight:700;font-size:14px;margin-bottom:4px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -2237,6 +2238,20 @@ renderKnow();
 /* ===== 追加計算ツール ===== */
 const CALC_HTML=`
 <details class="card o2card">
+    <summary>波形の見方チェッカー（不整脈の候補）</summary>
+    <div class="body">
+    <p class="muted" style="margin-top:0">モニタで見たものを順に答えると、不整脈の候補と「次にすること」が出ます。写真は使いません。判断は 12 誘導と医師で。</p>
+    <div class="rq" data-k="pulse"><div class="rq-h">1. 脈は触れる？ 血圧は保てている？</div><div class="drchips"><button class="drc" data-v="ok">触れる・安定</button><button class="drc" data-v="unstable">触れるが不安定（低血圧・意識低下・胸痛）</button><button class="drc" data-v="none">触れない</button></div></div>
+    <div class="rq" data-k="rate"><div class="rq-h">2. 心拍数は？</div><div class="drchips"><button class="drc" data-v="slow">50 未満</button><button class="drc" data-v="normal">50〜100</button><button class="drc" data-v="fast">100〜150</button><button class="drc" data-v="vfast">150 以上</button></div></div>
+    <div class="rq" data-k="qrs"><div class="rq-h">3. QRS の幅は？（3 mm ＝ 0.12 秒が目安）</div><div class="drchips"><button class="drc" data-v="narrow">狭い（0.12 秒未満）</button><button class="drc" data-v="wide">広い（0.12 秒以上）</button><button class="drc" data-v="none">QRS が分からない・形がない</button></div></div>
+    <div class="rq" data-k="rr"><div class="rq-h">4. RR 間隔は？</div><div class="drchips"><button class="drc" data-v="reg">規則的</button><button class="drc" data-v="irreg">ばらばら</button><button class="drc" data-v="drop">規則的だがときどき抜ける</button></div></div>
+    <div class="rq" data-k="p"><div class="rq-h">5. P 波は？</div><div class="drchips"><button class="drc" data-v="yes">あり、毎回 QRS の前にある</button><button class="drc" data-v="none">ない・分からない</button><button class="drc" data-v="saw">鋸歯状の波が続く</button><button class="drc" data-v="more">P が QRS より多い</button><button class="drc" data-v="prlong">PR が徐々に延びて抜ける</button><button class="drc" data-v="indep">P と QRS が無関係</button></div></div>
+    <div id="rhyRes" class="rangebox" style="display:none;margin-top:10px"></div>
+    <div class="row" style="margin-top:8px"><button class="small" id="rhyClr">最初から</button></div>
+    <p class="muted">これは学習用の目安です。同じ見え方でも別の不整脈のことがあり、モニタ 1 誘導では判断を誤ります。必ず 12 誘導心電図を記録し、医師に確認してください。</p>
+    </div>
+  </details>
+  <details class="card o2card">
     <summary>RSBI（浅速呼吸指数）</summary>
     <div class="body">
     <div class="row"><div><label>呼吸回数</label><div class="unit"><input type="number" inputmode="decimal" id="rsR" placeholder="25"><span>回/分</span></div></div>
@@ -4343,7 +4358,7 @@ PHOTOS['不整脈の管理（ICU で出会う順に）']=[{"id": "ecg_af", "t": 
 const KNOW_REV='2026 年 9 月（25 日：疾患 15 項目を追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
-  const SHORT=[['P/F','P/F 比'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
+  const SHORT=[['P/F','P/F 比'],['波形','波形の見方'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
     ['血ガス','血液ガス：予測'],['栄養','必要エネルギー'],['ハリス','ハリス'],['不感蒸泄','不感蒸泄'],
     ['メイロン','メイロン'],['FENa','FENa'],['輸血','輸血：予測'],['血行動態','血行動態'],['配合変化','配合変化'],['薬剤の目安','投与量の目安']];
   const box=$('calcFav'); let use={};
@@ -4507,8 +4522,8 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
 (function(){
   const GROUPS={
     '呼吸':['P/F 比','RSBI','ROX','予測体重','血液ガス'],
+    '循環':['波形の見方','血行動態','輸血：予測'],
     '薬剤':['__gamma','投与量の目安','配合変化'],
-    '循環':['血行動態','輸血：予測'],
     '電解質':['電解質の補正','メイロン','FENa'],
     '栄養':['栄養：必要','ハリス','不感蒸泄']
   };
@@ -4529,6 +4544,65 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
   seg.querySelectorAll('button').forEach(b=>b.onclick=()=>{show(b.dataset.g);window.scrollTo({top:0,behavior:'smooth'});});
   window.__calcShow=(el)=>{const g=map.get(el);if(g&&g!==cur)show(g);};
   (async()=>{const last=await store.get('calcgrp');show(names.includes(last)?last:cur);})();
+})();
+
+
+/* 波形の見方チェッカー */
+(function(){
+  const A={};
+  const R=$('rhyRes');
+  const set=(k,v,btn)=>{A[k]=v;btn.parentElement.querySelectorAll('.drc').forEach(b=>b.classList.toggle('on',b===btn));judge();};
+  document.querySelectorAll('#p-calc .rq').forEach(q=>q.querySelectorAll('.drc').forEach(b=>b.onclick=()=>set(q.dataset.k,b.dataset.v,b)));
+  $('rhyClr').onclick=()=>{for(const k in A)delete A[k];document.querySelectorAll('#p-calc .rq .drc').forEach(b=>b.classList.remove('on'));R.style.display='none';};
+  const go=t=>`<button class="small" data-rgo="${esc(t)}">${esc(t.replace(/（.*?）/g,''))} を読む</button>`;
+  function judge(){
+    const {pulse,rate,qrs,rr,p}=A;
+    if(!pulse)return;
+    let title='',body=[],act=[],cls='',topic='不整脈の管理（ICU で出会う順に）';
+    if(pulse==='none'){cls='high';title='脈が触れない → 心停止として対応';
+      body.push('波形の種類より先に胸骨圧迫。VF・無脈性 VT なら除細動、それ以外（PEA・心静止）は圧迫とアドレナリン');
+      act.push('コールして人を集める、胸骨圧迫、除細動器を持ってくる');topic='心肺蘇生（ACLS の要点）';}
+    else{
+      if(qrs===undefined||rate===undefined){title='2〜5 に答えると候補が出ます';}
+      else{
+        const fast=rate==='fast'||rate==='vfast';
+        if(qrs==='none'){cls='high';title='QRS の形がない → 心室細動か、電極・ノイズの確認';body.push('脈が触れているなら、電極の外れ・体動・電気メスなどのノイズを疑う。患者を見て、脈を触って、電極を確認');}
+        else if(rate==='slow'){
+          if(p==='indep'){cls='high';title='完全房室ブロック（3 度）の可能性';body.push('P 波と QRS が無関係に出て、心室は補充調律で遅い。症状がなくてもペーシングの準備。アトロピンは効かない');}
+          else if(p==='prlong'){title='2 度房室ブロック Mobitz Ⅰ型（ウェンケバッハ）の可能性';body.push('PR が徐々に延びて QRS が抜ける。房室結節の障害で、多くは経過観察。症状があればアトロピン');}
+          else if(p==='more'||rr==='drop'){cls='high';title='2 度房室ブロック Mobitz Ⅱ型 か 2:1 ブロックの可能性';body.push('PR は一定のまま QRS が抜ける。完全ブロックに進みやすい。ペーシングの準備、アトロピンは効かないことが多い');}
+          else if(p==='yes'){title='洞性徐脈の可能性';body.push('P 波が毎回あって遅い。原因：薬剤（β遮断薬・Ca 拮抗薬・ジゴキシン・アミオダロン）、迷走神経反射、低体温、甲状腺、下壁梗塞、高 K');}
+          else {title='徐脈（接合部・補充調律など）の可能性';body.push('P 波がなく遅い規則的な QRS は接合部調律、幅広ければ心室補充調律。原因の検索とペーシングの準備');}
+          act.push('症状（低血圧・意識・胸痛）があればアトロピン 0.5 mg → 経皮ペーシング。12 誘導、K・薬剤の確認');}
+        else if(qrs==='wide'&&fast){cls='high';title='心室頻拍（VT）として扱う';
+          body.push(rr==='irreg'?'幅広く不規則なら、心房細動＋変行伝導・WPW も候補だが、まず VT として扱う':'幅広い規則的な頻拍は、上室性の変行伝導との鑑別を後回しにして VT として扱う');
+          if(rate==='vfast')body.push('形と高さがねじれるように変わるならトルサード（QT 延長）。硫酸 Mg');
+          act.push(pulse==='unstable'?'不安定 → 同期下カルディオバージョン。人を集めて除細動器':'安定 → アミオダロン静注の準備、12 誘導、K・Mg・虚血の確認。急変に備えて除細動器をそばに');}
+        else if(qrs==='narrow'&&fast){
+          if(rr==='irreg'||p==='none'&&rr==='irreg'){title='心房細動の可能性';body.push('RR がばらばらで P 波がない。心拍数が速いと規則的に見えるので、定規で RR を測る');
+            act.push(pulse==='unstable'?'不安定 → 同期下カルディオバージョン':'安定 → レートコントロール（ランジオロール・ジルチアゼム）、K 4 以上・Mg 2 以上、脱水・痛み・貧血を直す。48 時間を超えたら抗凝固の検討');}
+          else if(p==='saw'||(rate==='vfast'&&rr==='reg'&&p!=='yes')){title=p==='saw'?'心房粗動（2:1）の可能性':'発作性上室頻拍（PSVT）か 心房粗動 2:1 の可能性';
+            body.push('150 前後の規則的な狭い頻拍は、まず心房粗動 2:1 を疑う。鋸歯状の F 波を Ⅱ・Ⅲ・aVF・V1 で探す');
+            act.push(pulse==='unstable'?'不安定 → 同期下カルディオバージョン（低エネルギーで効く）':'安定 → 迷走神経刺激 → アデノシン（ATP）急速静注（粗動なら F 波が見えるようになる）。12 誘導');}
+          else if(p==='yes'){title='洞性頻脈の可能性';body.push('P 波が毎回あって速い。不整脈ではなく「原因」のサイン：痛み、発熱、脱水・出血、低酸素、貧血、不安、薬剤（カテコラミン・気管支拡張薬）、肺塞栓');
+            act.push('原因を探して直す。心拍数だけ薬で下げない');}
+          else {title='上室性の頻拍（心房頻拍・接合部頻拍など）の可能性';body.push('狭い QRS の規則的な頻拍。P 波の形と位置で分ける');act.push('12 誘導、迷走神経刺激・アデノシンで診断と治療');}}
+        else if(rate==='normal'){
+          if(rr==='irreg'&&p==='none'){title='心房細動（レートは落ち着いている）の可能性';body.push('RR がばらばらで P 波がない。レートが 100 未満なら急がないが、抗凝固と原因の検討');act.push('12 誘導、K・Mg、抗凝固の確認');}
+          else if(rr==='drop'){title='期外収縮 か 2 度房室ブロックの可能性';body.push('ときどき早く出る（期外収縮）か、ときどき抜ける（ブロック）かを区別。幅広い早い波なら心室期外収縮（PVC）');act.push('PVC が増えていれば K・Mg・虚血を確認。3 連発以上は非持続性 VT として報告');}
+          else if(p==='prlong'){title='2 度房室ブロック Mobitz Ⅰ型の可能性';body.push('PR が徐々に延びて抜ける。多くは経過観察');act.push('12 誘導、薬剤の確認');}
+          else if(p==='indep'){cls='high';title='完全房室ブロック（心室レートが保たれている型）の可能性';body.push('P と QRS が無関係。ペーシングの準備');act.push('医師へ報告、ペーシングの準備');}
+          else if(qrs==='wide'){title='脚ブロック か 心室調律（ペーシング含む）の可能性';body.push('正常レートで幅広い QRS。ペースメーカーのスパイクがあればペーシング調律。新しい脚ブロックなら虚血・高 K を考える');act.push('前の心電図と比べる。K を確認');}
+          else {title='洞調律の範囲';body.push('P 波が毎回あり、規則的で、狭い QRS、50〜100。不整脈ではなさそう');act.push('気になる点があれば 12 誘導で確認');}}
+      }
+    }
+    if(!title)return;
+    R.style.display='';R.className='rangebox '+cls;
+    R.innerHTML=`<div style="font-size:15px;font-weight:700">${title}</div>`+(body.length?`<div class="rn">${body.map(esc).join('<br>')}</div>`:'')
+      +(act.length?`<div class="rn"><b>次にすること：</b>${act.map(esc).join('／')}</div>`:'')
+      +`<div style="margin-top:6px">${go(topic)}${topic!=='不整脈の管理（ICU で出会う順に）'?go('不整脈の管理（ICU で出会う順に）'):''}</div>`;
+    R.querySelectorAll('[data-rgo]').forEach(b=>b.onclick=()=>{document.querySelector('nav button[data-p=know]').click();setTimeout(()=>goTopic(b.dataset.rgo,null),150);});
+  }
 })();
 
 loadDrugs(); loadKnow(); calc();
