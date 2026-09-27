@@ -473,7 +473,13 @@ nav button{font-size:10px}
 <button id="backBtn" class="fab back" style="display:none">← 戻る</button>
 <div id="tocSheet"><div class="sheet"><div class="sheet-h"><b>知識メモ 目次</b><button class="small" id="tocClose">閉じる</button></div><div id="tocList"></div></div></div>
 <div id="aiSheet"><div class="sheet"><div class="sheet-h"><b>AI に聞く</b><button class="small" id="aiClose">閉じる</button></div>
-<p class="muted" id="aiTopic"></p><div id="aiImgNote" class="warn" style="display:none;margin:8px 0;font-size:12px;line-height:1.6"><b>写真を添付するときの約束</b><br>1. 撮る前に、氏名・ID・ベッド番号・日付が画面に入らないようにする（写ったらトリミングで消す）<br>2. 下のボタンでチャットを開いたら、写真を添付して送る（このアプリは写真を扱いません）<br>3. 返答は学習用の参考意見。判断は必ず 12 誘導心電図と医師で<br>4. 個人のアカウントで外部サービスに送ることになるので、院内のルールを確認してから使う</div>
+<p class="muted" id="aiTopic"></p><div id="aiImgNote" class="warn" style="display:none;margin:8px 0;font-size:12px;line-height:1.6"><b>写真を添付するときの約束</b><br>1. 撮る前に、氏名・ID・ベッド番号・日付が画面に入らないようにする（写ったらトリミングで消す）<br>2. 「写真を選ぶ」で写真を選び、「まとめて送る」で ChatGPT や Claude のアプリに渡す（このアプリは写真を保存・送信しません）<br>3. 返答は学習用の参考意見。判断は必ず 12 誘導心電図と医師で<br>4. 個人のアカウントで外部サービスに送ることになるので、院内のルールを確認してから使う</div>
+<div id="aiImgBox" style="display:none;margin:8px 0">
+  <label class="addph" style="margin:0"><input type="file" id="aiImgFile" accept="image/*" hidden>📷 写真を選ぶ／撮る</label>
+  <div id="aiImgPrev" style="display:none;margin-top:8px"><img id="aiImgEl" style="max-width:100%;max-height:180px;border-radius:8px;border:1px solid var(--line)"><div class="muted" style="font-size:11px;margin-top:4px">氏名・ID・日付が写っていないか確認</div></div>
+  <button class="primary" id="aiShare" style="width:100%;margin-top:8px" disabled>写真と質問文をまとめて送る（共有）</button>
+  <div class="muted" style="font-size:11px;margin-top:6px">iPhone・iPad では共有画面が開くので、ChatGPT や Claude のアプリを選びます。質問文は自動でコピーされるので、貼り付かなかったら長押しで貼り付けてください。</div>
+</div>
 <label>質問</label><textarea id="aiQ" placeholder="例：この項目の観察ポイントを新人向けに3つに絞ると？"></textarea>
 <div class="warn" style="margin-top:8px">患者の氏名・ID・具体的な症例情報は入力しないでください（外部サービスに送信されます）。回答は必ず施設のルールと医師の判断で確認を。</div>
 <div class="row" style="margin-top:10px"><button class="primary" id="aiGPT">ChatGPT</button><button class="primary" id="aiClaude">Claude</button><button class="primary" id="aiPplx">Perplexity</button></div>
@@ -2591,8 +2597,9 @@ META['よく使う正常値一覧'].extra=[...(META['よく使う正常値一覧
 /* AI に聞く（外部サービスへ質問を渡す） */
 let aiCtx=null;
 function openAI(k){aiCtx=k;$('aiTopic').textContent='項目：'+k.t;$('aiQ').value='';
-  const n=$('aiImgNote');if(n)n.style.display=k.img?'':'none';
+  const n=$('aiImgNote');if(n)n.style.display=k.img?'':'none';const bx=$('aiImgBox');if(bx){bx.style.display=k.img?'':'none';aiFile=null;$('aiImgPrev').style.display='none';$('aiShare').disabled=true;$('aiImgFile').value='';}
   $('aiSheet').style.display='flex';setTimeout(()=>$('aiQ').focus(),100);}
+let aiFile=null;
 function aiPrompt(){const k=aiCtx;
   if(k&&k.img){const q=$('aiQ').value.trim();
     return `私は ICU の看護師です。この後に添付するモニター心電図（またはモニタ画面）の写真について、学習のために読み方を教えてください。写真には患者の氏名・ID・日付は写っていません（写り込みがあれば無視してください）。\n\n【読んでほしい順番】\n1. 心拍数（おおよそ）とリズムの規則性（RR は一定か）\n2. QRS の幅（狭いか広いか）\n3. P 波の有無と QRS との関係（PR 間隔、脱落の有無）\n4. ST・T・QT で気になる点\n5. 以上から考えられる候補を、可能性の高い順に 2〜3 個。それぞれ「なぜそう考えるか」と「見分けるために次に確認すること（12 誘導・脈・血圧・K・Mg など）」\n6. 看護師として今すぐ確認・準備すべきこと\n\n【お願い】\n・これは診断ではなく学習用の参考意見です。最終判断は 12 誘導心電図と医師が行う前提で答えてください\n・写真の質（モアレ・角度・1 誘導のみ）で判断が不確かな場合は、はっきりそう書いてください\n・断定的な表現は避け、「〜の可能性」「〜を疑う」で書いてください${q?'\n\n【追加の質問】\n'+q:''}`;}const q=$('aiQ').value.trim()||'この項目の要点と、看護師が特に注意すべき点を教えてください。';const m=META[k.t]||{};const keys=(m.key||[]).map(x=>'・'+x).join('\n');
@@ -2604,6 +2611,14 @@ function aiPrompt(){const k=aiCtx;
   $('aiGPT').onclick=()=>go('https://chatgpt.com/?q='+encodeURIComponent(aiPrompt()));
   $('aiClaude').onclick=()=>go('https://claude.ai/new?q='+encodeURIComponent(aiPrompt()));
   $('aiPplx').onclick=()=>go('https://www.perplexity.ai/search?q='+encodeURIComponent(aiPrompt()));
+  $('aiImgFile').onchange=e=>{const f=e.target.files[0];if(!f)return;aiFile=f;$('aiImgEl').src=URL.createObjectURL(f);$('aiImgPrev').style.display='';$('aiShare').disabled=false;};
+  $('aiShare').onclick=async()=>{if(!aiFile){toast('先に写真を選んでください');return;}
+    const text=aiPrompt();
+    try{await navigator.clipboard.writeText(text);}catch(e){}
+    if(navigator.canShare&&navigator.canShare({files:[aiFile]})){
+      try{await navigator.share({files:[aiFile],title:'モニター心電図の読み方',text});s.style.display='none';toast('共有しました。質問文はコピー済みです');}
+      catch(err){if(err&&err.name!=='AbortError')toast('共有できませんでした。写真を保存して、チャットで添付してください');}}
+    else toast('この端末は写真の共有に対応していません。質問文はコピーしたので、チャットに写真を添付して貼り付けてください');};
   $('aiCopy').onclick=async()=>{try{await navigator.clipboard.writeText(aiPrompt());toast('コピーしました');}catch(e){const t=document.createElement('textarea');t.value=aiPrompt();document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();toast('コピーしました');}};
 })();
 
