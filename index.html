@@ -4207,6 +4207,97 @@ GLOSS.push(
 );
 
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
+/* ===== 全身の血管と略語 ===== */
+(function(){
+  const body=(x)=>`<g transform="translate(${x} 0)" fill="#FBF4F1" stroke="#C9B8B0" stroke-width="1"><ellipse cx="0" cy="44" rx="16" ry="19"/><path d="M-9 62 L9 62 L9 72 L-9 72z"/><path d="M-38 78 C-20 70 20 70 38 78 L46 210 L34 216 L28 152 L26 240 L16 240 L14 330 L20 400 L6 400 L2 330 L0 250 L-2 330 L-6 400 L-20 400 L-14 330 L-16 240 L-26 240 L-28 152 L-34 216 L-46 210z"/></g>`;
+  const L=(x1,y1,x2,y2,c)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="2.2" stroke-linecap="round"/>`;
+  const lab=(x,y,t,a,c,anchor='start')=>`<text x="${x}" y="${y}" font-size="7" fill="${c}" text-anchor="${anchor}"><tspan font-weight="700">${a}</tspan> ${t}</text>`;
+  const ld=(x1,y1,x2,y2)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#9AA7B0" stroke-width="0.6" stroke-dasharray="2 2"/>`;
+  const R='#C62828', B='#1E5AA8';
+  // ---------- 動脈 ----------
+  let a='<svg viewBox="0 0 340 420" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="8">'
+   +'<text x="170" y="12" text-anchor="middle" font-weight="700" font-size="10">全身の主要動脈と略語（赤）</text>'+body(128);
+  const cx=128;
+  // 大動脈：心臓(170,105)から弓→下行
+  a+=L(cx,108,cx,96,R)+`<path d="M${cx} 96 C${cx} 84 ${cx-24} 80 ${cx-28} 92" fill="none" stroke="${R}" stroke-width="2.2"/>`+L(cx-28,92,cx-28,150,R)+L(cx-28,150,cx-24,236,R); // 弓と下行〜腹部
+  // 弓の枝：腕頭(右)、左総頸、左鎖骨下
+  a+=L(cx-8,86,cx+14,72,R)+L(cx+14,72,cx+26,60,R)+L(cx+14,72,cx+34,84,R);   // BCA → RCCA, RSCA
+  a+=L(cx-18,84,cx-26,60,R)+L(cx-24,82,cx-36,86,R);                          // LCCA, LSCA
+  a+=L(cx+26,60,cx+28,44,R)+L(cx-26,60,cx-28,44,R);                          // ICA/ECA (頸→頭)
+  // 上肢：鎖骨下→腋窩→上腕→橈骨/尺骨
+  a+=L(cx+34,84,cx+40,100,R)+L(cx+40,100,cx+32,150,R)+L(cx+32,150,cx+30,205,R)+L(cx+32,150,cx+38,205,R);
+  a+=L(cx-36,86,cx-40,100,R)+L(cx-40,100,cx-32,150,R)+L(cx-32,150,cx-30,205,R)+L(cx-32,150,cx-38,205,R);
+  // 腹部枝
+  a+=L(cx-28,166,cx-14,166,R)+L(cx-28,178,cx-14,180,R)+L(cx-27,190,cx-40,192,R)+L(cx-27,190,cx-12,192,R)+L(cx-26,212,cx-12,214,R);
+  // 分岐：総腸骨→外腸骨→大腿→膝窩→前脛骨/後脛骨
+  a+=L(cx-24,236,cx-10,262,R)+L(cx-24,236,cx-38,262,R)+L(cx-10,262,cx-8,280,R)+L(cx-38,262,cx-40,280,R);
+  a+=L(cx-8,280,cx-6,338,R)+L(cx-6,338,cx-4,400,R)+L(cx-6,338,cx-12,400,R);
+  a+=L(cx-40,280,cx-42,338,R)+L(cx-42,338,cx-40,400,R)+L(cx-42,338,cx-48,400,R);
+  a+=`<ellipse cx="${cx}" cy="108" rx="14" ry="12" fill="#F4C7C3" stroke="${R}"/><text x="${cx}" y="111" text-anchor="middle" font-size="7" fill="${R}">心臓</text>`;
+  // ラベル（左列＝患者の右側、右列＝患者の左側）
+  const AL=[ [cx+34,44,'内頸／外頸動脈','ICA／ECA',200,40],[cx+30,60,'総頸動脈','CCA',200,56],[cx+14,72,'腕頭動脈（右のみ）','BCA',200,72],[cx+36,86,'鎖骨下動脈','SCA',200,88],
+    [cx+40,100,'腋窩動脈','AxA',200,104],[cx+32,150,'上腕動脈','BrA',200,150],[cx+38,205,'橈骨動脈（A ライン）','RA',200,200],[cx+30,205,'尺骨動脈','UA',200,214],
+    [cx-10,262,'総腸骨動脈','CIA',200,262],[cx-8,280,'外腸骨動脈','EIA',200,278],[cx-30,262,'内腸骨動脈','IIA',200,294],[cx-6,300,'大腿動脈（IABP・ECMO）','FA／SFA',200,318],[cx-6,338,'膝窩動脈','PopA',200,340],[cx-12,400,'後脛骨動脈（内果の後ろ）','PTA',200,388],[cx-4,400,'前脛骨動脈 → 足背動脈','ATA／DPA',200,404]];
+  const AR=[ [cx-28,92,'大動脈弓','AoA',72,92],[cx-28,130,'下行大動脈','DTA',72,128],[cx-14,166,'腹腔動脈','CeA',72,166],[cx-14,180,'上腸間膜動脈','SMA',72,180],[cx-40,192,'腎動脈','RenA',72,194],[cx-12,214,'下腸間膜動脈','IMA',72,214],[cx-24,236,'腹部大動脈','AA',72,232],[cx-24,238,'（臍の高さ L4 で分岐）','',72,242],[cx-26,60,'左総頸動脈','LCCA',72,60]];
+  AL.forEach(([x,y,t,ab,lx,ly])=>{a+=ld(x,y,lx-4,ly-2)+lab(lx,ly,t,ab,R);});
+  AR.forEach(([x,y,t,ab,lx,ly])=>{a+=ld(x,y,lx+2,ly-2)+lab(lx,ly,t,ab,R,'end');});
+  a+='<text x="170" y="416" text-anchor="middle" font-size="7.5" fill="#5F6E79">ICU で使う動脈：RA（A ライン）・FA（IABP・PCPS・A ライン）・DPA/PTA（下肢虚血の確認）</text></svg>';
+  // ---------- 静脈 ----------
+  let v='<svg viewBox="0 0 340 420" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="8">'
+   +'<text x="170" y="12" text-anchor="middle" font-weight="700" font-size="10">全身の主要静脈と略語（青）</text>'+body(128);
+  v+=L(cx+6,96,cx+6,150,B)+L(cx+6,150,cx+8,236,B);  // SVC → 右房 → IVC
+  v+=`<ellipse cx="${cx}" cy="108" rx="14" ry="12" fill="#DCE8F5" stroke="${B}"/><text x="${cx}" y="111" text-anchor="middle" font-size="7" fill="${B}">心臓</text>`;
+  v+=L(cx+6,96,cx+20,84,B)+L(cx+20,84,cx+30,60,B)+L(cx+20,84,cx+36,88,B); // 右腕頭→内頸/鎖骨下
+  v+=L(cx+6,96,cx-22,84,B)+L(cx-22,84,cx-30,60,B)+L(cx-22,84,cx-38,88,B); // 左腕頭
+  v+=L(cx+30,60,cx+30,44,B)+L(cx-30,60,cx-30,44,B);
+  v+=L(cx+36,88,cx+42,102,B)+L(cx+42,102,cx+34,150,B)+L(cx+34,150,cx+36,205,B);
+  v+=L(cx-38,88,cx-42,102,B)+L(cx-42,102,cx-34,150,B)+L(cx-34,150,cx-36,205,B);
+  v+=L(cx+8,236,cx+20,262,B)+L(cx+8,236,cx-8,262,B)+L(cx+20,262,cx+22,280,B)+L(cx-8,262,cx-10,280,B);
+  v+=L(cx+22,280,cx+20,338,B)+L(cx+20,338,cx+18,400,B)+L(cx-10,280,cx-12,338,B)+L(cx-12,338,cx-14,400,B);
+  v+=L(cx+22,280,cx+30,400,B)+L(cx-10,280,cx-18,400,B);  // 大伏在静脈（浅い）
+  v+=L(cx+8,170,cx-6,166,B)+L(cx+8,190,cx-6,192,B);      // 肝静脈・腎静脈（左へ）
+  const VL=[ [cx+30,44,'内頸静脈（CV の第一選択）','IJV',200,44],[cx+20,84,'腕頭静脈','BCV',200,72],[cx+36,88,'鎖骨下静脈（CV）','SCV',200,88],[cx+42,102,'腋窩静脈','AxV',200,104],[cx+34,150,'上腕静脈・尺側皮静脈（PICC）','BrV／BV',200,150],
+    [cx+6,120,'上大静脈（CV 先端の位置）','SVC',200,120],[cx+20,262,'総腸骨静脈','CIV',200,262],[cx+22,280,'外腸骨静脈','EIV',200,280],[cx+20,300,'大腿静脈（CV・ECMO 脱血・CHDF）','FV',200,304],[cx+20,338,'膝窩静脈','PopV',200,340],[cx+30,400,'大伏在静脈（CABG グラフト）','GSV',200,400]];
+  const VR=[ [cx+8,200,'下大静脈','IVC',72,200],[cx+8,202,'（径で体液量を見る）','',72,210],[cx-6,166,'肝静脈','HV',72,166],[cx-6,192,'腎静脈','RenV',72,190],[cx-30,60,'左内頸静脈','LIJV',72,52],[cx-38,88,'左鎖骨下静脈','LSCV',72,92],[cx-36,205,'橈側皮静脈','CV',72,222],[cx-36,207,'（末梢ルート）','',72,232]];
+  VL.forEach(([x,y,t,ab,lx,ly])=>{v+=ld(x,y,lx-4,ly-2)+lab(lx,ly,t,ab,B);});
+  VR.forEach(([x,y,t,ab,lx,ly])=>{v+=ld(x,y,lx+2,ly-2)+lab(lx,ly,t,ab,B,'end');});
+  v+='<text x="170" y="416" text-anchor="middle" font-size="7.5" fill="#5F6E79">CV の挿入部位：IJV・SCV・FV。先端は SVC と右房の境（気管分岐部の高さ）</text></svg>';
+  Object.assign(FIG,{vesA:a,vesV:v});
+
+  KNOW.push({t:'全身の血管と略語（動脈・静脈）',fig:'vesA',s:[
+   {h:'略語の読み方',b:['A ＝ artery（動脈）、V ＝ vein（静脈）。同じ名前で末尾だけ違うことが多い（FA ＝ 大腿動脈、FV ＝ 大腿静脈）','R／L を頭に付けて左右を示す（RCCA ＝ 右総頸動脈、LIJV ＝ 左内頸静脈）','カルテ・記録・エコーのレポートで出てくる略語を、図と表で対応づけて覚える']},
+   {h:'動脈：大動脈と頭頸部',b:['Ao 大動脈、AoA 大動脈弓、AAo 上行大動脈、DTA 下行胸部大動脈、AA 腹部大動脈（臍の高さ L4 で左右の総腸骨動脈に分岐）','大動脈弓の 3 本：BCA 腕頭動脈（右の CCA と SCA に分かれる）→ LCCA 左総頸動脈 → LSCA 左鎖骨下動脈。左には腕頭動脈がない','CCA 総頸動脈 → ICA 内頸動脈（脳へ）と ECA 外頸動脈（顔・頭皮へ）。VA 椎骨動脈は SCA から出て脳幹へ','脳：ACA 前大脳動脈、MCA 中大脳動脈、PCA 後大脳動脈、BA 脳底動脈、AComA／PComA 前・後交通動脈（ウィリス動脈輪）。詳細は「脳の解剖」']},
+   {h:'動脈：上肢',b:['SCA 鎖骨下動脈 → AxA 腋窩動脈 → BrA 上腕動脈 → RA 橈骨動脈と UA 尺骨動脈 → 手掌動脈弓','A ラインは RA が第一選択。UA との側副路（Allen テスト）を確認。BrA は側副路がないので原則避ける','ITA（IMA）内胸動脈：SCA から出て胸骨の裏を下る。CABG の LITA・RITA グラフト']},
+   {h:'動脈：腹部',b:['CeA 腹腔動脈（胃・肝・脾：LGA 左胃動脈、CHA 総肝動脈、SpA 脾動脈）、SMA 上腸間膜動脈（小腸〜横行結腸）、IMA 下腸間膜動脈（下行結腸〜直腸）','RenA 腎動脈（左右）。IABP の先端が下がると腎動脈・SMA を塞ぐ','Adamkiewicz 動脈：T8〜L1 の肋間・腰動脈から出る脊髄前面の動脈。胸腹部大動脈手術で対麻痺の原因']},
+   {h:'動脈：下肢',b:['CIA 総腸骨動脈 → EIA 外腸骨動脈（→ FA）と IIA 内腸骨動脈（骨盤内）','FA（CFA）総大腿動脈 → SFA 浅大腿動脈と DFA（PFA）深大腿動脈 → PopA 膝窩動脈 → ATA 前脛骨動脈（→ DPA 足背動脈）、PTA 後脛骨動脈（内果の後ろ）、PerA 腓骨動脈','ICU での使い方：FA は IABP・PCPS 送血・A ライン・心カテの穿刺部。下肢虚血の確認は DPA（足背）と PTA（内果の後ろ）を触れて左右で比べる']},
+   {h:'静脈',b:['SVC 上大静脈：左右の BCV 腕頭静脈が合流。CV カテーテルの先端は SVC 下部〜右房の境（気管分岐部の高さ）','BCV ← IJV 内頸静脈と SCV 鎖骨下静脈。CV の挿入部位は IJV（エコー下で第一選択）、SCV（感染は少ないが気胸のリスク）、FV（緊急時・感染と血栓が多い）','上肢：AxV 腋窩静脈 → BrV 上腕静脈、BV 尺側皮静脈（PICC の挿入部）、CV 橈側皮静脈（末梢ルート）','IVC 下大静脈：HV 肝静脈、RenV 腎静脈が合流。IVC の径と呼吸性変動で体液量を推定（「体液量の評価」）','下肢：CIV 総腸骨静脈 → EIV 外腸骨静脈 → FV 大腿静脈 → PopV 膝窩静脈。深部静脈血栓は FV・PopV・下腿の深部静脈に多い','GSV 大伏在静脈：内果の前から大腿内側を上る浅い静脈。CABG のグラフト。SSV 小伏在静脈は下腿の後ろ','PV 門脈（肝へ入る静脈）、PA 肺動脈（静脈血を運ぶ動脈）、PVs 肺静脈（動脈血を運ぶ静脈）：名前と血液の種類が逆になる例']},
+   {h:'冠動脈と肺循環の略語',b:['LMT 左主幹部 → LAD 左前下行枝（D 対角枝、S 中隔枝）、LCx 左回旋枝（OM 鈍縁枝）。RCA 右冠動脈（AM 鋭縁枝、PDA／PD 後下行枝、PL 後側壁枝）。詳細は「心臓の解剖と冠動脈セグメント」','PA 肺動脈（MPA 主肺動脈、RPA／LPA）、PAP 肺動脈圧、PAWP（PCWP）肺動脈楔入圧。Swan-Ganz は SVC → RA → RV → PA と進む']},
+   {h:'よくある取り違え',b:['IMA：内胸動脈（internal mammary）と下腸間膜動脈（inferior mesenteric）の両方に使われる。CABG の文脈なら内胸動脈（ITA）、腹部なら下腸間膜動脈','RA：橈骨動脈（radial artery）と右房（right atrium）。A ラインの話か心臓の話かで判断','CV：中心静脈（central vein）と橈側皮静脈（cephalic vein）。カテーテルの話なら中心静脈','PA：肺動脈と膝窩動脈（PopA と書き分けることが多い）']}
+  ]});
+  META['全身の血管と略語（動脈・静脈）']={cat:'解剖',key:['A は動脈、V は静脈。同じ名前で末尾だけ違う（FA／FV）','ICU で使う動脈：RA（A ライン）、FA（IABP・ECMO・カテ）、DPA／PTA（下肢虚血）','CV は IJV・SCV・FV から入れ、先端は SVC と右房の境'],secfig:{5:'vesV'}};
+  PHOTOS['全身の血管と略語（動脈・静脈）']=[
+   {id:'sysart',t:'全身の主要動脈（実際の図）',b:['上の模式図と略語を対応させながら見る','大動脈弓から腕頭・左総頸・左鎖骨下の 3 本が出る','腹部大動脈は臍の高さ（L4）で左右の総腸骨動脈に分かれる']},
+   {id:'thorabd',t:'胸部・腹部大動脈の分枝',b:['腹腔動脈・上腸間膜動脈・腎動脈・下腸間膜動脈の順に出る','IABP の先端がこの枝にかからない位置に置く']},
+   {id:'legart',t:'下肢の動脈（前面・後面）',b:['大腿動脈 → 膝窩動脈 → 前脛骨・後脛骨動脈','足背動脈と後脛骨動脈で下肢虚血を確認する']},
+   {id:'neckv',t:'頭頸部の静脈',b:['内頸静脈と鎖骨下静脈が腕頭静脈に合流する','CV の挿入部位と、気胸・動脈穿刺のリスクの位置関係']},
+   {id:'thorv',t:'胸部・腹部の静脈',b:['上大静脈と下大静脈が右房に入る','CV の先端は上大静脈の下部']}
+  ];
+  ORDER['解剖'].splice(1,0,'全身の血管と略語（動脈・静脈）');
+  XLINK.push(['血管の略語','全身の血管と略語（動脈・静脈）'],['大腿動脈','全身の血管と略語（動脈・静脈）'],['内頸静脈','全身の血管と略語（動脈・静脈）']);
+})();
+GLOSS.push(
+['FA','大腿動脈|femoral artery|CFA','鼠径部で触れる太い動脈。IABP・PCPS の送血・A ライン・心カテの穿刺部。浅大腿（SFA）と深大腿（DFA）に分かれる','全身の血管と略語（動脈・静脈）'],
+['IJV','内頸静脈|internal jugular vein','中心静脈カテーテルの第一選択の挿入部位。エコー下で穿刺。右のほうが上大静脈まで直線的','全身の血管と略語（動脈・静脈）'],
+['SCV','鎖骨下静脈|subclavian vein','中心静脈カテーテルの挿入部位の一つ。感染は少ないが気胸・動脈穿刺のリスク','全身の血管と略語（動脈・静脈）'],
+['SVC','上大静脈|superior vena cava','左右の腕頭静脈が合流して右房に入る静脈。CV カテーテルの先端はこの下部〜右房の境に置く','全身の血管と略語（動脈・静脈）'],
+['IVC','下大静脈|inferior vena cava','下半身の静脈血を右房に運ぶ。径と呼吸性変動で体液量を推定する','全身の血管と略語（動脈・静脈）'],
+['DPA','足背動脈|dorsalis pedis artery','足の甲で触れる動脈。後脛骨動脈（PTA）とともに下肢虚血の確認に使う','全身の血管と略語（動脈・静脈）'],
+['BCA','腕頭動脈|brachiocephalic artery|無名動脈','大動脈弓から最初に出る枝。右の総頸動脈と鎖骨下動脈に分かれる。左には存在しない','全身の血管と略語（動脈・静脈）'],
+['SMA','上腸間膜動脈|superior mesenteric artery','小腸から横行結腸を養う動脈。閉塞すると腸管壊死。IABP の先端がかかると危険','全身の血管と略語（動脈・静脈）'],
+['GSV','大伏在静脈|great saphenous vein','内果の前から大腿内側を上る浅い静脈。CABG のグラフトに使う','全身の血管と略語（動脈・静脈）']
+);
+
+GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 (function(){const bar=$('catBar');bar.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
 
 /* 血液ガス代償計算 */
