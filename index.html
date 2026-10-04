@@ -2448,8 +2448,20 @@ const CALC_HTML=`
   </div>
 </details>
 <details class="card o2card">
-  <summary>Na 排泄率（FENa）</summary>
+  <summary>腎前性か腎性か：BUN/Cr 比・FENa</summary>
   <div class="body">
+  <div class="rq-h" style="margin-top:0">BUN/Cr 比（血液だけで分かる）</div>
+  <div class="row"><div><label>BUN</label><div class="unit"><input type="number" inputmode="decimal" id="bcB" placeholder="例 40"><span>mg/dL</span></div></div>
+  <div><label>血清 Cr</label><div class="unit"><input type="number" inputmode="decimal" id="bcC" placeholder="例 1.2" step="0.1"><span>mg/dL</span></div></div></div>
+  <div class="result"><div class="muted" style="font-size:12px">BUN ÷ Cr</div><div class="big"><span id="bcN">－</span></div><div class="sub" id="bcS">BUN と Cr を入力</div></div>
+  <div id="bcNote" class="rangebox" style="display:none"></div>
+  <table class="o2" style="margin-top:8px;font-size:12px"><tr><th>BUN/Cr</th><th>考える病態</th></tr>
+  <tr><td><b>20 超</b></td><td style="text-align:left;font-weight:400">腎前性：脱水・出血・心不全・ショックなどで腎への血流が減り、BUN だけ再吸収されて上がる。ほかに消化管出血（血液の蛋白が吸収される）、高蛋白の栄養、ステロイド、異化亢進（発熱・外傷・熱傷）、閉塞後の腎後性</td></tr>
+  <tr><td><b>10〜20</b></td><td style="text-align:left;font-weight:400">正常範囲、または腎性（急性尿細管壊死など）。BUN と Cr が同じ割合で上がる</td></tr>
+  <tr><td><b>10 未満</b></td><td style="text-align:left;font-weight:400">BUN が作られない・薄まる：低蛋白の栄養・飢餓、肝不全（尿素を作れない）、透析後、妊娠、横紋筋融解（Cr だけ上がる）、筋肉量が多い</td></tr></table>
+  <p class="muted">BUN と Cr はどちらも腎で捨てられるが、BUN は尿細管で再吸収される分がある。腎への血流が減ると水とともに BUN が戻ってきて比が上がる。Cr は再吸収されないので、比を見ると「血流が足りないのか、腎そのものが壊れたのか」の手がかりになる。<br>
+  限界：高齢・やせ・筋肉量が少ない人は Cr が低く、比が高めに出る。利尿薬・ステロイド・消化管出血・高蛋白栄養でも上がるので、単独では決めず、病歴・体液量の評価・尿所見（FENa、尿比重、尿浸透圧）と合わせて判断する。</p>
+  <div class="rq-h" style="margin-top:14px">FENa（尿の検査が要る）</div>
   <div class="row"><div><label>尿 Na</label><div class="unit"><input type="number" inputmode="decimal" id="fUNa" placeholder="例 15"><span>mEq/L</span></div></div>
   <div><label>血清 Na</label><div class="unit"><input type="number" inputmode="decimal" id="fPNa" placeholder="例 140"><span>mEq/L</span></div></div></div>
   <div class="row"><div><label>尿 Cr</label><div class="unit"><input type="number" inputmode="decimal" id="fUCr" placeholder="例 80"><span>mg/dL</span></div></div>
@@ -4745,7 +4757,7 @@ const KNOW_REV='2026 年 9 月 28 日（当院資料：IABP・ドレーン・PMX
   /* --- 計算タブ：よく使う --- */
   const SHORT=[['P/F','P/F 比'],['波形','波形の見方'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
     ['血ガス','血液ガス：予測'],['栄養','必要エネルギー'],['ハリス','ハリス'],['不感蒸泄','不感蒸泄'],
-    ['メイロン','メイロン'],['FENa','FENa'],['輸血','輸血：予測'],['血行動態','血行動態'],['配合変化','配合変化'],['薬剤の目安','投与量の目安']];
+    ['メイロン','メイロン'],['BUN/Cr','BUN/Cr'],['輸血','輸血：予測'],['血行動態','血行動態'],['配合変化','配合変化'],['薬剤の目安','投与量の目安']];
   const box=$('calcFav'); let use={};
   const cards=()=>[...document.querySelectorAll('#p-calc details')];
   const draw=()=>{
@@ -4909,7 +4921,7 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
     '呼吸':['P/F 比','RSBI','ROX','予測体重','血液ガス'],
     '循環':['波形の見方','血行動態','輸血：予測'],
     '薬剤':['__gamma','投与量の目安','配合変化'],
-    '電解質':['電解質の補正','メイロン','FENa'],
+    '電解質':['電解質の補正','メイロン','BUN/Cr'],
     '栄養':['栄養：必要','ハリス','不感蒸泄']
   };
   const seg=$('calcSeg'), top=$('calcTop');
@@ -4989,6 +5001,21 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
       +`<div style="margin-top:6px">${go(topic)}${topic!=='不整脈の管理（ICU で出会う順に）'?go('不整脈の管理（ICU で出会う順に）'):''}</div>`;
     R.querySelectorAll('[data-rgo]').forEach(b=>b.onclick=()=>{document.querySelector('nav button[data-p=know]').click();setTimeout(()=>goTopic(b.dataset.rgo,null),150);});
   }
+})();
+
+
+/* BUN/Cr 比 */
+(function(){
+  const run=()=>{const b=parseFloat($('bcB').value),c=parseFloat($('bcC').value);const N=$('bcNote');
+    if(!(b>0)||!(c>0)){$('bcN').textContent='－';$('bcS').textContent='BUN と Cr を入力';N.style.display='none';return;}
+    const r=b/c;$('bcN').textContent=fmt(r,1);$('bcS').innerHTML=`${b} ÷ ${c} ＝ <b>${fmt(r,1)}</b>`;
+    let cls='',msg='';
+    if(r>20){cls='high';msg=`<b>${fmt(r,1)}：20 超 → 腎前性のパターン</b><div class="rn">脱水・出血・心不全・ショックによる腎血流の低下をまず考える。消化管出血、高蛋白栄養、ステロイド、異化亢進も同じ動きをする。体液量（IVC・下肢挙上テスト・尿量）と FENa で裏づける</div>`;}
+    else if(r>=10){msg=`<b>${fmt(r,1)}：10〜20 → 正常範囲か腎性</b><div class="rn">Cr が上がっていれば腎性（急性尿細管壊死など）の可能性。Cr の推移と尿所見で判断</div>`;}
+    else {cls='low';msg=`<b>${fmt(r,1)}：10 未満 → BUN が低いパターン</b><div class="rn">低蛋白栄養・飢餓、肝不全、透析後、横紋筋融解（CK を確認）、筋肉量が多い人</div>`;}
+    if(c>=1.5)msg+='<div class="rn">Cr 1.5 以上。AKI の評価（KDIGO：ベースラインの 1.5 倍、または 48 時間で 0.3 上昇）を「急性腎障害（AKI）と電解質」で</div>';
+    N.style.display='';N.className='rangebox '+cls;N.innerHTML=msg;};
+  ['bcB','bcC'].forEach(i=>$(i).addEventListener('input',run));
 })();
 
 loadDrugs(); loadKnow(); calc();
