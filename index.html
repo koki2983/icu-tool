@@ -124,6 +124,7 @@ table.compat td{text-align:left;font-weight:400;font-size:13px;vertical-align:to
 .xl{color:var(--teal);text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer}
 .rel{margin-top:10px;padding-top:8px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .rel .muted{width:100%;font-size:12px}
+.cklist{padding-left:0;list-style:none;margin:0}.cklist li{padding:8px 0;border-bottom:1px solid var(--line)}.cklist li label{display:flex;gap:8px;align-items:flex-start;font-size:15px;line-height:1.5}.cklist li input{width:18px;height:18px;margin-top:3px;flex:none}.cklist li.done>label span{color:var(--muted);text-decoration:line-through}h3.hl{background:var(--amber-soft);border-radius:6px;transition:background 1s}
 .relb{background:var(--teal-soft);border-color:#BFDDE3;color:var(--teal);font-size:13px}
 .fab{position:fixed;right:14px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:6;background:var(--teal);color:#fff;border:0;border-radius:22px;padding:10px 16px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.18)}
 .fab.back{right:auto;left:14px;background:#fff;color:var(--teal);border:1px solid var(--teal);font-weight:600;max-width:60vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -453,6 +454,11 @@ nav button{font-size:10px}
 </section>
 
 <!-- ============ 用語 ============ -->
+<section id="p-check" class="page">
+  <p class="muted" style="font-size:12px">教育チェックリストの土台。項目ごとに「📖 知識」「🧮 計算」ボタンで該当ページへ移動できる。チェックは端末内にだけ保存される。</p>
+  <div id="checkList"></div>
+</section>
+
 <section id="p-gloss" class="page">
   <input type="text" id="gSearch" class="search" placeholder="用語を検索（例：PEEP、せん妄、楔入圧）">
   <p class="muted" id="gCount"></p>
@@ -468,6 +474,7 @@ nav button{font-size:10px}
   <button data-p="drug"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v4l-4 8v5a2 2 0 002 2h8a2 2 0 002-2v-5l-4-8V3"/><path d="M7 15h10"/></svg>薬剤</button>
   <button data-p="score"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>スコア</button>
   <button data-p="know"><svg viewBox="0 0 24 24"><path d="M4 4h7a3 3 0 013 3v13a2 2 0 00-2-2H4zM20 4h-7a3 3 0 00-3 3v13a2 2 0 012-2h8z"/></svg>知識</button>
+  <button data-p="check" id="navCheck" style="display:none"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><path d="M4 6l1 1 2-2" /></svg>チェック</button>
   <button data-p="gloss"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h10M4 19h7"/><circle cx="18" cy="17" r="3"/><path d="M20.5 19.5L22 21"/></svg>用語</button>
 </nav>
 <button id="tocBtn" class="fab" title="目次">目次</button>
@@ -1049,7 +1056,7 @@ function renderKnow(){
     d.innerHTML=`<summary>${k.user!==undefined?'<span><span class="tag">自分</span>'+esc(k.t)+'</span>':esc(k.t)}</summary>
       <div class="body">${fig}${secs}
       <div class="memo"><label>自分のメモ</label><textarea placeholder="当院の値・ルール、覚え書き（例：目標血糖 ___、カフ圧の測定間隔 ___）">${esc(kMemo[key]||'')}</textarea>
-      <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}<button class="small ai" data-ai="${esc(k.t)}">AI に聞く</button></div>
+      <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}<button class="small ai" data-ai="${esc(k.t)}">AI に聞く</button>${k.user===undefined?`<button class="small" data-lnk="${esc(k.t)}" title="この項目への URL をコピー">リンク</button>`:''}</div>
       <label>自分の画像（自院の資料・手書きメモなど）</label>
       <div class="phs">${imgs}</div>
       <label class="addph"><input type="file" accept="image/*" hidden>＋ 画像を追加</label>
@@ -2225,7 +2232,7 @@ function renderKnow(){
       const imgs=(kImg[key]||[]).map((src,i)=>`<div class="ph"><img src="${src}" data-full="1" loading="lazy" decoding="async"><button class="small danger" data-del="${i}">削除</button></div>`).join('');
       d.insertAdjacentHTML('beforeend',`<div class="body">${keyBox}${vid}${fig}${secs}${photoBlock}${relBlock}
       <div class="memo"><label>自分のメモ</label><textarea placeholder="当院の値・ルール、覚え書き（例：目標血糖 ___、カフ圧の測定間隔 ___）">${esc(kMemo[key]||'')}</textarea>
-      <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}<button class="small ai" data-ai="${esc(k.t)}">AI に聞く</button></div>
+      <div class="bar"><button class="small primary">メモを保存</button>${k.user!==undefined?'<button class="small danger">項目を削除</button>':''}<button class="small ai" data-ai="${esc(k.t)}">AI に聞く</button>${k.user===undefined?`<button class="small" data-lnk="${esc(k.t)}" title="この項目への URL をコピー">リンク</button>`:''}</div>
       <label>自分の画像（自院の資料・手書きメモなど）</label>
       <div class="phs">${imgs}</div>
       <label class="addph"><input type="file" accept="image/*" hidden>＋ 画像を追加</label>
@@ -4310,6 +4317,114 @@ GLOSS.push(
 );
 
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
+/* ===== チェックリスト連動の土台（固定ID・ディープリンク・CHECK） ===== */
+/* 項目の固定ID → タイトル。タイトルを書き換えてもIDは変えない（チェックリスト側はIDで参照する） */
+const KID={
+abg:'血液ガスの読み方',vent:'呼吸の生理と人工呼吸管理',o2:'酸素療法',volume:'体液量の評価',catheter:'カテーテル管理とモニタリング',
+vasoactive:'循環作動薬と身体の相互作用',ecg:'心電図の読み方',cxr:'胸部X線の見方',nutrition:'栄養管理',transfusion:'輸血',
+iabp:'IABP',ecmo:'PCPS / VA-ECMO',chdf:'CHDF（持続的血液濾過透析）',cabg:'冠動脈バイパス術後',valve:'心臓弁置換・弁形成術後',
+aorta:'胸部・腹部大動脈瘤術後',gi_drain:'消化器術後のドレーン管理',brain_drain:'脳の解剖と脳ドレーン',position:'体位管理',trach:'気管切開時の気道チューブ管理',
+drug_basics:'薬剤投与の基礎知識',antibiotics:'抗菌薬の基本',normal_values:'よく使う正常値一覧',shock:'ショックの分類と初期対応',sepsis:'敗血症',
+acls:'心肺蘇生（ACLS の要点）',heart_failure:'心不全の急性期管理',padis:'鎮痛・鎮静・せん妄（PADIS）',aki:'急性腎障害（AKI）と電解質',dic:'DIC と凝固管理',
+chest_drain:'胸腔ドレーンと気胸',abcde:'急変の察知と初期対応（ABCDE）',references:'出典・参考ガイドライン',ct:'CT の見方（ICU で必要な範囲）',echo:'心エコーの見方（ICU で必要な範囲）',
+echo_nurse:'看護師のためのベッドサイドエコー手順',anat_heart:'心臓の解剖と冠動脈セグメント',anat_lung:'肺・気道の解剖',anat_brain:'脳の解剖（葉・脳幹・脳室）',anat_kidney_liver:'腎臓・肝臓の解剖',
+anat_spine:'脊椎・脊髄と体表の目安',hosp_cs_return:'当院：心外術後の受け入れ準備（ベッド作成〜帰室時）',sci:'脊髄損傷（頸髄損傷を中心に）',stroke:'脳梗塞（症状と急性期の看護）',pacing:'ペースメーカー（一時・恒久）',
+defib:'電気的除細動とカルディオバージョン',hosp_device:'当院：デバイス管理台帳（ペースメーカーのチェック表）の読み方',analgesia:'術後鎮痛（多角的鎮痛と神経ブロック）',psili:'P-SILI（患者自身の呼吸による肺損傷）',ami:'急性心筋梗塞（STEMI・NSTEMI）',
+pe:'肺血栓塞栓症（PE）と深部静脈血栓症',arrhythmia:'不整脈の管理（ICU で出会う順に）',rosc_ttm:'心停止後（ROSC）の管理と体温管理療法（TTM）',sah:'くも膜下出血（SAH）',ich:'脳出血（高血圧性脳出血）',
+se:'てんかん重積状態（けいれんの ICU 管理）',gbs:'ギラン・バレー症候群とフィッシャー症候群',gi_resection:'腸切除・胃切除の術後管理',pd:'膵頭十二指腸切除（PD）の術後管理',trauma:'外傷の初期対応とダメージコントロール',
+dka:'糖尿病性ケトアシドーシス（DKA）と高血糖高浸透圧状態',ip_ae:'間質性肺炎の急性増悪',asthma:'重症喘息発作（喘息重積）',hosp_drain:'当院：各科ドレーンの取り扱い（J-VAC・S-B バッグ・脳外ドレーン）',anat_vessels:'全身の血管と略語（動脈・静脈）'
+};
+const KID_R=Object.fromEntries(Object.entries(KID).map(([a,b])=>[b,a]));
+/* 計算ツールの固定ID → カードの見出しに含まれる文字 */
+const CALC_ID={gamma:'__gamma',pf:'P/F 比',rhythm:'波形の見方',rsbi:'RSBI',dose:'投与量の目安',rox:'ROX',pbw:'予測体重',nutrition:'栄養：必要',harris:'ハリス',iwl:'不感蒸泄',
+  abg:'血液ガス：予測',meylon:'メイロン',electrolyte:'電解質の補正',buncr:'BUN/Cr',transfusion:'輸血：予測',hemodynamics:'血行動態',compat:'配合変化'};
+const kidOf=t=>KID_R[t]||null;
+function showPage(p){const b=document.querySelector(`nav button[data-p="${p}"]`);if(b)b.click();return !!b;}
+/* 知識メモを ID（またはタイトル）で直接開く。sec は見出しの一部（省略可） */
+function openTopic(ref,sec,from){
+  const title=KID[ref]||ref; if(!KNOW.some(k=>k.t===title)){toast('項目が見つかりません：'+ref);return false;}
+  showPage('know');
+  if(curCat!=='すべて'){curCat='すべて';document.querySelectorAll('#catBar button').forEach(x=>x.classList.toggle('on',x.textContent==='すべて'));}
+  if($('kSearch').value){$('kSearch').value='';}
+  renderKnow(); goTopic(title,from||null);
+  if(sec){setTimeout(()=>{const el=document.querySelector(`[data-key="${CSS.escape('k:'+title)}"]`);if(!el)return;
+    const h=[...el.querySelectorAll('h3')].find(x=>x.textContent.includes(sec));
+    if(h){h.classList.add('hl');const y=h.getBoundingClientRect().top+window.scrollY-70;window.scrollTo({top:y,behavior:'smooth'});setTimeout(()=>h.classList.remove('hl'),2500);}},400);}
+  return true;
+}
+/* 計算ツールを ID で直接開く */
+function openCalc(id){
+  const key=CALC_ID[id]||id; showPage('calc');
+  if(key==='__gamma'){const t=$('calcTop');if(window.__calcShow)window.__calcShow(t);t.scrollIntoView({behavior:'smooth',block:'start'});return true;}
+  const d=[...document.querySelectorAll('#p-calc details')].find(x=>x.querySelector('summary').textContent.includes(key));
+  if(!d){toast('ツールが見つかりません：'+id);return false;}
+  if(window.__calcShow)window.__calcShow(d); d.open=true; setTimeout(()=>d.scrollIntoView({behavior:'smooth',block:'start'}),30); return true;
+}
+/* 共有用リンク（Excel のチェックリストなどに貼る） */
+function topicLink(ref,sec){const id=KID_R[ref]||ref;return location.origin+location.pathname+'#k='+id+(sec?'&s='+encodeURIComponent(sec):'');}
+function calcLink(id){return location.origin+location.pathname+'#c='+id;}
+/* URL の # で直接開く： #k=ami（項目） #k=ami&s=右側誘導（見出し） #c=pf（計算） #p=iv（タブ） */
+function handleHash(){
+  const h=location.hash.slice(1); if(!h||!h.includes('='))return;
+  const q=new URLSearchParams(h);
+  if(q.get('k'))openTopic(q.get('k'),q.get('s')||null);
+  else if(q.get('c'))openCalc(q.get('c'));
+  else if(q.get('p'))showPage(q.get('p'));
+  try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+}
+window.addEventListener('hashchange',handleHash);
+setTimeout(handleHash,80);
+/* 本文中の「リンク」ボタン：この項目への URL をコピー */
+$('kList').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-lnk]'); if(!b)return;
+  const url=topicLink(b.dataset.lnk);
+  try{await navigator.clipboard.writeText(url);toast('リンクをコピーしました');}
+  catch(err){prompt('この URL をコピー',url);}
+});
+
+/* ===== チェックリスト（土台）=====
+   見直し後の正式版はここに入れる。各項目：
+   t: やること  k: 関連する知識の ID（'id' または 'id#見出しの一部'）  c: 計算ツールの ID  note: 補足  */
+const CHECK=[
+{id:'cs_return',t:'心外帰室時チェックリスト（サンプル）',note:'連動の動作確認用のサンプル。正式版は見直し後に差し替える。',items:[
+  {t:'ベッド作成（人工呼吸器・モニター・吸引・ポンプ・加温装置の準備）',k:['hosp_cs_return#ベッド']},
+  {t:'帰室時の申し送りを受ける（術式・体外循環時間・出血量・ペーシング・使用薬剤）',k:['cabg','valve']},
+  {t:'循環の初期評価（CI・SVR・乳酸・尿量）',k:['catheter'],c:['hemodynamics']},
+  {t:'カテコラミンの γ を確認（体重・希釈・流量）',c:['gamma'],k:['vasoactive']},
+  {t:'ペーシングの設定とバックアップの確認',k:['pacing#設定','hosp_device']},
+  {t:'ドレーン排液量を 30 分ごとに確認（量・性状・エアリーク）',k:['hosp_drain','chest_drain']},
+  {t:'血液ガス・電解質（K・Ca・Hb）の確認',k:['abg'],c:['abg','electrolyte']},
+  {t:'輸液シートを開始する',p:'iv'}
+]}
+];
+let checkDone={};
+function renderCheck(){
+  const L=$('checkList'); if(!L)return; L.innerHTML='';
+  CHECK.forEach(cl=>{
+    const dn=checkDone[cl.id]||{};
+    const box=document.createElement('div'); box.className='card';
+    const chip=(ref,kind)=>{
+      if(kind==='k'){const [id,sec]=ref.split('#');const t=KID[id];if(!t)return '';return `<button type="button" class="small relb" data-ck="${esc(id)}" data-cs="${esc(sec||'')}">📖 ${esc(t.replace(/（.*?）/g,'').replace(/^当院：/,''))}${sec?'：'+esc(sec):''}</button>`;}
+      if(kind==='c'){return `<button type="button" class="small relb" data-cc="${esc(ref)}">🧮 ${esc(ref==='gamma'?'ガンマ計算':(CALC_ID[ref]||ref))}</button>`;}
+      return '';};
+    box.innerHTML=`<h2 style="margin:0 0 4px">${esc(cl.t)}</h2>${cl.note?`<p class="muted" style="margin:0 0 8px;font-size:12px">${esc(cl.note)}</p>`:''}
+      <ol class="cklist">${cl.items.map((it,i)=>`<li class="${dn[i]?'done':''}"><label><input type="checkbox" data-i="${i}" ${dn[i]?'checked':''}> <span>${esc(it.t)}</span></label>
+        <div class="rel" style="margin:4px 0 0 26px">${(it.k||[]).map(r=>chip(r,'k')).join('')}${(it.c||[]).map(r=>chip(r,'c')).join('')}${it.p?`<button type="button" class="small relb" data-cp="${esc(it.p)}">↗ ${esc(titles[it.p]||it.p)}</button>`:''}</div></li>`).join('')}</ol>
+      <div class="bar"><button class="small" data-reset="1">チェックをリセット</button><span class="muted" style="font-size:12px">${Object.values(dn).filter(Boolean).length} / ${cl.items.length} 済</span></div>`;
+    box.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.onchange=async()=>{(checkDone[cl.id]=checkDone[cl.id]||{})[cb.dataset.i]=cb.checked;await store.set('checkdone',checkDone);renderCheck();});
+    box.querySelector('[data-reset]').onclick=async()=>{checkDone[cl.id]={};await store.set('checkdone',checkDone);renderCheck();};
+    box.querySelectorAll('[data-ck]').forEach(b=>b.onclick=()=>openTopic(b.dataset.ck,b.dataset.cs||null));
+    box.querySelectorAll('[data-cc]').forEach(b=>b.onclick=()=>openCalc(b.dataset.cc));
+    box.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>showPage(b.dataset.cp));
+    L.appendChild(box);
+  });
+}
+(async()=>{checkDone=(await store.get('checkdone'))||{};renderCheck();})();
+/* 開発用：ID の一覧を取り出す（コンソールで dumpIds()） */
+function dumpIds(){return Object.entries(KID).map(([id,t])=>{const k=KNOW.find(x=>x.t===t);const m=META[t]||{};return {id,t,cat:m.cat||'',secs:k?[...k.s,...(m.extra||[])].map(s=>s.h).filter(Boolean):[]};});}
+
+titles.check='チェックリスト';
+
 (function(){const bar=$('catBar');bar.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
 
 /* 血液ガス代償計算 */
