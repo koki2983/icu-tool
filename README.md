@@ -100,7 +100,12 @@ ICU看護師がベッドサイドで使う、計算・スコア・知識の道�
 2. Claudeが `index.html` を編集し、GitHub APIで直接反映
 3. 数分で公開URLに反映される
 
-**トークン**
+**GitHub連携（2026年10月〜の運用）**
+- Claudeの「コネクタ」でGitHubを連携し、GitHub側で「Claude」アプリを koki2983 にインストール（対象に icu-tool を含める）してある
+- 新しいチャットでは「icu-tool を更新して」と頼めば、Claudeがリポジトリを取り込んで直接コミットできる。トークンを貼る必要はない
+- 連携が切れたときの再接続： https://claude.ai/customize/connectors?auth_start=github&auth_start_force=1
+
+**トークン（予備）**
 - classic personal access token（権限は `public_repo` のみ、**無期限**）。https://github.com/settings/tokens に表示される
 - トークン本体は管理者のロック付きメモに保管。**リポジトリやREADMEには絶対に書かない**（公開されると自動で無効化される）
 - 新しいチャットでClaudeに更新を頼むときは、このトークンを貼る
