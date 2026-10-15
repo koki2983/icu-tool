@@ -125,6 +125,7 @@ table.compat td{text-align:left;font-weight:400;font-size:13px;vertical-align:to
 .rel{margin-top:10px;padding-top:8px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .rel .muted{width:100%;font-size:12px}
 .cklist{padding-left:0;list-style:none;margin:0}.cklist li{padding:8px 0;border-bottom:1px solid var(--line)}.cklist li label{display:flex;gap:8px;align-items:flex-start;font-size:15px;line-height:1.5}.cklist li input{width:18px;height:18px;margin-top:3px;flex:none}.cklist li.done>label span{color:var(--muted);text-decoration:line-through}h3.hl{background:var(--amber-soft);border-radius:6px;transition:background 1s}
+.ivrt{font-size:11px;padding:2px 4px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--muted);max-width:92px;margin-left:auto}
 .relb{background:var(--teal-soft);border-color:#BFDDE3;color:var(--teal);font-size:13px}
 .fab{position:fixed;right:14px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:6;background:var(--teal);color:#fff;border:0;border-radius:22px;padding:10px 16px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.18)}
 .fab.back{right:auto;left:14px;background:#fff;color:var(--teal);border:1px solid var(--teal);font-weight:600;max-width:60vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -390,7 +391,7 @@ nav button{font-size:10px}
   <div id="ivNew" class="ivnew" style="display:none"></div>
   <div class="warn" style="margin-top:10px">患者の氏名・ID は入力しないでください。入力はこの端末だけに保存されます。10 時に新しいシートへ切り替わり、前のシートは翌日の 10 時に自動的に消えます。記録と確認は紙の輸液シートで行い、この計算は補助として使います。</div>
   <div class="seg" id="ivSeg" style="margin-top:10px">
-    <button data-v="c" class="on">点滴</button><button data-v="b">単回 IN</button><button data-v="o">OUT</button><button data-v="r">集計</button>
+    <button data-v="c" class="on">点滴</button><button data-v="b">単回 IN</button><button data-v="o">OUT</button><button data-v="r">集計</button><button data-v="g">図</button>
   </div>
 
   <div class="ivp card" data-v="c"><div class="body">
@@ -399,6 +400,8 @@ nav button{font-size:10px}
     <select id="ivCsel"></select>
     <div class="row"><div><label>名前（選ぶと入ります。手入力も可）</label><input type="text" id="ivCn" placeholder="例 ソルデム3A、A ライン"></div>
     <div><label>区分</label><select id="ivCk"><option value="w">水分</option><option value="b">輸血・アルブミン</option></select></div></div>
+    <label>投与経路（任意。選ぶと経路ごとにまとまり、流れ図に出ます）</label>
+    <div class="drchips" id="ivRt" style="margin-top:4px"></div>
     <label>入力のしかた</label>
     <div class="seg" id="ivMode" style="margin-top:4px"><button data-m="r" class="on">流量（mL/h）</button><button data-m="v">投与量と時間</button></div>
     <div class="row"><div><label>開始時刻</label><input type="time" id="ivCt"></div>
@@ -438,6 +441,14 @@ nav button{font-size:10px}
     <div class="tchips" data-for="ivOt"></div>
     <button class="primary" id="ivOadd" style="width:100%">OUT を追加</button>
     <div id="ivOlist" style="margin-top:10px"></div>
+  </div></div>
+
+  <div class="ivp card" data-v="g" style="display:none"><div class="body">
+    <h3 style="margin-top:0">投与の流れと流量の推移</h3>
+    <p class="muted" style="font-size:12px;margin:0 0 8px">経路ごとに、いま何が何 mL/h で入っているかと、10 時からの流量の変化。点滴ごとに「投与経路」を選ぶと経路別にまとまります。</p>
+    <div id="ivMap"></div>
+    <div id="ivChart" style="margin-top:12px"></div>
+    <div id="ivHist"></div>
   </div></div>
 
   <div class="ivp card" data-v="r" style="display:none"><div class="body">
@@ -4627,8 +4638,11 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
   function renderLists(){
     const C=$('ivClist');
     const sm=(s,i)=>{const m=toM(s.t,'in');return i>0&&m===0?1440:m;};
-    C.innerHTML=S.L.length?S.L.map(L=>{const seg=L.seg.map((s,i)=>({...s,_m:sm(s,i)})).sort((x,y)=>x._m-y._m);
-      return `<div class="iv"><div class="iv-h"><b>${esc(L.n||'（名前なし）')}${L.tot?`<small class="ivtot">${f1(L.tot)} mL を ${L.seg[0].t}〜${L.seg[1]?L.seg[1].t:''}</small>`:''}</b>${L.k==='b'?'<span class="tag c">輸血</span>':''}<button class="small" data-dl="${L.id}">削除</button></div>
+    const RTL=window.__ivRT||[];const rtIdx=r=>{const i=RTL.indexOf(r||'');return i<0?(r?RTL.length:RTL.length+1):i;};let _last=null;
+    C.innerHTML=S.L.length?[...S.L].sort((a,b)=>rtIdx(a.rt)-rtIdx(b.rt)).map(L=>{const seg=L.seg.map((s,i)=>({...s,_m:sm(s,i)})).sort((x,y)=>x._m-y._m);
+      const _g=L.rt||'経路未設定';const _hd=_g!==_last?`<div class="cath" style="margin:8px 0 4px">${esc(_g)}</div>`:'';_last=_g;
+      const _sel=`<select class="ivrt" data-rt="${L.id}"><option value="">経路</option>${RTL.map(r=>`<option value="${r}"${L.rt===r?' selected':''}>${r}</option>`).join('')}</select>`;
+      return _hd+`<div class="iv"><div class="iv-h"><b>${esc(L.n||'（名前なし）')}${L.tot?`<small class="ivtot">${f1(L.tot)} mL を ${L.seg[0].t}〜${L.seg[1]?L.seg[1].t:''}</small>`:''}</b>${L.k==='b'?'<span class="tag c">輸血</span>':''}${_sel}<button class="small" data-dl="${L.id}">削除</button></div>
       <div class="iv-seg">${seg.map((s,i)=>`<span class="chip">${s.t} ${+s.r===0?(s._m===1440?'終了':'OFF'):f2(+s.r)+' mL/h'}${i>0?` <a data-ds="${L.id}|${i}">×</a>`:''}</span>`).join('→')}</div>
       <div class="row iv-chg"><div><input type="time" id="t_${L.id}" value="${nowT()}"></div><div><div class="unit"><input type="number" inputmode="decimal" step="0.1" id="r_${L.id}" placeholder="流量"><span>mL/h</span></div></div></div>
       <div class="row"><button class="small" data-ch="${L.id}">流量を変更</button><button class="small" data-off="${L.id}">この時刻で OFF</button></div></div>`;}).join(''):'<div class="muted" style="font-size:13px">まだありません</div>';
@@ -4657,7 +4671,7 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
     $('ivCarry').onclick=()=>newSheet(true);$('ivFresh').onclick=()=>newSheet(false);}
   function newSheet(carry){snap();const keep=[];
     if(carry)S.L.forEach(L=>{const seg=L.seg.map((s,i)=>({...s,_m:segM(s,i)})).sort((x,y)=>x._m-y._m);const last=seg[seg.length-1];
-      if(last&&+last.r>0&&last._m<1440)keep.push({id:uid(),n:L.n,k:L.k,seg:[{t:'10:00',r:+last.r}]});});
+      if(last&&+last.r>0&&last._m<1440)keep.push({id:uid(),n:L.n,k:L.k,rt:L.rt||'',seg:[{t:'10:00',r:+last.r}]});});
     S={...fresh(),lab:S.lab||'',bk:S.bk,wt:S.wt,L:keep};save();all();
     toast(carry?`点滴 ${keep.length} 本を持ち越しました`:'新しいシートを始めました');}
   function renderRes(){
@@ -4669,13 +4683,13 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
       ${r.det.length?`<details class="ivd"><summary>内訳</summary><div>${r.det.map(esc).join('<br>')}</div></details>`:''}</div>`).join('');
   }
   function counts(){const c=S.L.length,bi=S.E.filter(e=>e.io==='in').length,o=S.E.filter(e=>e.io==='out').length;
-    const lab={c:'点滴',b:'単回 IN',o:'OUT',r:'集計'},n={c,b:bi,o};
+    const lab={c:'点滴',b:'単回 IN',o:'OUT',r:'集計',g:'図'},n={c,b:bi,o};
     document.querySelectorAll('#ivSeg button').forEach(b=>{const v=b.dataset.v;b.innerHTML=lab[v]+(n[v]?` <span class="cnt">${n[v]}</span>`:'');});}
   function all(){renderLists();renderRes();counts();renderSlots();renderNew();}
   document.querySelectorAll('#ivSeg button').forEach(b=>b.addEventListener('click',()=>{
     document.querySelectorAll('#ivSeg button').forEach(x=>x.classList.toggle('on',x===b));
     document.querySelectorAll('#ivCard .ivp').forEach(p=>p.style.display=p.dataset.v===b.dataset.v?'':'none');
-    if(b.dataset.v==='r')renderRes();}));
+    if(b.dataset.v==='r')renderRes();if(b.dataset.v==='g'&&window.__ivGraph)window.__ivGraph();}));
   let mode='r';
   const volHint=()=>{const t=$('ivCt').value,e=$('ivCe').value,v=parseFloat($('ivCv').value);
     if(t&&e&&v>0){const s=toM(t,'in');let en=toM(e,'in');if(en===0)en=1440;const d=en-s;
@@ -4689,10 +4703,10 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
   $('ivCadd').onclick=()=>{const t=$('ivCt').value;const n=$('ivCn').value.trim(),k=$('ivCk').value;
     if(mode==='r'){const r=parseFloat($('ivCr').value);if(!t||!(r>=0)){toast('開始時刻と流量を入れてください');return;}
       if(S.L.some(x=>x.n===n&&x.seg[0].t===t&&!x.tot)&&!confirm('同じ名前・同じ開始時刻の点滴がすでにあります。もう一度追加しますか？'))return;
-      snap();S.L.push({id:uid(),n,k,seg:[{t,r}]});$('ivCr').value='';}
+      snap();S.L.push({id:uid(),n,k,rt:window.__ivRt||'',seg:[{t,r}]});$('ivCr').value='';}
     else{const e=$('ivCe').value,v=parseFloat($('ivCv').value);if(!t||!e||!(v>0)){toast('開始・終了時刻と投与量を入れてください');return;}
       const s=toM(t,'in');let en=toM(e,'in');if(en===0)en=1440;const d=en-s;if(d<=0){toast('終了時刻は開始時刻より後にしてください');return;}
-      snap();S.L.push({id:uid(),n,k,tot:v,seg:[{t,r:v/(d/60)},{t:e,r:0}]});$('ivCv').value='';volHint();}
+      snap();S.L.push({id:uid(),n,k,rt:window.__ivRt||'',tot:v,seg:[{t,r:v/(d/60)},{t:e,r:0}]});$('ivCv').value='';volHint();}
     save();$('ivCn').value='';all();toast('追加しました');};
   const addE=(io,kSel,nId,tId,vId)=>{const [k,type]=$(kSel).value.split('|');const t=$(tId).value,v=parseFloat($(vId).value);
     if(!t||!(v>0||(io==='out'&&type==='尿'&&v===0))){toast('時刻と量を入れてください');return;}
@@ -5225,6 +5239,96 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
     if(c>=1.5)msg+='<div class="rn">Cr 1.5 以上。AKI の評価（KDIGO：ベースラインの 1.5 倍、または 48 時間で 0.3 上昇）を「急性腎障害（AKI）と電解質」で</div>';
     N.style.display='';N.className='rangebox '+cls;N.innerHTML=msg;};
   ['bcB','bcC'].forEach(i=>$(i).addEventListener('input',run));
+})();
+
+/* ===== 輸液シート：投与経路・流れ図・流量の推移 ===== */
+(function(){
+  const RT=['CV dis','CV mid','CV pro','末梢①','末梢②','PICC','A ライン','経管','その他'];
+  window.__ivRT=RT;
+  const RTC={'CV dis':'#0E6F80','CV mid':'#2A8FA3','CV pro':'#5BB3C4','末梢①':'#B7791F','末梢②':'#D4A24C','PICC':'#7B5EA7','A ライン':'#C0392B','経管':'#4E9A51','その他':'#6B7A80'};
+  const COL=['#0E6F80','#B7791F','#C0392B','#4E9A51','#7B5EA7','#2A8FA3','#D4A24C','#1F2A30','#5BB3C4','#9B2D6B'];
+  const esc2=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const pad=n=>String(n).padStart(2,'0');
+  const f=x=>{const v=Math.round(x*100)/100;return v.toLocaleString('ja-JP',{maximumFractionDigits:2});};
+  const hhmm=m=>{const t=(600+m)%1440;return pad(Math.floor(t/60))+':'+pad(t%60);};
+  /* 追加フォームの経路チップ */
+  const box=$('ivRt'); let cur='';
+  const drawRt=()=>{box.innerHTML=RT.map(r=>`<button type="button" class="drc${cur===r?' on':''}" data-rt="${r}" style="${cur===r?'border-color:'+RTC[r]+';color:'+RTC[r]:''}">${r}</button>`).join('');
+    box.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{cur=cur===b.dataset.rt?'':b.dataset.rt;window.__ivRt=cur;drawRt();});};
+  window.__ivRt='';drawRt();
+  const segs=L=>{const iv=window.__iv;return L.seg.map((s,i)=>{let m=iv.toM(s.t,'in');if(i>0&&m===0)m=1440;return {m,r:+s.r,t:s.t};}).sort((a,b)=>a.m-b.m);};
+  const rateAt=(L,m)=>{const sg=segs(L);let r=0;sg.forEach(s=>{if(s.m<=m)r=s.r;});return r;};
+  const nowM=()=>{const iv=window.__iv;const S=iv.S;const d=new Date();const m=iv.toM(pad(d.getHours())+':'+pad(d.getMinutes()),'in');
+    const sd=iv.sheetDay(Date.now());const sheet=S.day!==undefined?S.day:iv.sheetDay(S.c);return sd>sheet?1440:m;};
+  function drawMap(){
+    const S=window.__iv.S;const nm=nowM();const W=340;
+    const groups=[...RT,'未設定'].map(r=>({r,L:S.L.filter(L=>(L.rt||'未設定')===r)})).filter(g=>g.L.length);RTC['未設定']='#9AA6AB';
+    if(!groups.length){$('ivMap').innerHTML='<div class="muted" style="font-size:13px">点滴を追加し、経路（CV dis / mid / pro・末梢など）を選ぶと、ここに流れ図が出ます</div>';return;}
+    let y=26;const rows=[];
+    groups.forEach(g=>{const h=18+g.L.length*15;rows.push({g,y,h});y+=h+8;});
+    const H=y+40;const px=214;
+    let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="9">`;
+    s+=`<text x="8" y="14" font-weight="700" font-size="10">いま（${hhmm(nm>=1440?1439:nm)}）の投与の流れ</text>`;
+    // patient
+    const pcx=300,pcy=H/2;
+    s+=`<circle cx="${pcx}" cy="${pcy-26}" r="9" fill="#EEF5F7" stroke="#0E6F80" stroke-width="1.5"/><path d="M${pcx-16} ${pcy+14} Q${pcx} ${pcy-18} ${pcx+16} ${pcy+14} Z" fill="#EEF5F7" stroke="#0E6F80" stroke-width="1.5"/><text x="${pcx}" y="${pcy+30}" text-anchor="middle" font-weight="700">患者</text>`;
+    let tot=0;
+    rows.forEach(({g,y,h})=>{const c=RTC[g.r];const sum=g.L.reduce((a,L)=>a+rateAt(L,nm),0);tot+=sum;
+      s+=`<rect x="8" y="${y}" width="${px-8}" height="${h}" rx="6" fill="#fff" stroke="${c}" stroke-width="1.5"/>`;
+      s+=`<rect x="8" y="${y}" width="62" height="${h}" rx="6" fill="${c}" fill-opacity="0.12"/>`;
+      s+=`<text x="39" y="${y+h/2+3}" text-anchor="middle" font-weight="700" fill="${c}">${esc2(g.r)}</text>`;
+      g.L.forEach((L,i)=>{const r=rateAt(L,nm);const yy=y+13+i*15;
+        s+=`<text x="76" y="${yy}" fill="${r>0?'#1F2A30':'#9AA6AB'}">${esc2((L.n||'（名前なし）').slice(0,14))}</text><text x="${px-4}" y="${yy}" text-anchor="end" font-weight="700" fill="${r>0?c:'#9AA6AB'}">${r>0?f(r)+' mL/h':'OFF'}</text>`;});
+      // connector
+      const yc=y+h/2;const sw=sum>0?Math.min(6,1.5+sum/20):1;
+      s+=`<path d="M${px} ${yc} C ${px+30} ${yc}, ${pcx-50} ${pcy}, ${pcx-18} ${pcy}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-opacity="${sum>0?0.85:0.25}"${sum>0?'':' stroke-dasharray="3 3"'}/>`;
+      s+=`<text x="${px+6}" y="${yc-3}" font-size="8" fill="${c}">${sum>0?f(sum)+' mL/h':''}</text>`;});
+    s+=`<text x="${W-8}" y="${H-6}" text-anchor="end" font-size="9">合計 <tspan font-weight="700">${f(tot)} mL/h</tspan>（約 ${f(tot*24)} mL/日）</text>`;
+    s+='</svg>';
+    $('ivMap').innerHTML=s;
+  }
+  function chartSvg(list,title,nm){
+    const W=340,H=190,x0=36,x1=330,y0=22,y1=150;
+    const X=m=>x0+(x1-x0)*m/1440;
+    let max=0;list.forEach(o=>o.sg.forEach(s=>{if(s.r>max)max=s.r;}));
+    const bps=[...new Set(list.flatMap(o=>o.sg.map(s=>s.m)))].sort((a,b)=>a-b);
+    const totPts=[];bps.forEach(m=>{const t=list.reduce((a,o)=>a+rateAt(o.L,m),0);totPts.push({m,t});if(t>max)max=t;});
+    if(max<=0)max=10;const step=max>200?100:max>100?50:max>50?20:max>20?10:max>10?5:max>4?2:1;const ymax=Math.ceil(max/step)*step;
+    const Y=r=>y1-(y1-y0)*r/ymax;
+    let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="9">`;
+    s+=`<text x="8" y="13" font-weight="700" font-size="10">${title}</text>`;
+    for(let r=0;r<=ymax;r+=step){s+=`<line x1="${x0}" y1="${Y(r)}" x2="${x1}" y2="${Y(r)}" stroke="#E3E9EC"/><text x="${x0-4}" y="${Y(r)+3}" text-anchor="end" fill="#6B7A80">${r}</text>`;}
+    [0,240,480,720,960,1200,1440].forEach(m=>{s+=`<line x1="${X(m)}" y1="${y0}" x2="${X(m)}" y2="${y1}" stroke="${m%480===0?'#CBD5DB':'#E3E9EC'}"/><text x="${X(m)}" y="${y1+12}" text-anchor="middle" fill="#6B7A80">${(600+m)%1440/60|0}時</text>`;});
+    if(list.length>1){let d='';totPts.forEach((p,i)=>{const nx=i+1<totPts.length?totPts[i+1].m:1440;d+=`${i?'L':'M'}${X(p.m)} ${Y(p.t)} L${X(nx)} ${Y(p.t)} `;});
+      s+=`<path d="${d}" fill="none" stroke="#9AA6AB" stroke-width="2.5" stroke-opacity="0.6"/>`;}
+    list.forEach(o=>{let d='';o.sg.forEach((sg,i)=>{const nx=i+1<o.sg.length?o.sg[i+1].m:1440;d+=`${i?'L':'M'}${X(sg.m)} ${Y(sg.r)} L${X(nx)} ${Y(sg.r)} `;
+        if(i>0)s+=`<circle cx="${X(sg.m)}" cy="${Y(sg.r)}" r="2.5" fill="${o.c}"/>`;});
+      s+=`<path d="${d}" fill="none" stroke="${o.c}" stroke-width="1.8"/>`;});
+    if(nm<1440)s+=`<line x1="${X(nm)}" y1="${y0}" x2="${X(nm)}" y2="${y1}" stroke="#C0392B" stroke-dasharray="3 2"/><text x="${X(nm)}" y="${y0-4}" text-anchor="middle" fill="#C0392B" font-size="8">今</text>`;
+    s+=`<text x="${x1}" y="${H-4}" text-anchor="end" fill="#6B7A80" font-size="8">${list.length>1?'灰色の太線＝合計 mL/h　':''}●＝変更した時刻</text>`;
+    s+='</svg>';
+    s+='<div class="rel" style="margin-top:4px">'+list.map(o=>`<span class="chip" style="border-left:6px solid ${o.c};font-size:13px">${esc2(o.L.n||'（名前なし）')}${o.L.rt?' <small class="muted">'+esc2(o.L.rt)+'</small>':''} <b>${rateAt(o.L,nm)>0?f(rateAt(o.L,nm))+' mL/h':'OFF'}</b></span>`).join('')+'</div>';
+    return s;
+  }
+  function drawChart(){
+    const S=window.__iv.S;const nm=nowM();
+    if(!S.L.length){$('ivChart').innerHTML='';$('ivHist').innerHTML='';return;}
+    const list=S.L.map((L,i)=>({L,i,sg:segs(L),c:COL[i%COL.length]}));
+    const mx=o=>Math.max(...o.sg.map(s=>s.r));
+    const small=list.filter(o=>mx(o)<=20),big=list.filter(o=>mx(o)>20);
+    let s='';
+    if(big.length)s+=chartSvg(big,'流量の推移：輸液・輸血など（mL/h）',nm);
+    if(small.length)s+=(big.length?'<div style="height:10px"></div>':'')+chartSvg(small,'流量の推移：シリンジなど少量（mL/h）',nm);
+    $('ivChart').innerHTML=s;
+    const ev=[];list.forEach(o=>{o.sg.forEach((sg,i)=>{ev.push({m:sg.m,t:sg.t,n:o.L.n||'（名前なし）',rt:o.L.rt||'',from:i?o.sg[i-1].r:null,to:sg.r,c:o.c});});});
+    ev.sort((a,b)=>a.m-b.m||a.n.localeCompare(b.n,'ja'));
+    $('ivHist').innerHTML='<h3 style="margin:12px 0 4px">変更の履歴（時刻順）</h3>'+(ev.length?'<table class="o2" style="font-size:12px"><tr><th>時刻</th><th style="text-align:left">点滴</th><th>経路</th><th>流量</th></tr>'+ev.map(e=>`<tr><td>${e.m>=1440?'10:00':e.t}</td><td style="text-align:left;border-left:4px solid ${e.c}">${esc2(e.n)}</td><td>${esc2(e.rt)}</td><td>${e.from===null?'開始 <b>'+f(e.to)+'</b>':(e.to===0?f(e.from)+' → <b>OFF</b>':f(e.from)+' → <b>'+f(e.to)+'</b>')}</td></tr>`).join('')+'</table>':'');
+  }
+  window.__ivGraph=()=>{try{drawMap();drawChart();}catch(e){console.error(e);}};
+  // redraw when the iv data changes
+  const orig=window.__iv.all;window.__iv.all=function(){orig.apply(this,arguments);if(document.querySelector('#ivSeg button.on')?.dataset.v==='g')window.__ivGraph();};
+  // route change on existing drips (delegation)
+  $('ivClist').addEventListener('change',e=>{const sel=e.target.closest('select[data-rt]');if(!sel)return;const L=window.__iv.S.L.find(x=>x.id===sel.dataset.rt);if(!L)return;L.rt=sel.value;store.set('ivsheet_'+window.__iv.slot,window.__iv.S);window.__iv.all();toast('経路を '+(sel.value||'未設定')+' にしました');});
 })();
 
 loadDrugs(); loadKnow(); calc();
