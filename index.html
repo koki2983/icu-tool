@@ -130,6 +130,11 @@ table.compat td{text-align:left;font-weight:400;font-size:13px;vertical-align:to
 .fab{position:fixed;right:14px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:6;background:var(--teal);color:#fff;border:0;border-radius:22px;padding:10px 16px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.18)}
 .fab.back{right:auto;left:14px;background:#fff;color:var(--teal);border:1px solid var(--teal);font-weight:600;max-width:60vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #tocSheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:30;align-items:flex-end}
+#srSheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:31;align-items:flex-end}
+#srSheet .sheet{background:var(--card);width:100%;max-height:88vh;overflow:auto;border-radius:16px 16px 0 0;padding:12px 14px calc(16px + env(safe-area-inset-bottom))}
+#srSheet .row{display:flex;gap:6px;align-items:center}
+.srit{padding:8px 6px;border-bottom:1px solid var(--line)}.srit:active{background:var(--teal-soft)}.srt{font-weight:700;font-size:14px}.srs{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}.srs mark,.srt mark{background:#FFE89A;color:inherit;padding:0 1px;border-radius:2px}
+.item.hl{outline:2px solid var(--amber);outline-offset:2px}
 #tocSheet .sheet{background:var(--card);width:100%;max-height:80vh;overflow:auto;border-radius:16px 16px 0 0;padding:12px 14px calc(16px + env(safe-area-inset-bottom))}
 .sheet-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .tocb{display:block;width:100%;text-align:left;border:0;background:none;padding:9px 6px;border-bottom:1px solid var(--line);font-size:15px}
@@ -196,7 +201,7 @@ nav button{font-size:10px}
 </head>
 <body>
 
-<header><h1 id="ttl">ガンマ計算</h1><span class="sub"><button id="fsBtn" class="small" title="文字サイズ">文字 Aa</button></span></header>
+<header><h1 id="ttl">ガンマ計算</h1><span class="sub"><button id="srBtn" class="small" title="検索">🔍 検索</button> <button id="fsBtn" class="small" title="文字サイズ">文字 Aa</button></span></header>
 
 <main>
 
@@ -490,6 +495,9 @@ nav button{font-size:10px}
 </nav>
 <button id="tocBtn" class="fab" title="目次">目次</button>
 <button id="backBtn" class="fab back" style="display:none">← 戻る</button>
+<div id="srSheet"><div class="sheet"><div class="sheet-h"><b>検索</b><button class="small" id="srClose">閉じる</button></div>
+<div class="row" style="margin:0 0 6px"><input type="search" id="srQ" class="search" placeholder="例：脱血不良、カフ圧、PEEP 血圧" autocomplete="off" style="margin:0"><button class="small" id="srClear" style="flex:none">消す</button></div>
+<div id="srHint"></div><div id="srRes"></div></div></div>
 <div id="tocSheet"><div class="sheet"><div class="sheet-h"><b>知識メモ 目次</b><button class="small" id="tocClose">閉じる</button></div><div id="tocList"></div></div></div>
 <div id="aiSheet"><div class="sheet"><div class="sheet-h"><b>AI に聞く</b><button class="small" id="aiClose">閉じる</button></div>
 <p class="muted" id="aiTopic"></p><div id="aiImgNote" class="warn" style="display:none;margin:8px 0;font-size:12px;line-height:1.6"><b>写真を添付するときの約束</b><br>1. 撮る前に、氏名・ID・ベッド番号・日付が画面に入らないようにする（写ったらトリミングで消す）<br>2. 「写真を選ぶ」で写真を選び、「まとめて送る」で ChatGPT や Claude のアプリに渡す（このアプリは写真を保存・送信しません）<br>3. 返答は学習用の参考意見。判断は必ず 12 誘導心電図と医師で<br>4. 個人のアカウントで外部サービスに送ることになるので、院内のルールを確認してから使う</div>
@@ -5360,6 +5368,89 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
   const orig=window.__iv.all;window.__iv.all=function(){orig.apply(this,arguments);if(document.querySelector('#ivSeg button.on')?.dataset.v==='g')window.__ivGraph();};
   // route change on existing drips (delegation)
   $('ivClist').addEventListener('change',e=>{const sel=e.target.closest('select[data-rt]');if(!sel)return;const L=window.__iv.S.L.find(x=>x.id===sel.dataset.rt);if(!L)return;L.rt=sel.value;store.set('ivsheet_'+window.__iv.slot,window.__iv.S);window.__iv.all();toast('経路を '+(sel.value||'未設定')+' にしました');});
+})();
+
+/* ===== 全文検索（知識・用語・計算・薬剤・スコア） ===== */
+(function(){
+  const sheet=$('srSheet'),inp=$('srQ'),res=$('srRes'),hint=$('srHint');
+  if(!sheet)return;
+  const norm=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[\s　・]/g,'');
+  const esc2=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let IDX=null;
+  function build(){
+    IDX=[];
+    const push=o=>{o.n=norm(o.text);IDX.push(o);};
+    KNOW.forEach(k=>{const m=META[k.t]||{};
+      push({ty:'k',title:k.t,sec:'',text:k.t+' '+(m.key||[]).join(' '),w:2});
+      [...k.s,...(m.extra||[])].forEach(sec=>{push({ty:'k',title:k.t,sec:sec.h||'',text:(sec.h||'')+' '+sec.b.map(x=>x.replace(/^!/,'')).join(' '),w:1,head:sec.h||''});});
+      (PHOTOS[k.t]||[]).forEach(p=>push({ty:'k',title:k.t,sec:'写真で見る所見',text:p.t+' '+p.b.join(' '),w:1,head:'写真で見る所見'}));});
+    GLOSS.forEach(g=>push({ty:'g',title:g[0],text:g[0]+' '+(g[1]||'')+' '+g[2],def:g[2],topic:g[3],w:2}));
+    [...document.querySelectorAll('#p-calc details')].forEach(d=>{const sm=d.querySelector('summary');if(!sm)return;push({ty:'c',title:sm.textContent.trim(),text:sm.textContent+' '+d.textContent.slice(0,400),key:sm.textContent.trim(),w:2});});
+    push({ty:'c',title:'ガンマ計算',text:'ガンマ計算 γ 流量 mL/h μg/kg/min 希釈',key:'__gamma',w:2});
+    PRESET.forEach(d=>push({ty:'d',title:d.name,text:d.name+' '+(d.note||'')+' '+(d.rt||'')+' '+(d.rn||''),def:[d.note,d.rt&&'目安 '+d.rt].filter(Boolean).join('／'),w:2}));
+    (typeof drugs!=='undefined'?drugs:[]).forEach(d=>push({ty:'d',title:d.name,text:d.name+' '+(d.note||'')+' '+(d.rt||''),def:d.note||'',w:2}));
+    [...document.querySelectorAll('#scoreSeg button')].forEach(b=>{const pane=$('s-'+b.dataset.s);push({ty:'s',title:b.textContent.trim(),text:b.textContent+' '+(pane?pane.textContent.slice(0,600):''),key:b.dataset.s,w:2});});
+  }
+  const snippet=(text,terms)=>{const t=String(text);const tn=norm(t);
+    // map normalized index back approximately: search in raw text case-insensitively first
+    let pos=-1;for(const q of terms){const i=t.toLowerCase().indexOf(q);if(i>=0){pos=i;break;}}
+    if(pos<0){for(const q of terms){const i=tn.indexOf(q);if(i>=0){pos=Math.min(i,t.length-1);break;}}}
+    const a=Math.max(0,pos-26),b=Math.min(t.length,(pos<0?0:pos)+60);
+    let s=(a>0?'…':'')+t.slice(a,b)+(b<t.length?'…':'');
+    s=esc2(s);
+    terms.forEach(q=>{if(!q)return;const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');s=s.replace(re,m=>'<mark>'+m+'</mark>');});
+    return s;};
+  function run(){
+    const raw=inp.value.trim();
+    if(!raw){res.innerHTML='';hint.style.display='';return;}
+    hint.style.display='none';
+    if(!IDX)build();
+    const terms=raw.split(/[\s　]+/).filter(Boolean);const tn=terms.map(norm).filter(Boolean);
+    const hits=[];
+    IDX.forEach(o=>{if(!tn.every(q=>o.n.includes(q)))return;
+      let sc=o.w*10;const tt=norm(o.title);tn.forEach(q=>{if(tt.includes(q))sc+=20;if(o.head&&norm(o.head).includes(q))sc+=25;if(tt===q)sc+=30;});
+      hits.push({o,sc});});
+    hits.sort((a,b)=>b.sc-a.sc);
+    const G={k:'知識メモ',g:'用語集',c:'計算ツール',d:'薬剤',s:'スコア'};
+    const by={};hits.forEach(h=>{(by[h.o.ty]=by[h.o.ty]||[]).push(h);});
+    let html='';let total=0;
+    ['k','g','c','d','s'].forEach(ty=>{const L=by[ty];if(!L)return;
+      // knowledge: collapse to max 3 sections per topic
+      let items=L;if(ty==='k'){const cnt={};items=L.filter(h=>{cnt[h.o.title]=(cnt[h.o.title]||0)+1;return cnt[h.o.title]<=3;});}
+      items=items.slice(0,25);total+=items.length;
+      html+=`<div class="cath" style="margin:10px 0 4px">${G[ty]} <span class="muted" style="font-weight:400">${L.length}</span></div>`;
+      html+=items.map((h,i)=>{const o=h.o;const idx=IDX.indexOf(o);
+        const t2=ty==='k'?`${esc2(o.title)}${o.sec?` <span class="muted">› ${esc2(o.sec)}</span>`:''}`:esc2(o.title);
+        const body=ty==='k'?snippet(o.text.replace(/^.*? /,''),terms):(ty==='g'?snippet(o.def,terms):(ty==='d'?snippet(o.def||'',terms):''));
+        return `<div class="srit" data-i="${idx}"><div class="srt">${t2}</div>${body?`<div class="srs">${body}</div>`:''}</div>`;}).join('');});
+    res.innerHTML=html||'<div class="muted" style="padding:12px 4px">見つかりませんでした。別の言い方（略語・商品名・一般名）で試してください</div>';
+    res.querySelectorAll('.srit').forEach(el=>el.onclick=()=>go(IDX[+el.dataset.i]));
+    try{const rc=JSON.parse(localStorage.getItem('srRecent')||'[]');}catch(e){}
+  }
+  function go(o){
+    close();
+    try{const rc=JSON.parse(localStorage.getItem('srRecent')||'[]').filter(x=>x!==inp.value.trim());rc.unshift(inp.value.trim());localStorage.setItem('srRecent',JSON.stringify(rc.slice(0,8)));}catch(e){}
+    if(o.ty==='k'){openTopic(o.title,o.sec||null);}
+    else if(o.ty==='g'){showPage('gloss');$('gSearch').value=o.title;$('gSearch').dispatchEvent(new Event('input'));window.scrollTo(0,0);}
+    else if(o.ty==='c'){openCalc(o.key==='__gamma'?'gamma':o.key);}
+    else if(o.ty==='d'){showPage('drug');setTimeout(()=>{const el=[...document.querySelectorAll('#drugList .item')].find(x=>x.textContent.includes(o.title));if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('hl');setTimeout(()=>el.classList.remove('hl'),2500);}},60);}
+    else if(o.ty==='s'){showPage('score');const b=document.querySelector(`#scoreSeg button[data-s="${o.key}"]`);if(b)b.click();window.scrollTo(0,0);}
+  }
+  function recent(){let rc=[];try{rc=JSON.parse(localStorage.getItem('srRecent')||'[]');}catch(e){}
+    hint.innerHTML='<div class="muted" style="font-size:12px;margin-bottom:6px">知識メモの本文・用語・計算ツール・薬剤・スコアをまとめて探します。スペース区切りで AND 検索（例：「PEEP 血圧」）</div>'
+      +(rc.length?'<div class="muted" style="font-size:11px">最近の検索</div><div class="drchips">'+rc.map(q=>`<button type="button" class="drc" data-q="${esc2(q)}">${esc2(q)}</button>`).join('')+'</div>':'')
+      +'<div class="muted" style="font-size:11px;margin-top:8px">例</div><div class="drchips">'+['脱血不良','カフ圧','右手 SpO₂','高K','抜管','PSH','ΔP','ノルアドレナリン'].map(q=>`<button type="button" class="drc" data-q="${q}">${q}</button>`).join('')+'</div>';
+    hint.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{inp.value=b.dataset.q;run();});}
+  const open=()=>{sheet.style.display='flex';recent();run();setTimeout(()=>inp.focus(),50);};
+  const close=()=>{sheet.style.display='none';};
+  $('srBtn').onclick=open;$('srClose').onclick=close;
+  sheet.addEventListener('click',e=>{if(e.target===sheet)close();});
+  let tm;inp.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(run,120);});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}});
+  $('srClear').onclick=()=>{inp.value='';run();recent();inp.focus();};
+  window.__srOpen=q=>{open();if(q){inp.value=q;run();}};
+  // データが変わったら索引を作り直す
+  window.__srReset=()=>{IDX=null;};
 })();
 
 loadDrugs(); loadKnow(); calc();
