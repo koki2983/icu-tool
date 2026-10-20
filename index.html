@@ -126,7 +126,7 @@ table.compat td{text-align:left;font-weight:400;font-size:13px;vertical-align:to
 .rel .muted{width:100%;font-size:12px}
 .cklist{padding-left:0;list-style:none;margin:0}.cklist li{padding:8px 0;border-bottom:1px solid var(--line)}.cklist li label{display:flex;gap:8px;align-items:flex-start;font-size:15px;line-height:1.5}.cklist li input{width:18px;height:18px;margin-top:3px;flex:none}.cklist li.done>label span{color:var(--muted);text-decoration:line-through}h3.hl{background:var(--amber-soft);border-radius:6px;transition:background 1s}
 .ivrt{font-size:11px;padding:2px 4px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--muted);max-width:92px;margin-left:auto}
-.abx{display:inline-block;min-width:22px;text-align:center;border-radius:6px;padding:1px 6px;font-weight:700}.abx.ok{background:#E6F4EA;color:#2E7D32}.abx.warn{background:#FFF1E0;color:#B25E00}.abx.ng{background:#FDECEA;color:#C0392B}
+.abx{display:inline-block;min-width:22px;text-align:center;border-radius:6px;padding:1px 6px;font-weight:700}.abx.ok{background:#E6F4EA;color:#2E7D32}.abx.warn{background:#FFF1E0;color:#B25E00}.abx.ng{background:#FDECEA;color:#C0392B}.abx.na{background:#e5e7eb;color:#4b5563}
 .relb{background:var(--teal-soft);border-color:#BFDDE3;color:var(--teal);font-size:13px}
 .fab{position:fixed;right:14px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:6;background:var(--teal);color:#fff;border:0;border-radius:22px;padding:10px 16px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.18)}
 .fab.back{right:auto;left:14px;background:#fff;color:var(--teal);border:1px solid var(--teal);font-weight:600;max-width:60vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2604,6 +2604,11 @@ const CALC_HTML=`
   <div id="cpList" style="margin-top:8px"></div>
   <p class="muted">判定は一般的な配合変化の情報に基づく目安です。最終判断は自施設の配合変化表と薬剤師の確認によります。表にない組み合わせは「情報なし」と表示されます。<br>
   同じルートで流してよい場合でも、側管から入れるときは前後に生食でフラッシュすると安全です。</p>
+  <div class="rq-h" style="margin-top:14px">当院 ICU：薬剤 × 薬剤の配合変化表（46 剤）</div>
+  <div class="row"><div><label>薬剤 1</label><select id="cmA"></select></div><div><label>薬剤 2（任意）</label><select id="cmB"></select></div></div>
+  <div id="cmRes" class="rangebox" style="margin-top:8px"></div>
+  <div id="cmList"></div>
+  <p class="muted" style="margin-top:6px"><span class="abx ok">○</span> 配合可　<span class="abx ng">×</span> 配合不可　<span class="abx warn">△</span> 条件付き・注意　<span class="abx na">−</span> データなし<br>当院 ICU の「薬剤配合変化表」（46 剤 × 46 剤）を写したもの。記号の意味は原本の凡例に従い、不明点・「−」の組み合わせは薬剤師へ相談する。原本の縦横で判定が異なる 1 組（ハンプ × ソルデム1）は慎重な方（△）で表示。表の改訂時はこの画面も更新する。</p>
   <div class="rq-h" style="margin-top:14px">当院：抗菌薬 × 輸液の配合禁忌表（薬剤部）</div>
   <div class="row"><div><label>抗菌薬</label><select id="abxA"></select></div><div><label>輸液</label><select id="abxF"></select></div></div>
   <div id="abxRes" style="margin-top:8px"></div>
@@ -4658,6 +4663,31 @@ GLOSS.push(
 );
 
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
+/* ===== 当院 ICU：薬剤 × 薬剤 配合変化表（46 剤） ===== */
+(function(){
+  const N=["アセリオ", "アタラックスP", "アミオダロン", "イーケプラ", "イノバン注シリンジ0.3%", "エダラボン", "エリル", "オザグレル", "オノアクト", "カルバゾクロムスルホン酸", "グリセリン", "KCL", "硝酸イソソルビド", "ジルチアゼム", "セレネース", "ソセゴン", "ソル・コーテフ", "ソル・メドロール", "ドブタミンシリンジ0.3%", "ニカルジピン", "ニコランジル", "ニトログリセリン", "ノルアドレナリン", "ハンプ", "ピトレシン", "ヒューマリンR", "ファモチジン", "フェンタニル", "プレセデックス", "フロセミド", "プロポフォール", "ヘパリン", "ホストイン", "マンニトール", "ミダゾラム", "メイロン", "メトクロプラミド", "ロピオン", "エルネオパ1号・2号", "ソルデム1", "ソルデム3A", "ソルアセトD", "ソルアセトF", "ビーフリード", "5%ブドウ糖", "ラクテック"];
+  const R=["=tnnnonnooonnooononooononnooooxonoonoxoooooooo", "t=nnnnnnnnnnnntonnnoonnnnnoonnnnnnoxoooonooooo", "nn=nonnnnnnooonnnnoonnnononononxnnonnnnnnnnnon", "nnn=nonnnnonnnnnonnnnnnnnnonnonooxoonnnonoonoo", "nnon=oooooonoonnnxnonnnxnoonnxnnnnnxnnonnonnoo", "onnoo=oooooooonnnnnooonoononnxnoooononnotoooto", "nnnnoo=ooooooonnnnnxoonoonnnnnnooonxonnoooonoo", "nnnnooo=oooooonnnxnxoonoononnononoxnonoooooooo", "onnnoooo=ooooonnnonoooooonononoonooxonnooooooo", "onnnooooo=oooonoxooxoonoonooooxoooonooxooooooo", "onnooooooo=ooonnoonooonoononnonooooooonooooooo", "nnonnoooooo=xonnxxoooonoooxonnoonooxonononnnno", "nnonooooooox=onnnnnooooooooonxoonooxonnoooonoo", "ononooooooooo=nnnnnooonoonnonxonnooxoxnooooooo", "otnnnnnnnnnnnn=onnnoonnnnnoonnnnnnonxoonnnnnoo", "oonnnnnnnonnnno=nnnonnnxnnonoxnnnnonooononnnno", "nnnonnnnnxoxnnnn=onxooxxxnnnnxnxooxonoononnnno", "onnnxnnxoooxnnnno=nxonoxnnnnnooxnnxnxoononnnno", "nnonnnnnnononnnnnn=ooooxnonnnnnonnnnnnnnnnnnoo", "ooonooxxoxooooooxxo=xoooooonoxnxnooxoonnooxxox", "oonnnoooooooooonooox=oooooooxoxonxoooonnoooooo", "onnnnooooooooonnonooo=noooonoxoonooxooxoonnooo", "nnnnnnnnonnnonnnxoooon=xnxnnonnnnnnnnntnnnnnon", "ononxooooooooonxxxxooox=oxoooxoxnooxonntoooxno", "nnnnnooooooooonnxnnooono=nnnnxnonooxonnnonnnno", "nnononnnnnnoonnnnnooooxxn=ooonoonnooxnnnonnnno", "oonooonooooxonoonnnooonono=nnonooooooxooooonoo", "ooonnnnnnonoooonnnnnonnonon=oxoonnonoxononnnnn", "onnnnnnnoonnnnnonnnoxooonono=ooonnxnnnonnooono", "onooxxnonoonxxnxxonxoxnxxnoxo=oooxxoxoxnnnnnoo", "xnnnnnnnoxnooonnnonnxonononooo=onnonxxnnxxxxxx", "onxonoooooooonnnxxoxoonxooooooo=ooxxoxnnonnnno", "nnnonoonnoonnnnnonnnnnnnnnonnono=ononoonoonnno", "onnxnooooooooonnonnoxonoononnxnoo=xxonononnnno", "oooononxooooooooxxnooonoooooxxoxnx=xoxnnonxnno", "nxnoxnxnxnoxxxnnonnxoxnxxoonnonxoxx=ootnonnnnx", "oonnnoooooooooxonxnooonooxoonxxonooo=xnnonnnno", "xonnnnnnnoonnxoooonooonnnnxxnoxxonxox=nnonnonx", "oonnonnonxnonnoooonnnxtnnnoooxnnoontnn=nnnnnnn", "oononoooooonoonnnnnnnontnnonnnnnnnnnnnn=nnnnnn", "onnnntoooooooonooonooonooooonnxooooooonn=nnnnn", "oonoooooooonoonnnnnoonnonnononxnonnnnnnnn=nnnn", "oononoooooonoonnnnnxonnonnononxnnnxnnnnnnn=nnn", "oonnnonoooonnonnnnnxoonxnnnnonxnnnnnnonnnnn=no", "oooootooooonooonnnooooonnnonnoxnnnnnnnnnnnnn=n", "oonooooooooooooooooxoonoooonooxooooxoxnnnnnon="];
+  const LAB={o:'○',x:'×',t:'△',n:'−'};const CLS={o:'ok',x:'ng',t:'warn',n:'na'};
+  const MEAN={o:'配合可（同一ルートで投与できる）',x:'配合不可（同一ルートでの混合・側管投与は避ける）',t:'条件付き・注意（薬剤師に確認してから）',n:'データなし（表に記載がない＝安全とは言えない。薬剤師に確認）'};
+  const A=$('cmA'),B=$('cmB'),res=$('cmRes'),list=$('cmList');
+  const opt=N.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
+  A.innerHTML='<option value="">— 薬剤 1 を選ぶ —</option>'+opt;B.innerHTML='<option value="">— 薬剤 2（任意）—</option>'+opt;
+  const cell=c=>`<span class="abx ${CLS[c]}">${LAB[c]}</span>`;
+  window.__cmxGet=(a,b)=>R[a][b];
+  function run(){const a=A.value,b=B.value;
+    if(a===''){res.className='rangebox';res.innerHTML='薬剤 1 を選ぶと、当院の表 46 剤との配合可否が一覧で出ます。薬剤 2 も選ぶと、その 2 剤の判定だけを大きく表示します';list.innerHTML='';return;}
+    const ai=+a;let html='';
+    if(b!==''&&+b!==ai){const bi=+b,c=R[ai][bi],c2=R[bi][ai];
+      res.className='rangebox'+(c==='x'?' high':'');
+      res.innerHTML=`<b>${N[ai]} × ${N[bi]}：${cell(c)} ${MEAN[c]}</b>${c!==c2?`<div class="rn">表の縦横で判定が異なる（${LAB[c]} / ${LAB[c2]}）。慎重な方で表示。薬剤師に確認</div>`:''}<div class="rn">同一ルートが可でも、側管から入れるときは前後に生食フラッシュ。カテコラミン・鎮静薬のルートに側管は原則つながない</div>`;}
+    else if(b!==''&&+b===ai){res.className='rangebox';res.innerHTML='同じ薬剤が選ばれています';}
+    else{res.className='rangebox';res.innerHTML=`<b>${N[ai]}</b> と各薬剤の配合（当院の表）`;}
+    const g={x:[],t:[],o:[],n:[]};
+    N.forEach((n,i)=>{if(i===ai)return;g[R[ai][i]].push(n);});
+    const sec=(k,t)=>g[k].length?`<div class="rangebox${k==='x'?' high':''}" style="margin-top:8px"><b>${cell(k)} ${t}（${g[k].length}）</b><div class="rn">${g[k].join('、')}</div></div>`:'';
+    list.innerHTML=sec('x','配合不可')+sec('t','条件付き・注意')+sec('o','配合可')+sec('n','データなし');}
+  A.onchange=run;B.onchange=run;run();
+})();
 (function(){const bar=$('catBar');bar.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
 
 /* 血液ガス代償計算 */
@@ -5103,7 +5133,7 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 
 
 /* よく使う・入口・ステッパー（すべて軽い処理） */
-const KNOW_REV='2026 年 10 月 20 日（当院：抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
+const KNOW_REV='2026 年 10 月 20 日（当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
   const SHORT=[['P/F','P/F 比'],['波形','波形の見方'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
