@@ -4688,6 +4688,109 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
     list.innerHTML=sec('x','配合不可')+sec('t','条件付き・注意')+sec('o','配合可')+sec('n','データなし');}
   A.onchange=run;B.onchange=run;run();
 })();
+/* ===== 心不全：ファンタスティック 4（HFrEF の基本 4 剤） ===== */
+FIG.hf4=`<svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="9">
+<text x="170" y="14" font-size="11" fill="#1F2A30" text-anchor="middle" font-weight="700">HFrEF（LVEF 40% 以下）の基本 4 剤＝ファンタスティック 4</text>
+<text x="170" y="27" font-size="8" fill="#6B7A80" text-anchor="middle">4 つを「順番に」ではなく「早く・同時に・少量から」そろえる（入院中に始める）</text>
+<g>
+<rect x="8" y="36" width="76" height="92" rx="7" fill="#E8F1FA" stroke="#3B8BD0" stroke-width="1.5"/>
+<text x="46" y="52" font-size="10" fill="#1E3A5F" text-anchor="middle" font-weight="700">ARNI</text>
+<text x="46" y="63" font-size="7.5" fill="#1E3A5F" text-anchor="middle">（または ACE 阻害薬/ARB）</text>
+<text x="46" y="78" font-size="8" fill="#1F2A30" text-anchor="middle">エンレスト</text>
+<text x="46" y="92" font-size="7" fill="#6B7A80" text-anchor="middle">RAA 系を抑える</text>
+<text x="46" y="102" font-size="7" fill="#6B7A80" text-anchor="middle">＋ BNP を守る</text>
+<text x="46" y="118" font-size="7" fill="#C0392B" text-anchor="middle">血圧↓・K↑・Cr↑</text>
+<rect x="92" y="36" width="76" height="92" rx="7" fill="#FFF1E0" stroke="#E08A2E" stroke-width="1.5"/>
+<text x="130" y="52" font-size="10" fill="#8A4B00" text-anchor="middle" font-weight="700">β 遮断薬</text>
+<text x="130" y="78" font-size="8" fill="#1F2A30" text-anchor="middle">アーチスト</text>
+<text x="130" y="88" font-size="8" fill="#1F2A30" text-anchor="middle">メインテート</text>
+<text x="130" y="102" font-size="7" fill="#6B7A80" text-anchor="middle">心臓を休ませる</text>
+<text x="130" y="118" font-size="7" fill="#C0392B" text-anchor="middle">徐脈・血圧↓・うっ血</text>
+<rect x="176" y="36" width="76" height="92" rx="7" fill="#E6F4EA" stroke="#2E7D32" stroke-width="1.5"/>
+<text x="214" y="52" font-size="10" fill="#1B5E20" text-anchor="middle" font-weight="700">MRA</text>
+<text x="214" y="78" font-size="8" fill="#1F2A30" text-anchor="middle">スピロノラクトン</text>
+<text x="214" y="88" font-size="8" fill="#1F2A30" text-anchor="middle">セララ</text>
+<text x="214" y="102" font-size="7" fill="#6B7A80" text-anchor="middle">線維化を防ぐ</text>
+<text x="214" y="118" font-size="7" fill="#C0392B" text-anchor="middle">K↑・Cr↑</text>
+<rect x="260" y="36" width="76" height="92" rx="7" fill="#F3E8FA" stroke="#8E44AD" stroke-width="1.5"/>
+<text x="298" y="52" font-size="10" fill="#5B2C6F" text-anchor="middle" font-weight="700">SGLT2 阻害薬</text>
+<text x="298" y="78" font-size="8" fill="#1F2A30" text-anchor="middle">フォシーガ</text>
+<text x="298" y="88" font-size="8" fill="#1F2A30" text-anchor="middle">ジャディアンス</text>
+<text x="298" y="102" font-size="7" fill="#6B7A80" text-anchor="middle">心臓と腎臓を守る</text>
+<text x="298" y="118" font-size="7" fill="#C0392B" text-anchor="middle">脱水・ケトン・感染</text>
+</g>
+<rect x="8" y="138" width="328" height="44" rx="6" fill="#F4F8FB" stroke="#B8CCD9"/>
+<text x="14" y="152" font-size="8" fill="#1F2A30" font-weight="700">4 剤そろうと</text>
+<text x="14" y="164" font-size="8" fill="#1F2A30">心血管死＋心不全入院が約 6 割減る（ACE 阻害薬＋β 遮断薬だけと比べて）</text>
+<text x="14" y="176" font-size="8" fill="#1F2A30">発症後 1〜2 年が最も効く時期。外来で「だんだん」では遅い</text>
+<rect x="8" y="190" width="328" height="52" rx="6" fill="#FDECEA" stroke="#C0392B"/>
+<text x="14" y="204" font-size="8" fill="#C0392B" font-weight="700">ICU で「始めない・いったん止める」目安（医師の判断）</text>
+<text x="14" y="215" font-size="7.5" fill="#1F2A30">ショック・強心薬中：β 遮断薬は新規に始めない。ARNI/MRA は血圧が落ち着いてから</text>
+<text x="14" y="226" font-size="7.5" fill="#1F2A30">K 5.0 超・Cr 急上昇：MRA/ARNI を保留。絶食・手術前・ケトン↑：SGLT2 阻害薬を中止</text>
+<text x="14" y="238" font-size="7" fill="#6B7A80">看護師の自己判断で止めない・再開しない。止める理由が消えたら再開を医師に確認</text>
+</svg>`;
+(function(){
+const m=META['心不全の急性期管理']=META['心不全の急性期管理']||{};
+const secs=[
+ {h:'ファンタスティック 4 とは（HFrEF の基本 4 剤）',f:'hf4',b:[
+  'LVEF 40% 以下の心不全（HFrEF）で、生命予後を良くすることが証明された 4 つの薬の総称。①ARNI（ACE 阻害薬/ARB で代用可）、②β 遮断薬、③MRA（ミネラルコルチコイド受容体拮抗薬）、④SGLT2 阻害薬',
+  '日本循環器学会の心不全ガイドライン（2021 フォーカスアップデート → 2025 改訂）、欧州（ESC 2021/2023）、米国（AHA/ACC/HFSA 2022）がいずれもクラス I で推奨。「GDMT（ガイドラインに基づく薬物治療）」「基本 4 剤」とも呼ぶ',
+  '4 剤がそろうと、ACE 阻害薬＋β 遮断薬だけの時代と比べて心血管死・心不全入院が約 6 割減り、余命が数年延びると推定されている（Vaduganathan ら、Lancet 2020）',
+  '昔は「ACE 阻害薬 → β 遮断薬 → MRA」と順番に数か月かけて足していったが、今は「4 剤を早く・同時に・少量から」始めて、退院後 数週間で増量するのが標準（STRONG-HF 試験で早期増量が再入院を減らした）',
+  'ICU に入る急性心不全・心原性ショック・心筋梗塞後の患者が「これから 4 剤を始める人」なので、ICU 看護師が薬の意味と観察点を知っておく意味は大きい'
+ ]},
+ {h:'① ARNI：エンレスト（サクビトリル/バルサルタン）',b:[
+  'ARB（バルサルタン）とネプリライシン阻害薬（サクビトリル）の合剤。RAA 系を抑えつつ、心臓を守る Na 利尿ペプチド（ANP/BNP）を分解されにくくする。ACE 阻害薬より死亡・入院を減らした（PARADIGM-HF）',
+  '用量：50 mg 1 日 2 回から。目標 200 mg 1 日 2 回。血圧が低い人は 50 mg でも難しいことがある',
+  '!ACE 阻害薬から切り替えるときは 36 時間以上あける（血管浮腫のリスク）。ARB からはそのまま切り替え可。ACE 阻害薬との併用は禁忌',
+  '観察：収縮期血圧（100 未満は要相談）、K（5.5 超で保留）、Cr/eGFR（30% 超の悪化で見直し）、血管浮腫（顔・唇・舌の腫れ → 気道の緊急）',
+  '!検査の落とし穴：エンレスト内服中は BNP が「上がる」（分解が抑えられるため）。心不全の指標には NT-proBNP を使う。採血のオーダーを確認する',
+  'ARNI が使えない（血圧・費用・腎）ときは ACE 阻害薬（エナラプリル等）か ARB（カンデサルタン等）で代用。ACE 阻害薬の空咳はブラジキニンのせいで ARB では出ない'
+ ]},
+ {h:'② β 遮断薬：アーチスト（カルベジロール）・メインテート（ビソプロロール）',b:[
+  '交感神経の過剰な刺激から心筋を守り、心拍数を下げて拡張期を長くし、不整脈死を減らす。心不全で証明があるのはカルベジロール・ビソプロロール・メトプロロールコハク酸塩の 3 つ',
+  '用量：アーチスト 1.25〜2.5 mg 1 日 2 回、メインテート 0.625〜1.25 mg 1 日 1 回という「ごく少量」から。目標はアーチスト 20 mg/日、メインテート 5 mg/日。2 週間ごとに倍量',
+  '!急性心不全で「うっ血が強い・強心薬を使っている・ショック」のときは新規に始めない。うっ血が取れ、血行動態が安定してから（典型的には退院前）',
+  'すでに内服していた患者が急性増悪で入院したとき：中止すると再入院・死亡が増えるので「減量して続ける」が基本。中止するのはショック・徐脈・重度低灌流のときだけ（医師の判断）',
+  '観察：心拍数（50 未満は報告）、血圧、起座呼吸・体重増加（始めた直後に一時的にうっ血が悪化しうる）、喘息（カルベジロールは非選択性）、血糖（低血糖の症状を隠す）',
+  '増量期のだるさ・めまいは多くが数週間で慣れる。「効いていない」のではなく「心臓が休んでいる」と患者に説明すると続けやすい'
+ ]},
+ {h:'③ MRA：スピロノラクトン・セララ（エプレレノン）',b:[
+  'アルドステロンを抑えて、心筋の線維化・リモデリングと Na 貯留を防ぐ。死亡を約 3 割減らした（RALES、EMPHASIS-HF）。利尿薬としての力は弱く、目的は「予後改善」',
+  '用量：スピロノラクトン 12.5〜25 mg/日、セララ 25 → 50 mg/日。スピロノラクトンは女性化乳房・乳房痛が出ることがあり、男性はセララに変えることが多い',
+  '!始める条件：K 5.0 mEq/L 未満、eGFR 30 以上。開始後 1 週間・4 週間で K と Cr を再検。K 5.5 超なら減量・中止',
+  '!ICU での落とし穴：ARNI＋MRA＋K 補正＋腎機能悪化が重なると高 K になりやすい。K 製剤の指示が出ているとき、MRA が入っているかを必ず見る。NSAIDs・ST 合剤も K を上げる',
+  '新しい MRA としてフィネレノン（ケレンディア）が HFpEF（EF 40% 超）でも入院を減らした（FINEARTS-HF 2024）'
+ ]},
+ {h:'④ SGLT2 阻害薬：フォシーガ（ダパグリフロジン）・ジャディアンス（エンパグリフロジン）',b:[
+  'もとは糖尿病薬。尿に糖と Na を出し、心臓と腎臓を守る。糖尿病がなくても効き、HFrEF で心血管死・入院を約 25% 減らした（DAPA-HF、EMPEROR-Reduced）。HFpEF でも効く唯一の薬（EMPEROR-Preserved、DELIVER）',
+  '用量：10 mg 1 日 1 回で固定。増量が要らず、血圧・K への影響が小さいので 4 剤の中で一番始めやすい。入院中・利尿薬と同時に始めても安全だった（EMPULSE）',
+  '!正常血糖ケトアシドーシス：血糖が高くないのに（250 未満でも）アシドーシスになる。絶食・脱水・手術・インスリン減量・飲酒が誘因。嘔気・腹痛・倦怠感・頻呼吸・AG 開大 → 尿/血中ケトンを測る',
+  '!手術・絶食のときは中止：予定手術の 3 日前（フォシーガ・ジャディアンス）から休薬。ICU で経口摂取できない・絶食中は続けない（医師に確認）。再開は食事が安定してから',
+  '観察：尿量が増える（浸透圧利尿）ので利尿薬と合わせて脱水・血圧低下・Cr 上昇に注意（開始直後の eGFR 軽度低下は想定内）。性器感染（陰部の痒み・おりもの）、尿路感染、1 型糖尿病・eGFR 20 未満は適応外',
+  '尿糖が常に陽性になるので、尿検査の「尿糖＋」は薬の効果であって血糖コントロール不良ではない'
+ ]},
+ {h:'ICU での始め方と看護の観察（当院の医師の指示が優先）',b:[
+  '始める順番は「患者ごと」：血圧が低ければ SGLT2 阻害薬 → MRA → 少量 β 遮断薬 → ARNI、うっ血が強ければ MRA・SGLT2 阻害薬から、頻脈・虚血があれば β 遮断薬を優先、という組み立て',
+  '目安：強心薬を離脱し、収縮期血圧 90〜100 以上、K 5.0 未満、Cr が安定、経口摂取できる → 4 剤のどれかを始める相談のタイミング。「全部そろえてから退院」が目標',
+  '毎日の観察：体重（同じ条件で）、in/out、血圧（起立性）、心拍数、K・Cr・NT-proBNP、尿量、起座呼吸・浮腫、めまい・ふらつき（転倒）',
+  '報告の目安：収縮期血圧 90 未満または症状のある低血圧、心拍数 50 未満、K 5.5 超、Cr が前日の 1.5 倍、嘔気・腹痛＋頻呼吸（ケトアシドーシス）、顔や舌の腫れ（血管浮腫）',
+  '腎機能・K は「少し悪くなっても続ける」ことが多い：Cr 30% までの上昇・K 5.5 までは、やめるより続けるほうが予後が良い。中止の判断は医師。「数値が動いた」事実と症状を正確に伝える',
+  '薬が増える患者への説明：「心臓を休ませる薬」「心臓と腎臓を守る薬」「むくみと K を調整する薬」と役割で伝える。自己中断が再入院の最大の原因',
+  '4 剤に足す候補（＋α）：イバブラジン（コララン、心拍数 75 以上の洞調律）、ベルイシグアト（ベリキューボ、増悪を繰り返す人）、鉄剤静注（鉄欠乏）、ジゴキシン、ループ利尿薬は「症状の薬」で予後は変えない'
+ ]}
+];
+m.extra=(m.extra||[]).concat(secs);
+})();
+GLOSS.push(
+['ファンタスティック 4','Fantastic Four|基本 4 剤|GDMT|心不全の 4 剤','HFrEF（LVEF 40% 以下）の予後を改善する 4 つの薬：ARNI（または ACE 阻害薬/ARB）・β 遮断薬・MRA・SGLT2 阻害薬。早く・同時に・少量から始める','心不全の急性期管理'],
+['ARNI','アンジオテンシン受容体ネプリライシン阻害薬|エンレスト|サクビトリル/バルサルタン','ARB とネプリライシン阻害薬の合剤。ACE 阻害薬より心不全の予後を改善。ACE 阻害薬からの切り替えは 36 時間あける。内服中は BNP が上がるので NT-proBNP で評価','心不全の急性期管理'],
+['MRA','ミネラルコルチコイド受容体拮抗薬|スピロノラクトン|エプレレノン|セララ|抗アルドステロン薬','アルドステロンを抑えて心筋の線維化と Na 貯留を防ぐ心不全の基本薬。K 5.0 以上・eGFR 30 未満では始めない。高 K に注意','心不全の急性期管理'],
+['SGLT2 阻害薬','フォシーガ|ダパグリフロジン|ジャディアンス|エンパグリフロジン','尿に糖と Na を出して心臓と腎臓を守る薬。糖尿病がなくても心不全（HFrEF・HFpEF とも）で予後を改善。絶食・手術前は中止、正常血糖ケトアシドーシスに注意','心不全の急性期管理'],
+['正常血糖ケトアシドーシス','euglycemic DKA|euDKA','SGLT2 阻害薬で起こる、血糖が高くないケトアシドーシス。絶食・脱水・手術・インスリン減量が誘因。嘔気・腹痛・頻呼吸・AG 開大で疑い、ケトンを測る','心不全の急性期管理'],
+['GDMT','guideline-directed medical therapy|ガイドラインに基づく薬物治療','心不全ガイドラインで推奨される薬物治療のこと。HFrEF では基本 4 剤（ファンタスティック 4）をそろえ、目標用量まで増量することを指す','心不全の急性期管理']
+);
+GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 (function(){const bar=$('catBar');bar.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
 
 /* 血液ガス代償計算 */
@@ -5133,7 +5236,7 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 
 
 /* よく使う・入口・ステッパー（すべて軽い処理） */
-const KNOW_REV='2026 年 10 月 20 日（当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
+const KNOW_REV='2026 年 10 月 20 日（心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
   const SHORT=[['P/F','P/F 比'],['波形','波形の見方'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
