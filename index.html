@@ -2497,6 +2497,43 @@ const CALC_HTML=`
   </div>
 </details>
 <details class="card o2card">
+  <summary>膠質浸透圧（COP）とアルブミンで引ける水分</summary>
+  <div class="body">
+  <div class="row"><div><label>総蛋白（TP）</label><div class="unit"><input type="number" inputmode="decimal" id="cpTP" placeholder="例 5.2" step="0.1"><span>g/dL</span></div></div>
+  <div><label>アルブミン（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="cpAlb" placeholder="例 2.4" step="0.1"><span>g/dL</span></div></div></div>
+  <div class="result"><div class="muted" style="font-size:12px">血中膠質浸透圧（推定）＝ TP × 4 − 0.8</div><div class="big"><span id="cpN">－</span><em>mmHg</em></div><div class="sub" id="cpS">総蛋白を入力（正常 約 28 mmHg）</div></div>
+  <div id="cpNote" class="rangebox" style="display:none"></div>
+  <div class="rq-h" style="margin-top:14px">アルブミン製剤で血管内に引ける水分の目安</div>
+  <div class="row"><div><label>製剤</label><select id="cpPrep"><option value="12.5">25% 50 mL（12.5 g）</option><option value="25">25% 100 mL（25 g）</option><option value="12.5b">5% 250 mL（12.5 g）</option><option value="10">20% 50 mL（10 g）</option></select></div>
+  <div><label>本数</label><div class="unit"><input type="number" inputmode="decimal" id="cpBot" value="1" min="1" step="1"><span>本</span></div></div></div>
+  <div class="rangebox" id="cpAlbBox" style="margin-top:8px"></div>
+  <table class="o2" style="margin-top:8px;font-size:12px"><tr><th>COP</th><th>意味</th></tr>
+  <tr><td><b>28 前後</b></td><td style="text-align:left;font-weight:400">正常。血管内に水を保つ力が十分</td></tr>
+  <tr><td><b>20〜25</b></td><td style="text-align:left;font-weight:400">低下。浮腫が出やすい。輸液が血管内にとどまりにくい</td></tr>
+  <tr><td><b>20 以下</b></td><td style="text-align:left;font-weight:400">乏尿・浮腫・肺水腫が出現しうる。輸液反応性と合わせて、アルブミン補充を医師と相談</td></tr></table>
+  <p class="muted">膠質浸透圧（コロイド浸透圧）は、血漿の蛋白が血管内に水を引き留める力。アルブミンがその約 80% を担う（1 g のアルブミンで約 5 mmHg、約 17 mL の水を血管内に引く）。蛋白が減ると水が間質へ漏れ、浮腫・胸水・腹水になり、血管内は足りないのに体は水浸しという状態になる。<br>
+  式は総蛋白からの推定（Landis‐Pappenheimer の近似）。実測は膠質浸透圧計が要る。静注したアルブミンは 10〜15 分で血管内に行き渡り、血管外へ抜けるまで数日〜約 1 週間。半減期は約 15〜20 日（肝硬変・蛋白喪失では延長）。<br>
+  <b>当院・医師の指示が優先。</b>アルブミン製剤の適応は『科学的根拠に基づいたアルブミン製剤の使用ガイドライン』（日本輸血・細胞治療学会）に沿って医師が判断する。敗血症の初期蘇生や低アルブミン血症そのものへのルーチン投与は推奨されない。</p>
+  </div>
+</details>
+<details class="card o2card">
+  <summary>周術期の体液喪失：術前の欠損・術中の喪失・維持輸液</summary>
+  <div class="body">
+  <div class="row"><div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="poW" placeholder="例 60" step="0.1"><span>kg</span></div></div>
+  <div><label>絶食（絶飲）時間</label><div class="unit"><input type="number" inputmode="decimal" id="poF" placeholder="例 12" step="0.5"><span>時間</span></div></div></div>
+  <div class="row"><div><label>手術の種類</label><select id="poT"><option value="ab_up">開腹：上腹部（5〜15）</option><option value="ab_lo">開腹：下腹部（5〜10）</option><option value="chest">開胸（3〜8）</option><option value="brain">脳・頭部（2〜5）</option><option value="minor">表在・四肢（0〜2）</option></select></div>
+  <div><label>手術時間</label><div class="unit"><input type="number" inputmode="decimal" id="poH" placeholder="例 4" step="0.5"><span>時間</span></div></div></div>
+  <div class="row"><div><label>出血（ガーゼ重量・任意）</label><div class="unit"><input type="number" inputmode="decimal" id="poG" placeholder="例 200" step="10"><span>g</span></div></div>
+  <div><label>吸引出血量（任意）</label><div class="unit"><input type="number" inputmode="decimal" id="poS" placeholder="例 300" step="10"><span>mL</span></div></div></div>
+  <div class="result"><div class="muted" style="font-size:12px">術中までの喪失の合計（推定）</div><div class="big"><span id="poN">－</span><em>mL</em></div><div class="sub" id="poSub">体重・絶食時間・手術時間を入力</div></div>
+  <table class="o2" id="poTbl" style="margin-top:8px;font-size:12px"></table>
+  <div id="poNote" class="rangebox" style="display:none"></div>
+  <p class="muted">古典的な外科輸液の目安（教科書の値）。術前の欠損＝ 2 mL × 体重 × 絶食時間。術中の体液喪失（サードスペースへの移動・蒸散）＝ 手術の種類ごとの mL/kg/時間 × 手術時間、3 時間を超えた分は半分で計算。開腹中の不感蒸泄 1 mL/kg/時間。出血はガーゼ重量 × 1.5 ＋ 吸引量。維持輸液は 4‐2‐1 ルール（10 kg まで 4 mL/kg/h、次の 10 kg は 2、以降 1）。<br>
+  ICU で使う場面：帰室時に「術中どれだけ失って、どれだけ入ったか」を見積もり、術後の尿量・血圧・乳酸と照らす。近年は ERAS や目標指向型輸液（GDFT）で「入れすぎない」方向にあり、この値は上限の目安。<b>実際の輸液は麻酔記録と医師の指示が優先。</b></p>
+  </div>
+</details>
+
+<details class="card o2card">
   <summary>輸血：予測 Hb 上昇と必要単位数</summary>
   <div class="body">
   <div class="row"><div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="tW" placeholder="例 55"><span>kg</span></div></div>
@@ -4356,7 +4393,7 @@ dka:'糖尿病性ケトアシドーシス（DKA）と高血糖高浸透圧状態
 const KID_R=Object.fromEntries(Object.entries(KID).map(([a,b])=>[b,a]));
 /* 計算ツールの固定ID → カードの見出しに含まれる文字 */
 const CALC_ID={gamma:'__gamma',pf:'P/F 比',rhythm:'波形の見方',rsbi:'RSBI',dose:'投与量の目安',rox:'ROX',pbw:'予測体重',nutrition:'栄養：必要',harris:'ハリス',iwl:'不感蒸泄',
-  abg:'血液ガス：予測',meylon:'メイロン',electrolyte:'電解質の補正',buncr:'BUN/Cr',transfusion:'輸血：予測',hemodynamics:'血行動態',compat:'配合変化'};
+  abg:'血液ガス：予測',meylon:'メイロン',electrolyte:'電解質の補正',buncr:'BUN/Cr',transfusion:'輸血：予測',hemodynamics:'血行動態',compat:'配合変化',cop:'膠質浸透圧',periop:'周術期'};
 const kidOf=t=>KID_R[t]||null;
 function showPage(p){const b=document.querySelector(`nav button[data-p="${p}"]`);if(b)b.click();return !!b;}
 /* 知識メモを ID（またはタイトル）で直接開く。sec は見出しの一部（省略可） */
@@ -5013,12 +5050,12 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 
 
 /* よく使う・入口・ステッパー（すべて軽い処理） */
-const KNOW_REV='2026 年 10 月 17 日（重症頭部外傷と DAI を追加）';
+const KNOW_REV='2026 年 10 月 20 日（膠質浸透圧・周術期輸液の計算と知識を追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
   const SHORT=[['P/F','P/F 比'],['波形','波形の見方'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
     ['血ガス','血液ガス：予測'],['栄養','必要エネルギー'],['ハリス','ハリス'],['不感蒸泄','不感蒸泄'],
-    ['メイロン','メイロン'],['BUN/Cr','BUN/Cr'],['輸血','輸血：予測'],['血行動態','血行動態'],['配合変化','配合変化'],['薬剤の目安','投与量の目安']];
+    ['メイロン','メイロン'],['BUN/Cr','BUN/Cr'],['輸血','輸血：予測'],['血行動態','血行動態'],['配合変化','配合変化'],['薬剤の目安','投与量の目安'],['膠質浸透圧','膠質浸透圧'],['周術期の喪失','周術期']];
   const box=$('calcFav'); let use={};
   const cards=()=>[...document.querySelectorAll('#p-calc details')];
   const draw=()=>{
@@ -5183,7 +5220,8 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
     '循環':['波形の見方','血行動態','輸血：予測'],
     '薬剤':['__gamma','投与量の目安','配合変化'],
     '電解質':['電解質の補正','メイロン','BUN/Cr'],
-    '栄養':['栄養：必要','ハリス','不感蒸泄']
+    '栄養':['栄養：必要','ハリス','不感蒸泄'],
+    '輸液':['膠質浸透圧','周術期']
   };
   const seg=$('calcSeg'), top=$('calcTop');
   const cards=[...document.querySelectorAll('#p-calc > details')];
@@ -5453,6 +5491,75 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
   window.__srReset=()=>{IDX=null;};
 })();
 
+/* 膠質浸透圧 */
+(function(){
+  const v=id=>parseFloat($(id).value);
+  const run=()=>{const tp=v('cpTP'),alb=v('cpAlb');const N=$('cpNote');
+    if(!(tp>0)){$('cpN').textContent='－';$('cpS').textContent='総蛋白を入力（正常 約 28 mmHg）';N.style.display='none';albBox();return;}
+    const cop=tp*4-0.8;$('cpN').textContent=fmt(cop,1);
+    $('cpS').innerHTML=`${tp} × 4 − 0.8 ＝ <b>${fmt(cop,1)} mmHg</b>${alb>0?`（アルブミン ${alb} g/dL は全体の約 ${fmt(alb/tp*100,0)}%）`:''}`;
+    let cls='',msg='';
+    if(cop<=20){cls='high';msg=`<b>${fmt(cop,1)} mmHg：20 以下 → 乏尿・浮腫・肺水腫が出うる</b><div class="rn">輸液しても血管内にとどまりにくい。尿量・浮腫・胸部X線・酸素化を見て、輸液反応性と一緒に報告。アルブミン補充の適応は医師が判断</div>`;}
+    else if(cop<25){msg=`<b>${fmt(cop,1)} mmHg：やや低下</b><div class="rn">浮腫が出やすい。蛋白の摂取（栄養）、尿・ドレーンからの蛋白喪失、肝機能を確認</div>`;}
+    else {msg=`<b>${fmt(cop,1)} mmHg：おおむね正常範囲</b>`;}
+    N.style.display='';N.className='rangebox '+cls;N.innerHTML=msg;albBox();};
+  const albBox=()=>{const sel=$('cpPrep').value;const g=parseFloat(sel);const bot=Math.max(1,parseInt($('cpBot').value)||1);const tot=g*bot;
+    const isIso=sel==='12.5b';
+    // 血漿量 ~ 40 mL/kg(体重未入力なら70kg) : 1 g/dL 上昇に必要な g = 血漿量(dL)
+    const W=parseFloat(($('nuW')&&$('nuW').value)||($('ivWt')&&$('ivWt').value)||70)||70;const pv=W*40/100;// dL
+    const dAlb=tot/pv;const dCop=dAlb*5;
+    $('cpAlbBox').innerHTML=`${$('cpPrep').options[$('cpPrep').selectedIndex].text} × ${bot} 本 ＝ アルブミン <b>${fmt(tot,1)} g</b><div class="rn">血管内に引ける水分の目安：約 <b>${Math.round(tot*17)} mL</b>（1 g あたり約 17 mL）${isIso?'。5% 製剤は等張なので「引く」より「補う」（投与量そのものが血管内に入る）':''}<br>血清アルブミンの上昇の目安：約 <b>${fmt(dAlb,1)} g/dL</b>（体重 ${fmt(W,0)} kg・血漿量 40 mL/kg と仮定）→ 膠質浸透圧 約 ＋${fmt(dCop,1)} mmHg<br>投与後は血管内が増えるので、血圧・尿量・呼吸状態（肺うっ血）を見る。25% 製剤は静注速度に注意</div>`;};
+  ['cpTP','cpAlb'].forEach(i=>$(i).addEventListener('input',run));
+  ['cpPrep','cpBot'].forEach(i=>$(i).addEventListener('input',albBox));$('cpPrep').addEventListener('change',albBox);
+  albBox();
+})();
+/* 周術期の体液喪失 */
+(function(){
+  const v=id=>parseFloat($(id).value);
+  const RATE={ab_up:[5,15],ab_lo:[5,10],chest:[3,8],brain:[2,5],minor:[0,2]};
+  const run=()=>{const W=v('poW'),F=v('poF'),H=v('poH'),G=v('poG'),S=v('poS');const T=$('poTbl'),N=$('poNote');
+    if(!(W>0)){$('poN').textContent='－';$('poSub').textContent='体重・絶食時間・手術時間を入力';T.innerHTML='';N.style.display='none';return;}
+    const maint=W<=10?W*4:W<=20?40+(W-10)*2:60+(W-20)*1;
+    const fast=F>0?2*W*F:0;
+    const [lo,hi]=RATE[$('poT').value];
+    const effH=H>0?(Math.min(H,3)+Math.max(0,H-3)*0.5):0;
+    const op=[lo*W*effH,hi*W*effH];
+    const isAb=$('poT').value.startsWith('ab');
+    const ins=isAb&&H>0?1*W*H:0;
+    const bleed=(G>0?G*1.5:0)+(S>0?S:0);
+    const totLo=fast+op[0]+ins+bleed,totHi=fast+op[1]+ins+bleed;
+    $('poN').textContent=`${Math.round(totLo).toLocaleString('ja-JP')}〜${Math.round(totHi).toLocaleString('ja-JP')}`;
+    $('poSub').innerHTML=`術前の欠損 ＋ 術中の喪失 ＋ 出血（維持輸液は別）`;
+    const rows=[];
+    rows.push(['維持輸液（4‐2‐1）','体重から',`${Math.round(maint)} mL/h（${Math.round(maint*24).toLocaleString('ja-JP')} mL/日）`]);
+    rows.push(['術前の欠損',F>0?`2 mL × ${W} kg × ${F} 時間`:'絶食時間を入力',F>0?Math.round(fast)+' mL':'－']);
+    rows.push(['術中の体液喪失',H>0?`${lo}〜${hi} mL/kg/h × ${effH===H?H+' 時間':`（3 時間＋残り ${fmt(H-3,1)} 時間の半分）`}`:'手術時間を入力',H>0?`${Math.round(op[0])}〜${Math.round(op[1])} mL`:'－']);
+    if(isAb)rows.push(['開腹中の不感蒸泄',H>0?`1 mL/kg/h × ${H} 時間`:'',H>0?Math.round(ins)+' mL':'－']);
+    if(bleed>0)rows.push(['出血',`${G>0?`ガーゼ ${G} g × 1.5`:''}${G>0&&S>0?' ＋ ':''}${S>0?`吸引 ${S} mL`:''}`,Math.round(bleed)+' mL']);
+    rows.push(['<b>合計（維持を除く）</b>','',`<b>${Math.round(totLo)}〜${Math.round(totHi)} mL</b>`]);
+    if(H>0)rows.push(['参考：手術中の維持輸液','維持 × 手術時間',Math.round(maint*H)+' mL']);
+    T.innerHTML='<tr><th style="width:92px">項目</th><th>計算</th><th>量</th></tr>'+rows.map(r=>`<tr><td style="text-align:left">${r[0]}</td><td style="text-align:left;font-weight:400;font-size:12px">${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+    N.style.display='';N.className='rangebox';
+    N.innerHTML=`<b>帰室時の見方</b><div class="rn">麻酔記録の「輸液量 − 出血 − 尿量」と、この見積もりを比べる。見積もりより入っていなければ術後の乏尿・頻脈・乳酸上昇に注意、はるかに多ければ術後の浮腫・酸素化悪化・体重増加に注意。術後 1〜3 日目に間質の水が血管内へ戻る（リフィリング）ので、尿量が増える時期に合わせて輸液を減らす。</div>`;};
+  ['poW','poF','poH','poG','poS'].forEach(i=>$(i).addEventListener('input',run));$('poT').addEventListener('change',run);
+})();
+
+/* ===== 追加知識：アルブミン・周術期輸液（外科輸液の古典的目安） ===== */
+(function(){
+const add=(t,secs)=>{const m=META[t]=META[t]||{};m.extra=[...(m.extra||[]),...secs];};
+add('輸血',[{h:'アルブミンの生理と製剤（膠質浸透圧）',b:['体内のアルブミンは 4〜5 g/kg。そのうち血管内に約 40%、血管外（間質）に約 60% がある','静注したアルブミンは 10〜15 分で血管内に行き渡り、血管外へ移るには約 7 日かかる。半減期は約 15〜20 日。肝硬変や蛋白喪失（ネフローゼ・熱傷・腸管）では異化が減って半減期が延びる','役割は 3 つ：① 血中膠質浸透圧の維持（約 80% を担う）② 薬や物質を運ぶ（キャリア蛋白）③ 体内の予備アミノ酸源','膠質浸透圧（mmHg）≒ 総蛋白（g/dL）× 4 − 0.8。正常 約 28。20 以下で乏尿・浮腫・肺水腫が出うる（計算タブ「膠質浸透圧」）','アルブミン 1 g で約 5 mmHg、約 17 mL の水を血管内に引く。25% 50 mL（12.5 g）1 本で約 200 mL 相当。等張の 5% 製剤は「引く」より「補う」','!適応は『科学的根拠に基づいたアルブミン製剤の使用ガイドライン』に沿って医師が判断。低アルブミン血症の数字を上げる目的だけの投与、敗血症初期蘇生のルーチン投与は推奨されない。術後・肝硬変の腹水穿刺後・SBP・肝腎症候群などに適応がある','投与後に見る：血圧・尿量・呼吸状態（肺うっ血）、25% 製剤は急速静注で循環負荷。投与量と反応（尿量・浮腫）を記録して共有']}]);
+add('体液量の評価',[{h:'周術期の体液喪失の見積もり（外科輸液の古典的目安）',b:['維持輸液：4‐2‐1 ルール。10 kg まで 4 mL/kg/h、次の 10 kg は 2、以降 1（60 kg で 100 mL/h）。1 日では 10 kg 以下 100 mL/kg、10〜20 kg は 1,000＋50 mL/kg、20 kg 以上は 1,500＋20 mL/kg','術前の欠損：絶食で 2 mL/kg/時間（60 kg・12 時間で約 1.4 L）。緊急手術では嘔吐・下痢・イレウス・出血の分も','術中の喪失（サードスペースへの移動・蒸散）：開腹 5〜15 mL/kg/h（上腹部＞下腹部）、開胸 3〜8、脳 2〜5、表在 0〜2。3 時間を超えると半分程度。開腹中の不感蒸泄 1 mL/kg/h、体腔への貯留 500〜800 mL、出血はガーゼ重量 × 1.5（計算タブ「周術期」）','麻酔の影響：体液代謝はほとんど変えないが、血管拡張で相対的に循環血漿量が減り、腎血流も低下する','循環血漿量低下のサイン：尿量 0.5 mL/kg/h 以下（50 kg で 25 mL/h 以下）、血圧低下、脈圧減少、頻脈、CVP 3 cmH₂O 以下、PAWP 5 mmHg 以下','2‐to‐5 cm ルール（古典的な輸液負荷の判定）：等張液 50〜200 mL を 10 分で入れ、CVP が 2 cmH₂O 以上上がらなければ同じ輸液を続け、5 以上上がれば輸液を止めて昇圧薬や利尿薬を考え、2〜5 ならそのまま 10 分後に再評価して繰り返す。現在は下肢挙上テストや動的指標（SVV・PPV）の方が信頼される','術後 1〜3 日に間質の水が血管内へ戻る（リフィリング）。尿量が増えるこの時期は輸液を減らさないと心不全・肺水腫になる','!現在の標準は ERAS・目標指向型輸液（GDFT）で「入れすぎない」。上の数値は喪失量の上限の目安として使い、実際の輸液は麻酔記録と医師の指示に従う']}]);
+add('腸切除・胃切除の術後管理',[{h:'術式別の輸液・栄養のポイント（外科の古典的知識）',b:['肝切除：日本の肝癌は B・C 型肝炎からの肝硬変が多く、術後に肝性昏睡に陥るリスクがある。予防にアミノレバン（分岐鎖アミノ酸）を使うことがある（施設による）。黄疸・アンモニア・意識・血糖（肝の糖新生低下で低血糖）を見る','食道癌手術：高齢で多臓器の機能低下を合併し、嚥下困難で低蛋白・貧血があり、放射線治療後のことも多い。開胸開腹の大きな侵襲で、術後は再建食道を使うため経腸栄養か TPN で栄養管理。反回神経麻痺（嗄声・誤嚥）、縫合不全、肺炎に注意','胃癌手術：幽門狭窄があれば術前から TPN。胃液喪失（嘔吐・胃管）で低 Cl 性アルカローシスになるので術前に補正。術後は TPN か早期経腸栄養','ビタミン B12：回腸で吸収されるが、胃の壁細胞が出す内因子が必要。胃全摘や回腸切除では吸収できず、数年後に悪性貧血が起こるので補給（注射）が必要','手術侵襲と血糖（surgical diabetes）：手術でインスリン抵抗性が上がり、糖利用低下・脂肪分解・蛋白崩壊が起こる。インスリンを使いながら糖を入れる。現在の目標血糖は 140〜180 mg/dL（かつての 100〜200 より厳しい上限）。尿糖・ケトンも参考','経腸栄養（EN）が静脈栄養（TPN）より優れる：腸管免疫を保ち、感染とバクテリアルトランスロケーション（腸内細菌が全身へ移る）を防ぐ。1993 年の ASPEN ガイドライン以降の原則。「腸が使えるなら腸を使う」','!数値は古典的な外科輸液の教科書の値。ERAS・最新ガイドライン・当院の術後パスが優先']}]);
+GLOSS.push(
+['膠質浸透圧','コロイド浸透圧|COP|colloid osmotic pressure','血漿の蛋白（主にアルブミン）が水を血管内に引き留める力。約 28 mmHg。総蛋白 × 4 − 0.8 で推定。20 以下で浮腫・肺水腫','輸血'],
+['サードスペース','third space|第三腔','手術や炎症で血管内から間質・体腔へ移動し、循環に使えなくなった体液。開腹で 5〜15 mL/kg/h が目安。術後 1〜3 日で血管内へ戻る（リフィリング）','体液量の評価'],
+['4‐2‐1 ルール','維持輸液の計算|4-2-1','維持輸液の目安。10 kg まで 4 mL/kg/h、次の 10 kg は 2、以降 1 mL/kg/h。60 kg で約 100 mL/h','体液量の評価'],
+['リフィリング','refilling|利尿期','術後 1〜3 日に間質へ逃げていた水が血管内へ戻り、尿量が増える時期。輸液を減らさないと肺水腫・心不全','体液量の評価'],
+['バクテリアルトランスロケーション','bacterial translocation|BT','腸管粘膜の萎縮・透過性亢進で腸内細菌や毒素が血液やリンパに移行すること。絶食・TPN 長期で起こりやすく、経腸栄養で防ぐ','腸切除・胃切除の術後管理']
+);
+})();
+
+GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 loadDrugs(); loadKnow(); calc();
 
 </script>
