@@ -2497,6 +2497,32 @@ const CALC_HTML=`
   </div>
 </details>
 <details class="card o2card">
+  <summary>体液の見える化：区画・消化液の組成・喪失の評価（NICE CG174）</summary>
+  <div class="body">
+  <div class="row"><div><label>体重</label><div class="unit"><input type="number" inputmode="decimal" id="bfW" placeholder="例 60" step="0.1"><span>kg</span></div></div>
+  <div><label>性別・年齢</label><select id="bfS"><option value="m">男性（成人）</option><option value="f">女性（成人）</option><option value="e">高齢（65 歳以上）</option></select></div></div>
+  <div id="bfComp" style="margin-top:6px"></div>
+  <div class="rq-h" style="margin-top:14px">消化液など 1 日の分泌量と組成（mEq/L）</div>
+  <div id="bfSec"></div>
+  <div class="rq-h" style="margin-top:14px">目の前の患者の喪失（24 時間分を入力）</div>
+  <div class="row"><div><label>胃管・嘔吐</label><div class="unit"><input type="number" inputmode="decimal" id="bfL_g" placeholder="0" step="10"><span>mL</span></div></div>
+  <div><label>胆汁ドレーン</label><div class="unit"><input type="number" inputmode="decimal" id="bfL_b" placeholder="0" step="10"><span>mL</span></div></div></div>
+  <div class="row"><div><label>膵液・小腸瘻・イレウス管</label><div class="unit"><input type="number" inputmode="decimal" id="bfL_s" placeholder="0" step="10"><span>mL</span></div></div>
+  <div><label>下痢・回腸ストーマ</label><div class="unit"><input type="number" inputmode="decimal" id="bfL_d" placeholder="0" step="10"><span>mL</span></div></div></div>
+  <div class="row"><div><label>多量の発汗・発熱</label><select id="bfL_w"><option value="0">なし</option><option value="300">発熱 38℃ 台（＋300）</option><option value="600">39℃ 以上・多汗（＋600）</option><option value="1000">高温環境・大量発汗（＋1,000）</option></select></div>
+  <div><label>尿量（24 時間）</label><div class="unit"><input type="number" inputmode="decimal" id="bfL_u" placeholder="例 1200" step="10"><span>mL</span></div></div></div>
+  <div id="bfLoss" style="margin-top:8px"></div>
+  <div class="rq-h" style="margin-top:14px">循環血液量が足りないサイン（NICE CG174：当てはまるものをタップ）</div>
+  <div class="drchips" id="bfSign"></div>
+  <div id="bfAss" class="rangebox" style="margin-top:8px;display:none"></div>
+  <p class="muted">区画：体重の約 60%（男性）・50〜55%（女性・高齢）が水。そのうち 2/3 が細胞内、1/3 が細胞外（間質 3/4・血漿 1/4）。循環血液量は約 70 mL/kg。<br>
+  消化液は 1 日に約 7〜8 L 分泌されほぼ全部が再吸収される。外に出る（胃管・ドレーン・下痢・瘻）と、その液の組成に応じた電解質と酸塩基の異常が出る：胃液 → Cl・H⁺ を失い<b>低 Cl 性代謝性アルカローシス</b>＋低 K、膵液・胆汁・小腸液・下痢 → HCO₃⁻ を失い<b>代謝性アシドーシス</b>＋低 K・低 Na。補充は「失ったものに近い液で」（NICE：replace like with like）。<br>
+  NICE CG174（Intravenous fluid therapy in adults in hospital, 2013／2017 更新）の 5R：<b>R</b>esuscitation（蘇生：晶質液 500 mL を 15 分以内、再評価、2,000 mL 入れても不安定なら専門家へ）・<b>R</b>outine maintenance（維持：水 25〜30 mL/kg/日、Na・K・Cl 各約 1 mmol/kg/日、ブドウ糖 50〜100 g/日。肥満は理想体重、高齢・腎不全・心不全は 20〜25 mL/kg）・<b>R</b>eplacement（喪失の補充）・<b>R</b>edistribution（再分布：浮腫・敗血症・低 Alb）・<b>R</b>eassessment（再評価：毎日の体重・in/out・電解質）。<br>
+  <b>数値は一般的な目安。輸液の内容と量は医師の指示が優先。</b>電解質の推定は「組成 × 量」の机上計算で、実測（血液・尿・排液の電解質）に置き換えていく。</p>
+  </div>
+</details>
+
+<details class="card o2card">
   <summary>膠質浸透圧（COP）とアルブミンで引ける水分</summary>
   <div class="body">
   <div class="row"><div><label>総蛋白（TP）</label><div class="unit"><input type="number" inputmode="decimal" id="cpTP" placeholder="例 5.2" step="0.1"><span>g/dL</span></div></div>
@@ -4393,7 +4419,7 @@ dka:'糖尿病性ケトアシドーシス（DKA）と高血糖高浸透圧状態
 const KID_R=Object.fromEntries(Object.entries(KID).map(([a,b])=>[b,a]));
 /* 計算ツールの固定ID → カードの見出しに含まれる文字 */
 const CALC_ID={gamma:'__gamma',pf:'P/F 比',rhythm:'波形の見方',rsbi:'RSBI',dose:'投与量の目安',rox:'ROX',pbw:'予測体重',nutrition:'栄養：必要',harris:'ハリス',iwl:'不感蒸泄',
-  abg:'血液ガス：予測',meylon:'メイロン',electrolyte:'電解質の補正',buncr:'BUN/Cr',transfusion:'輸血：予測',hemodynamics:'血行動態',compat:'配合変化',cop:'膠質浸透圧',periop:'周術期'};
+  abg:'血液ガス：予測',meylon:'メイロン',electrolyte:'電解質の補正',buncr:'BUN/Cr',transfusion:'輸血：予測',hemodynamics:'血行動態',compat:'配合変化',cop:'膠質浸透圧',periop:'周術期',fluid:'体液の見える化'};
 const kidOf=t=>KID_R[t]||null;
 function showPage(p){const b=document.querySelector(`nav button[data-p="${p}"]`);if(b)b.click();return !!b;}
 /* 知識メモを ID（またはタイトル）で直接開く。sec は見出しの一部（省略可） */
@@ -5050,12 +5076,12 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 
 
 /* よく使う・入口・ステッパー（すべて軽い処理） */
-const KNOW_REV='2026 年 10 月 20 日（膠質浸透圧・周術期輸液の計算と知識を追加）';
+const KNOW_REV='2026 年 10 月 20 日（体液の見える化・膠質浸透圧・周術期輸液を追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
   const SHORT=[['P/F','P/F 比'],['波形','波形の見方'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
     ['血ガス','血液ガス：予測'],['栄養','必要エネルギー'],['ハリス','ハリス'],['不感蒸泄','不感蒸泄'],
-    ['メイロン','メイロン'],['BUN/Cr','BUN/Cr'],['輸血','輸血：予測'],['血行動態','血行動態'],['配合変化','配合変化'],['薬剤の目安','投与量の目安'],['膠質浸透圧','膠質浸透圧'],['周術期の喪失','周術期']];
+    ['メイロン','メイロン'],['BUN/Cr','BUN/Cr'],['輸血','輸血：予測'],['血行動態','血行動態'],['配合変化','配合変化'],['薬剤の目安','投与量の目安'],['体液の見える化','体液の見える化'],['膠質浸透圧','膠質浸透圧'],['周術期の喪失','周術期']];
   const box=$('calcFav'); let use={};
   const cards=()=>[...document.querySelectorAll('#p-calc details')];
   const draw=()=>{
@@ -5221,7 +5247,7 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
     '薬剤':['__gamma','投与量の目安','配合変化'],
     '電解質':['電解質の補正','メイロン','BUN/Cr'],
     '栄養':['栄養：必要','ハリス','不感蒸泄'],
-    '輸液':['膠質浸透圧','周術期']
+    '輸液':['体液の見える化','膠質浸透圧','周術期']
   };
   const seg=$('calcSeg'), top=$('calcTop');
   const cards=[...document.querySelectorAll('#p-calc > details')];
@@ -5490,6 +5516,84 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
   // データが変わったら索引を作り直す
   window.__srReset=()=>{IDX=null;};
 })();
+
+/* 体液の見える化 */
+(function(){
+  const v=id=>parseFloat($(id).value);
+  const C={na:'#0E6F80',k:'#B7791F',cl:'#4E9A51',hco3:'#7B5EA7'};
+  const SEC=[
+    {n:'唾液',vol:'1〜1.5 L',na:10,k:26,cl:10,hco3:30,note:'K・HCO₃ が多い'},
+    {n:'胃液',vol:'1.5〜2.5 L',na:60,k:10,cl:130,hco3:0,note:'Cl と H⁺ が多い → 失うとアルカローシス'},
+    {n:'胆汁',vol:'0.5〜1 L',na:145,k:5,cl:100,hco3:35,note:'ほぼ細胞外液に近い'},
+    {n:'膵液',vol:'0.5〜1.5 L',na:140,k:5,cl:75,hco3:115,note:'HCO₃ が非常に多い → 失うとアシドーシス'},
+    {n:'小腸液',vol:'2〜3 L',na:140,k:5,cl:104,hco3:30,note:'イレウス・小腸瘻'},
+    {n:'下痢・回腸ストーマ',vol:'',na:60,k:30,cl:40,hco3:30,note:'K・HCO₃ を失う'},
+    {n:'汗',vol:'0.1〜0.5 L',na:50,k:5,cl:55,hco3:0,note:'低張。発熱・高温で増える'}];
+  const KEY={g:'胃液',b:'胆汁',s:'小腸液',d:'下痢・回腸ストーマ',w:'汗'};
+  function comp(){const W=v('bfW');const s=$('bfS').value;const B=$('bfComp');
+    if(!(W>0)){B.innerHTML='<div class="muted" style="font-size:12px">体重を入れると、この患者の体液区画（L）が出ます</div>';return;}
+    const f=s==='m'?0.6:s==='f'?0.5:0.5;const tbw=W*f,icf=tbw*2/3,ecf=tbw/3,isf=ecf*3/4,pl=ecf/4,bv=W*0.07;
+    const w=320,x0=10;const sc=w/tbw;
+    let svg=`<svg viewBox="0 0 340 150" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="9">`;
+    svg+=`<text x="10" y="12" font-weight="700" font-size="10">体内の水 ${tbw.toFixed(1)} L（体重 ${W} kg の ${Math.round(f*100)}%）</text>`;
+    svg+=`<rect x="${x0}" y="20" width="${icf*sc}" height="34" fill="#EEF5F7" stroke="#0E6F80" rx="4"/><text x="${x0+icf*sc/2}" y="34" text-anchor="middle" font-weight="700" fill="#0E6F80">細胞内液</text><text x="${x0+icf*sc/2}" y="48" text-anchor="middle" fill="#0E6F80">${icf.toFixed(1)} L（2/3）</text>`;
+    svg+=`<rect x="${x0+icf*sc}" y="20" width="${isf*sc}" height="34" fill="#FFF6E5" stroke="#B7791F" rx="4"/><text x="${x0+icf*sc+isf*sc/2}" y="34" text-anchor="middle" font-weight="700" fill="#B7791F">間質液</text><text x="${x0+icf*sc+isf*sc/2}" y="48" text-anchor="middle" fill="#B7791F">${isf.toFixed(1)} L</text>`;
+    svg+=`<rect x="${x0+(icf+isf)*sc}" y="20" width="${pl*sc}" height="34" fill="#FDECEA" stroke="#C0392B" rx="4"/><text x="${x0+(icf+isf)*sc+pl*sc/2}" y="34" text-anchor="middle" font-weight="700" fill="#C0392B" font-size="8">血漿</text><text x="${x0+(icf+isf)*sc+pl*sc/2}" y="48" text-anchor="middle" fill="#C0392B" font-size="8">${pl.toFixed(1)}</text>`;
+    svg+=`<path d="M${x0+icf*sc} 60 L${x0+tbw*sc} 60" stroke="#6B7A80"/><text x="${x0+icf*sc+ecf*sc/2}" y="72" text-anchor="middle" fill="#6B7A80">細胞外液 ${ecf.toFixed(1)} L（1/3）＝ 輸液が最初に入る場所</text>`;
+    svg+=`<text x="10" y="90" fill="#1F2A30">循環血液量 約 <tspan font-weight="700">${(bv).toFixed(1)} L</tspan>（70 mL/kg）　血漿 ${pl.toFixed(1)} L</text>`;
+    svg+=`<text x="10" y="104" fill="#C0392B">細胞外液の 10%（${(ecf*0.1).toFixed(1)} L）を失うと頻脈・乏尿、20%（${(ecf*0.2).toFixed(1)} L）で血圧低下</text>`;
+    svg+=`<text x="10" y="122" fill="#6B7A80">等張液 1 L → 細胞外液に分布、血管内に残るのは約 1/4（250 mL）</text>`;
+    svg+=`<text x="10" y="136" fill="#6B7A80">5% ブドウ糖 1 L → 全区画に広がり、血管内には約 1/12（80 mL）</text>`;
+    svg+='</svg>';B.innerHTML=svg;}
+  function sec(){const rows=SEC.map(s=>{const tot=s.na+s.k+s.cl+s.hco3;const bar=(k,val)=>val?`<div style="width:${val/160*100}%;background:${C[k]};height:12px" title="${k} ${val}"></div>`:'';
+      return `<div style="display:flex;align-items:center;gap:6px;margin:3px 0;font-size:12px"><div style="width:84px;flex:none"><b>${s.n}</b><br><span class="muted" style="font-size:10px">${s.vol}</span></div><div style="flex:1"><div style="display:flex;width:100%;border-radius:3px;overflow:hidden;background:#F3F6F7">${bar('na',s.na)}${bar('k',s.k)}${bar('cl',s.cl)}${bar('hco3',s.hco3)}</div><div class="muted" style="font-size:10px;margin-top:2px">Na ${s.na}・K ${s.k}・Cl ${s.cl}・HCO₃ ${s.hco3}　${s.note}</div></div></div>`;}).join('');
+    $('bfSec').innerHTML=`<div style="display:flex;gap:10px;font-size:11px;margin-bottom:4px"><span><i style="display:inline-block;width:10px;height:10px;background:${C.na}"></i> Na</span><span><i style="display:inline-block;width:10px;height:10px;background:${C.k}"></i> K</span><span><i style="display:inline-block;width:10px;height:10px;background:${C.cl}"></i> Cl</span><span><i style="display:inline-block;width:10px;height:10px;background:${C.hco3}"></i> HCO₃</span><span class="muted">（横幅 160 mEq/L）</span></div>`+rows;}
+  function loss(){const W=v('bfW');const L={g:v('bfL_g')||0,b:v('bfL_b')||0,s:v('bfL_s')||0,d:v('bfL_d')||0,w:+$('bfL_w').value||0};const U=v('bfL_u');
+    const B=$('bfLoss');const tot=Object.values(L).reduce((a,b)=>a+b,0);
+    const need=W>0?{water:[W*25,W*30],na:W*1,k:W*1,cl:W*1,mg:[W*0.1,W*0.2],ca:[W*0.1,W*0.15],p:[W*0.3,W*0.5],glu:[50,100]}:null;
+    let html='';
+    if(need){html+=`<div class="rangebox" style="margin-top:0"><b>1 日の基本必要量（維持・NICE CG174／ESPEN）</b><table class="o2" style="margin-top:6px;font-size:12px"><tr><th>項目</th><th>目安</th><th>この患者</th></tr>
+      <tr><td>水</td><td style="font-weight:400">25〜30 mL/kg</td><td>${Math.round(need.water[0])}〜${Math.round(need.water[1])} mL（${Math.round(need.water[0]/24)}〜${Math.round(need.water[1]/24)} mL/h）</td></tr>
+      <tr><td>Na</td><td style="font-weight:400">約 1 mmol/kg</td><td>約 ${Math.round(need.na)} mEq（生食 ${Math.round(need.na/154*1000)} mL 相当）</td></tr>
+      <tr><td>K</td><td style="font-weight:400">約 1 mmol/kg</td><td>約 ${Math.round(need.k)} mEq（KCL 20 mEq 製剤 ${(need.k/20).toFixed(1)} 本）</td></tr>
+      <tr><td>Cl</td><td style="font-weight:400">約 1 mmol/kg</td><td>約 ${Math.round(need.cl)} mEq</td></tr>
+      <tr><td>Mg</td><td style="font-weight:400">0.1〜0.2 mmol/kg</td><td>${(need.mg[0]).toFixed(0)}〜${(need.mg[1]).toFixed(0)} mmol（${Math.round(need.mg[0]*2)}〜${Math.round(need.mg[1]*2)} mEq）</td></tr>
+      <tr><td>Ca</td><td style="font-weight:400">0.1〜0.15 mmol/kg</td><td>${need.ca[0].toFixed(0)}〜${need.ca[1].toFixed(0)} mmol</td></tr>
+      <tr><td>P</td><td style="font-weight:400">0.3〜0.5 mmol/kg</td><td>${need.p[0].toFixed(0)}〜${need.p[1].toFixed(0)} mmol</td></tr>
+      <tr><td>ブドウ糖</td><td style="font-weight:400">50〜100 g（飢餓性ケトーシス予防）</td><td>5% 糖液 1〜2 L 相当</td></tr></table>
+      <div class="rn">高齢・腎不全・心不全は水 20〜25 mL/kg。肥満は理想体重で。経腸栄養・食事が入っていればその分を引く。K・Mg・P は腎機能と血液データで調整（医師の指示）</div></div>`;}
+    else html+='<div class="muted" style="font-size:12px">体重を入れると 1 日の基本必要量が出ます</div>';
+    if(tot>0){const e={na:0,k:0,cl:0,hco3:0};Object.entries(L).forEach(([k,ml])=>{if(!ml)return;const s=SEC.find(x=>x.n===KEY[k]);['na','k','cl','hco3'].forEach(i=>e[i]+=s[i]*ml/1000);});
+      const alk=L.g, acid=L.b+L.s+L.d;
+      let ab='';if(alk>500&&alk>=acid)ab='胃液の喪失が主 → <b>低 Cl 性代謝性アルカローシス・低 K</b> に向かう。pH・HCO₃・Cl・K を確認。補充は生食（＋KCl）が基本';
+      else if(acid>500)ab='膵液・胆汁・小腸液・下痢の喪失が主 → <b>HCO₃ を失って代謝性アシドーシス・低 K・低 Na</b> に向かう。pH・HCO₃・K・Na を確認。補充は細胞外液（乳酸／酢酸リンゲル）が基本';
+      if(alk>500&&acid>500)ab='胃液と腸液の両方を失っている → 酸塩基はどちらにも振れる。血液ガスで方向を確認し、失っている液に近い組成で補充';
+      html+=`<div class="rangebox high" style="margin-top:8px"><b>喪失の合計 ${Math.round(tot).toLocaleString('ja-JP')} mL/日</b>${W>0?`（細胞外液 ${(W*(($('bfS').value==='m'?0.6:0.5))/3).toFixed(1)} L の約 ${Math.round(tot/1000/(W*(($('bfS').value==='m'?0.6:0.5))/3)*100)}%）`:''}
+      <table class="o2" style="margin-top:6px;font-size:12px"><tr><th></th><th>Na</th><th>K</th><th>Cl</th><th>HCO₃</th></tr><tr><td>失う量 mEq/日</td><td>${Math.round(e.na)}</td><td>${Math.round(e.k)}</td><td>${Math.round(e.cl)}</td><td>${Math.round(e.hco3)}</td></tr>${need?`<tr><td>基本必要量</td><td>${Math.round(need.na)}</td><td>${Math.round(need.k)}</td><td>${Math.round(need.cl)}</td><td>－</td></tr><tr><td><b>合計の目安</b></td><td><b>${Math.round(e.na+need.na)}</b></td><td><b>${Math.round(e.k+need.k)}</b></td><td><b>${Math.round(e.cl+need.cl)}</b></td><td>－</td></tr>`:''}</table>
+      ${ab?`<div class="rn">${ab}</div>`:''}
+      <div class="rn">発汗・発熱分（${L.w} mL）は低張なので水の補充が中心。${U>=0&&W>0?`尿量 ${U} mL/日 ＝ ${(U/W/24).toFixed(2)} mL/kg/h${U/W/24<0.5?'（<b>0.5 未満：乏尿</b>。循環血液量と腎機能を評価）':''}`:''}</div></div>`;}
+    B.innerHTML=html;}
+  const SIGNS=[['sbp','収縮期血圧 100 未満'],['hr','心拍数 90 超'],['crt','CRT 2 秒超'],['cold','末梢が冷たい・まだら'],['rr','呼吸数 20 超'],['uo','尿量 0.5 mL/kg/h 未満'],['plr','下肢挙上で血圧・SV が上がる（PLR 陽性）'],['news','NEWS 5 以上'],['hist','嘔吐・下痢・出血・絶食の病歴']];
+  let on=new Set();
+  function signs(){const b=$('bfSign');b.innerHTML=SIGNS.map(([k,t])=>`<button type="button" class="drc${on.has(k)?' on':''}" data-k="${k}">${t}</button>`).join('');
+    b.querySelectorAll('[data-k]').forEach(x=>x.onclick=()=>{on.has(x.dataset.k)?on.delete(x.dataset.k):on.add(x.dataset.k);signs();ass();});}
+  function ass(){const A=$('bfAss');const W=v('bfW');if(!on.size){A.style.display='none';return;}A.style.display='';
+    const n=on.size;const hard=['sbp','hr','crt','plr'].filter(k=>on.has(k)).length;
+    let msg='';
+    if(hard>=2||n>=4){A.className='rangebox high';msg=`<b>循環血液量の不足が疑われる（${n} 項目）</b><div class="rn">NICE CG174 の蘇生：晶質液（Na 130〜154 mmol/L：生食・リンゲル液）<b>500 mL を 15 分以内</b>にボーラス → 血圧・心拍・CRT・尿量・呼吸状態を再評価 → 必要なら繰り返す。<b>合計 2,000 mL 入れても不安定なら専門家（集中治療医）に相談</b>。${W>0?`この患者の 500 mL は細胞外液の約 ${Math.round(0.5/(W*0.6/3)*100)}%。`:''}輸液反応性（PLR・SVV）と肺うっ血（SpO₂・呼吸数・クラックル）を同時に見る。敗血症なら J‑SSCG 2024 の初期蘇生（30 mL/kg 目安、過剰を避け再評価）</div>`;}
+    else {A.className='rangebox';msg=`<b>サインは ${n} 項目。要注意だが蘇生輸液の基準には届かない</b><div class="rn">in/out・体重・尿量の推移を 1〜2 時間ごとに見直す。下肢挙上テストで反応性を確認してから輸液量を決める。乏尿だけなら腎前性か腎性かを BUN/Cr・FENa で</div>`;}
+    A.innerHTML=msg;}
+  ['bfW'].forEach(i=>$(i).addEventListener('input',()=>{comp();loss();ass();}));
+  $('bfS').addEventListener('change',()=>{comp();loss();});
+  ['bfL_g','bfL_b','bfL_s','bfL_d','bfL_u'].forEach(i=>$(i).addEventListener('input',loss));$('bfL_w').addEventListener('change',loss);
+  comp();sec();loss();signs();
+  $('bfUse')&&($('bfUse').onclick=()=>{});
+})();
+
+(function(){const m=META['体液量の評価']=META['体液量の評価']||{};m.extra=[...(m.extra||[]),
+{h:'体液の区画と消化液の組成（NICE CG174 の 5R）',b:['体重の約 60%（男性）・50〜55%（女性・高齢）が水。2/3 が細胞内、1/3 が細胞外。細胞外の 3/4 が間質、1/4 が血漿。循環血液量は約 70 mL/kg（計算タブ「体液の見える化」で患者の体重から L 表示）','輸液の行き先：等張液（生食・リンゲル）は細胞外液に分布し、血管内に残るのは約 1/4。5% ブドウ糖は全区画に広がり血管内には約 1/12 しか残らない。だから蘇生は等張液','消化液は 1 日 7〜8 L 分泌され、ほぼ全部が再吸収される。胃液 1.5〜2.5 L（Na 60・K 10・Cl 130）、胆汁 0.5〜1 L（Na 145・K 5・Cl 100・HCO₃ 35）、膵液 0.5〜1.5 L（Na 140・K 5・Cl 75・HCO₃ 115）、小腸液 2〜3 L（Na 140・K 5・Cl 104・HCO₃ 30）、下痢（Na 60・K 30・Cl 40・HCO₃ 30）、汗（Na 50・K 5・Cl 55）','胃液を失う（嘔吐・胃管）→ Cl と H⁺ を失い低 Cl 性代謝性アルカローシス・低 K。膵液・胆汁・小腸液・下痢を失う → HCO₃ を失い代謝性アシドーシス・低 K・低 Na。補充は失った液に近い組成で（NICE：replace like with like）','1 日の基本必要量（NICE CG174 維持輸液）：水 25〜30 mL/kg、Na・K・Cl 各約 1 mmol/kg、ブドウ糖 50〜100 g。高齢・腎不全・心不全は水 20〜25 mL/kg、肥満は理想体重で。Mg 0.1〜0.2・Ca 0.1〜0.15・P 0.3〜0.5 mmol/kg（ESPEN）','NICE CG174 の 5R：Resuscitation（晶質液 500 mL を 15 分以内、再評価、2 L で不安定なら専門家）、Routine maintenance（上の維持量）、Replacement（喪失の補充）、Redistribution（浮腫・敗血症・低 Alb での再分布を考える）、Reassessment（毎日の体重・in/out・電解質で見直す）','循環血液量が足りないサイン（NICE）：収縮期血圧 100 未満、心拍 90 超、CRT 2 秒超、末梢冷感、呼吸数 20 超、NEWS 5 以上、下肢挙上テスト陽性。2 つ以上重なれば蘇生輸液を考える','!計算は「組成 × 量」の机上の推定。実際は血液・尿・排液の電解質を測って補正する。輸液の内容と量は医師の指示が優先']}];})();
+GLOSS.push(['5R（NICE）','NICE CG174|輸液の 5R','英国 NICE の成人輸液ガイドラインの考え方：蘇生・維持・補充・再分布・再評価。維持は水 25〜30 mL/kg/日、Na・K・Cl 各 1 mmol/kg/日、糖 50〜100 g/日','体液量の評価'],
+['消化液の組成','胃液 膵液 胆汁 小腸液 電解質','胃液は Cl・H⁺ が多く失うとアルカローシス、膵液・胆汁・小腸液は HCO₃ が多く失うとアシドーシス。補充は失った液に近い組成で','体液量の評価']);
 
 /* 膠質浸透圧 */
 (function(){
