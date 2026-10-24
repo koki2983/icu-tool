@@ -4980,6 +4980,103 @@ GLOSS.push(
 ['6R','薬剤投与の 6R|Right patient/drug/dose/route/time/purpose','正しい患者・薬剤・用量・経路・時間・目的。昇圧薬・血管作動薬では特に慎重に確認する','ICU 経験のない看護師のための重症患者管理クイックガイド（JACCN）']
 );
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
+/* ===== ICU の評価の枠組み：by system（系統別評価） ===== */
+FIG.bysys=`<svg viewBox="0 0 340 330" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="9">
+<text x="170" y="14" font-size="11" fill="#1F2A30" text-anchor="middle" font-weight="700">by problem と by system：見方の違い</text>
+<rect x="8" y="24" width="158" height="86" rx="7" fill="#F4F8FB" stroke="#B8CCD9" stroke-width="1.5"/>
+<text x="87" y="40" font-size="10" fill="#1E3A5F" text-anchor="middle" font-weight="700">by problem（一般病棟）</text>
+<text x="16" y="56" font-size="7.5" fill="#1F2A30">問題リストを作り、1 つずつ解く</text>
+<text x="16" y="68" font-size="7.5" fill="#1F2A30">例：#1 肺炎 #2 糖尿病 #3 転倒リスク</text>
+<text x="16" y="80" font-size="7.5" fill="#1F2A30">SOAP の A（アセスメント）が中心</text>
+<text x="16" y="92" font-size="7.5" fill="#1F2A30">「問題が解決したら退院」</text>
+<text x="16" y="104" font-size="7" fill="#C0392B">弱点：挙がっていない問題を見落とす</text>
+<rect x="174" y="24" width="158" height="86" rx="7" fill="#FFF7E6" stroke="#E0A030" stroke-width="1.5"/>
+<text x="253" y="40" font-size="10" fill="#8A4B00" text-anchor="middle" font-weight="700">by system（ICU）</text>
+<text x="182" y="56" font-size="7.5" fill="#1F2A30">決めた臓器系を毎日「全部」見る</text>
+<text x="182" y="68" font-size="7.5" fill="#1F2A30">問題がなくても「問題なし」と書く</text>
+<text x="182" y="80" font-size="7.5" fill="#1F2A30">SOAP の O（客観データ）を系統的に</text>
+<text x="182" y="92" font-size="7.5" fill="#1F2A30">「全系統が安定したら ICU 退室」</text>
+<text x="182" y="104" font-size="7" fill="#2E7D32">強み：見落としがない。引き継ぎが揃う</text>
+<text x="170" y="128" font-size="10" fill="#1F2A30" text-anchor="middle" font-weight="700">ABCDE ＋ III（よく使う順番）</text>
+<g font-size="8">
+<rect x="8" y="136" width="324" height="22" rx="4" fill="#E8F1FA" stroke="#9FB8CC"/><text x="14" y="150" font-weight="700" fill="#1E3A5F">A 気道</text><text x="70" y="150" fill="#1F2A30">挿管の有無・チューブの深さ・固定・カフ圧・抜管の見込み</text>
+<rect x="8" y="160" width="324" height="22" rx="4" fill="#E8F1FA" stroke="#9FB8CC"/><text x="14" y="174" font-weight="700" fill="#1E3A5F">B 呼吸</text><text x="70" y="174" fill="#1F2A30">モード・FiO₂・PEEP・P/F・呼吸数・分泌物・X 線・SBT の可否</text>
+<rect x="8" y="184" width="324" height="22" rx="4" fill="#E8F1FA" stroke="#9FB8CC"/><text x="14" y="198" font-weight="700" fill="#1E3A5F">C 循環</text><text x="70" y="198" fill="#1F2A30">血圧・HR・リズム・昇圧薬の量・乳酸・尿量・in/out・エコー</text>
+<rect x="8" y="208" width="324" height="22" rx="4" fill="#E8F1FA" stroke="#9FB8CC"/><text x="14" y="222" font-weight="700" fill="#1E3A5F">D 意識</text><text x="70" y="222" fill="#1F2A30">GCS・瞳孔・RASS・CAM-ICU・鎮静薬・鎮痛・麻痺・けいれん</text>
+<rect x="8" y="232" width="324" height="22" rx="4" fill="#E8F1FA" stroke="#9FB8CC"/><text x="14" y="246" font-weight="700" fill="#1E3A5F">E 環境</text><text x="70" y="246" fill="#1F2A30">体温・皮膚・褥瘡・ライン類と挿入日・体位・拘縮・家族</text>
+<rect x="8" y="256" width="324" height="22" rx="4" fill="#FFF1E0" stroke="#E0A030"/><text x="14" y="270" font-weight="700" fill="#8A4B00">I 感染</text><text x="70" y="270" fill="#1F2A30">発熱・WBC/CRP/PCT・培養・抗菌薬の日数・カテーテル関連感染</text>
+<rect x="8" y="280" width="324" height="22" rx="4" fill="#FFF1E0" stroke="#E0A030"/><text x="14" y="294" font-weight="700" fill="#8A4B00">I イオン</text><text x="70" y="294" fill="#1F2A30">Na・K・Mg・P・Ca・酸塩基・腎機能・CHDF・輸液の内容</text>
+<rect x="8" y="304" width="324" height="22" rx="4" fill="#FFF1E0" stroke="#E0A030"/><text x="14" y="318" font-weight="700" fill="#8A4B00">I インスリン</text><text x="70" y="318" fill="#1F2A30">血糖・インスリン・栄養（経路・量・到達率）・内分泌（ステロイド）</text>
+</g>
+</svg>`;
+KNOW.push({t:'ICU の評価の枠組み：by system（系統別評価）',fig:'bysys',s:[
+ {h:'by system とは',b:[
+  '患者を「問題ごと」ではなく「臓器系ごと」に、決めた順番で毎日すべて評価する考え方。ICU の医師のカルテ・回診・申し送りはこの形で書かれることが多い',
+  '一般病棟は by problem：問題リスト（#1 肺炎、#2 糖尿病…）を作って 1 つずつ解決する。SOAP の A（アセスメント）が中心で、問題が解決すれば退院',
+  'ICU は by system：患者は生命維持を医療者に預けている状態なので、「問題がある所」だけでなく「全部の系統」を毎日見て、生命維持に必要なものを供給し続けながら回復を待つ。SOAP の O（客観データ）を系統的に並べる',
+  '問題がなくても「呼吸：問題なし」と書く。これが by problem との一番の違いで、「挙がっていない問題を見落とす」ことを防ぐ',
+  '裏返すと、すべての系統が安定して「ICU でしかできない管理」がなくなった時点が ICU 退室の目安になる',
+  '看護師にとっては、医師の記録を読む・回診で聞く・申し送りをする・看護記録を書く、すべての土台。順番を体に入れておくと、情報が頭の中で整理される'
+ ]},
+ {h:'ABCDE ＋ III（代表的な項目立て）',b:[
+  'A：Airway（気道）。気道の確保のしかた（自然気道・挿管・気管切開）、チューブの深さとサイズ、固定、カフ圧、抜管・カニューレ交換の見込み',
+  'B：Breathing（呼吸）。人工呼吸器のモードと設定、FiO₂・PEEP、P/F 比、呼吸数と呼吸仕事、分泌物、胸部 X 線、血液ガス、自発呼吸トライアル（SBT）ができるか、ドレーン',
+  'C：Circulation（循環）。血圧・心拍数・リズム、昇圧薬・強心薬の種類と量（γ）、乳酸、尿量、in/out と体重、心エコー、補助循環（IABP・ECMO）、ペーシング',
+  'D：Dysfunction of CNS（中枢神経・意識）。GCS、瞳孔、RASS と鎮静薬、鎮痛、CAM-ICU、麻痺・けいれん、頭蓋内圧、脳 CT。資料によって D を「意識」と呼ぶ',
+  'E：Environment（環境・外的要因）。体温、皮膚と褥瘡、ライン・ドレーン・チューブの一覧と挿入日、体位と離床、拘縮、家族と患者の意思・治療の目標',
+  'I：Infection（感染）。発熱、WBC・CRP・プロカルシトニン、培養の結果、抗菌薬の種類と何日目か、カテーテル関連の感染源、感染対策',
+  'I：Ion（電解質・酸塩基・腎）。Na・K・Mg・P・Ca、pH・HCO₃⁻、Cr・尿量、CHDF の設定、輸液の内容と速度',
+  'I：Insulin（血糖・内分泌・栄養）。血糖とインスリン、ステロイド・甲状腺、栄養の経路（経腸・静脈）と量、目標に対する到達率、下痢・胃残',
+  '資料によって並べ方が違う（下の「頭から足へ」も同じ目的の別の並べ方）。大事なのは「決めた順で毎回全部見る」こと'
+ ]},
+ {h:'頭から足へ（head-to-toe）の並べ方',b:[
+  '① 神経（意識・鎮静・鎮痛・せん妄）② 気道・肺 ③ 循環 ④ 消化器・栄養・内分泌（血糖） ⑤ 腎・電解質 ⑥ 感染・免疫 ⑦ 血液・凝固（Hb・血小板・DIC・抗凝固・血栓予防）⑧ 皮膚（褥瘡・熱傷・ライントラブル）⑨ 筋骨格（拘縮予防・骨折・離床）⑩ 管理物のまとめ（挿入日も）',
+  'ABCDE+III に比べて「血液・凝固」「筋骨格」「管理物」が独立しているので、看護の視点（DVT 予防、離床、デバイス管理）が抜けにくい',
+  '電子カルテに定型文（テンプレート）として登録しておくと、毎回の記載が楽で見落としが減る。当院のテンプレートがあればそれに合わせる'
+ ]},
+ {h:'看護師の 1 日での使い方',b:[
+  '朝の情報収集：by system の順に「今の状態」「今日の目標」「今日の予定」を埋める。例：B「FiO₂ 0.4、PEEP 8、P/F 220。目標：日中に SBT。予定：10 時に鎮静を切って評価」',
+  '回診・申し送り：同じ順で話すと聞く側が整理しやすい。「A 挿管 3 日目 22 cm 固定、B …、C ノルアド 0.08γ …」。ISBAR の B（Background）の中身を by system で並べるイメージ',
+  '看護記録：系統ごとに「観察 → 判断 → 対応」。問題がない系統は「問題なし・継続」と一言で済ませてよい',
+  '勤務の終わりに、各系統で「今日変わったこと」「次の勤務にしてほしいこと」を 1 行ずつ。これが次の人の by system の出発点になる',
+  '異常を見つけたら、その系統の「数字」と「患者の見た目」の両方で報告する（「P/F が 150 に下がって、呼吸数 30、努力呼吸あり」）'
+ ]},
+ {h:'FAST HUG との組み合わせ',b:[
+  'by system が「状態の評価」なら、FAST HUG（Vincent 2005）は「毎日の予防・基本ケアのチェック」。回診で両方を使う ICU が多い',
+  'F：Feeding（栄養は入っているか）A：Analgesia（痛みは取れているか）S：Sedation（鎮静は浅く適切か）T：Thromboprophylaxis（血栓予防）H：Head-up（頭部挙上 30°）U：Ulcer prophylaxis（ストレス潰瘍予防）G：Glucose（血糖）',
+  '拡張版 FAST HUGS BID：S を足して Spontaneous breathing trial（SBT）・Skin（皮膚）、B：Bowel（排便）、I：Indwelling catheter（不要なカテーテルを抜く）、D：De-escalation（抗菌薬の見直し）',
+  'by system で E（環境）と I（感染・イオン・インスリン）を見るときに、FAST HUG の項目をそのまま確認項目にすると漏れがない'
+ ]},
+ {h:'よくある落とし穴',b:[
+  '「異常のある系統だけ」書く・話す → by problem に戻ってしまい、静かに悪くなる系統（腎・電解質・皮膚・血栓）を見落とす',
+  '数字だけ並べて判断がない → 「P/F 220」で終わらず「昨日より改善、SBT 可能」まで',
+  'E（環境）を飛ばす → ライン・ドレーンの挿入日、褥瘡、拘縮、家族の情報が抜ける。カテーテル関連感染・MDRPU の予防はここで決まる',
+  '順番が人によって違う → 当院の順番（医師のカルテの順）に合わせると、医師と看護師で会話が噛み合う',
+  '新人は「全部の系統を埋める」こと自体が勉強になる。埋められない系統は「分からない」と書いて先輩に聞く'
+ ]},
+ {h:'例：心外術後 1 日目の by system（書き方の見本）',b:[
+  'A：経口挿管 8.0 mm、門歯 22 cm、カフ圧 25。本日抜管の方針',
+  'B：PSV PS 8 / PEEP 5 / FiO₂ 0.35、P/F 300、RR 16、分泌物少量白色。X 線：両側軽度の無気肺、胸水なし。SBT 9 時',
+  'C：ノルアド 0.05γ 漸減中、MAP 70、HR 90 洞調律、PAC 散発、乳酸 1.2、尿量 1.5 mL/kg/h、バランス +800、ドレーン 30 mL/h 漿液性。ペーシング待機',
+  'D：鎮静オフ、RASS 0、GCS E4VTM6、瞳孔左右差なし、CAM-ICU 陰性、NRS 3（アセトアミノフェン定期＋フェンタニル少量）',
+  'E：体温 37.4、皮膚トラブルなし、CV 右内頸（術当日挿入）、A ライン左橈骨、胸腔ドレーン 2 本、尿道カテーテル。ヘッドアップ 30°、本日端座位まで。家族へは医師から説明済み',
+  'I 感染：予防的セファゾリン 2 日目で終了予定。WBC 11,000、CRP 5（術後反応の範囲）。カテーテル刺入部きれい',
+  'I イオン：K 4.0、Mg 2.0、Cr 0.9、pH 7.40 HCO₃⁻ 24。輸液 40 mL/h、K 補正なし',
+  'I インスリン・栄養：血糖 140〜180、インスリン持続 1 単位/h。抜管後に飲水 → 翌日から食事。胃残なし',
+  '→ 今日の目標：抜管、ノルアド離脱、端座位。次の勤務へ：抜管後の嚥下評価と、K・Mg の夕方再検'
+ ]}
+]});
+META['ICU の評価の枠組み：by system（系統別評価）']={cat:'全身管理',key:['問題のある所だけでなく「全系統」を決めた順で毎日見る。問題なしも書く','ABCDE＋III：気道・呼吸・循環・意識・環境＋感染・イオン・インスリン','申し送り・記録・回診を同じ順にそろえると、医師と噛み合い、見落としが減る'],secfig:{}};
+(function(){const o=ORDER['全身管理']||(ORDER['全身管理']=[]);const i=o.indexOf('ICU 経験のない看護師のための重症患者管理クイックガイド（JACCN）');o.splice(i<0?0:i+1,0,'ICU の評価の枠組み：by system（系統別評価）');})();
+KID.by_system='ICU の評価の枠組み：by system（系統別評価）';KID_R[KID.by_system]='by_system';
+XLINK.push(['by system','ICU の評価の枠組み：by system（系統別評価）'],['系統別評価','ICU の評価の枠組み：by system（系統別評価）'],['FAST HUG','ICU の評価の枠組み：by system（系統別評価）']);
+GLOSS.push(
+['by system','バイシステム|系統別評価|systems-based approach','ICU で、患者を臓器系ごと（気道・呼吸・循環・意識・環境・感染・電解質・血糖など）に決めた順で毎日すべて評価する方法。問題がない系統も「問題なし」と記録し、見落としを防ぐ','ICU の評価の枠組み：by system（系統別評価）'],
+['by problem','バイプロブレム|問題志向型|POS','問題リストを作って 1 つずつ解決していく一般病棟の考え方。SOAP の A が中心。ICU では挙がっていない問題を見落とすため by system と併用する','ICU の評価の枠組み：by system（系統別評価）'],
+['ABCDE+III','エービーシーディーイー プラス スリーアイ','by system の代表的な項目立て。A 気道・B 呼吸・C 循環・D 意識・E 環境に、I 感染（Infection）・I イオン（Ion：電解質・酸塩基・腎）・I インスリン（Insulin：血糖・内分泌・栄養）を加えたもの','ICU の評価の枠組み：by system（系統別評価）'],
+['FAST HUG','ファストハグ|FAST HUGS BID','ICU で毎日確認する基本ケアの語呂（Vincent 2005）：Feeding 栄養・Analgesia 鎮痛・Sedation 鎮静・Thromboprophylaxis 血栓予防・Head-up 頭部挙上・Ulcer prophylaxis 潰瘍予防・Glucose 血糖。拡張版は SBT・皮膚・排便・不要なカテーテル抜去・抗菌薬の見直しを足す','ICU の評価の枠組み：by system（系統別評価）']
+);
+GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 (function(){const bar=$('catBar');bar.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
 
 /* 血液ガス代償計算 */
@@ -5425,7 +5522,7 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 
 
 /* よく使う・入口・ステッパー（すべて軽い処理） */
-const KNOW_REV='2026 年 10 月 24 日（JACCN 重症患者管理クイックガイド・心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
+const KNOW_REV='2026 年 10 月 24 日（by system・JACCN 重症患者管理クイックガイド・心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
   const SHORT=[['P/F','P/F 比'],['波形','波形の見方'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
@@ -5467,7 +5564,7 @@ const KNOW_REV='2026 年 10 月 24 日（JACCN 重症患者管理クイックガ
     'CHDF':['CHDF（持続的血液濾過透析）','急性腎障害（AKI）と電解質','体液量の評価'],
     '大動脈・消化器術後':['胸部・腹部大動脈瘤術後','消化器術後のドレーン管理','脊椎・脊髄と体表の目安','術後鎮痛（多角的鎮痛と神経ブロック）'],
     '急変・当直':['急変の察知と初期対応（ABCDE）','心肺蘇生（ACLS の要点）','電気的除細動とカルディオバージョン','心電図の読み方'],
-    '初めての重症患者（応援・1 年目）':['ICU 経験のない看護師のための重症患者管理クイックガイド（JACCN）','人工呼吸器：はじめての受け持ち（仕組み・モード・1 日の流れ）','急変の察知と初期対応（ABCDE）','鎮痛・鎮静・せん妄（PADIS）','薬剤投与の基礎知識']
+    '初めての重症患者（応援・1 年目）':['ICU 経験のない看護師のための重症患者管理クイックガイド（JACCN）','ICU の評価の枠組み：by system（系統別評価）','人工呼吸器：はじめての受け持ち（仕組み・モード・1 日の流れ）','急変の察知と初期対応（ABCDE）','鎮痛・鎮静・せん妄（PADIS）','薬剤投与の基礎知識']
   };
   const FIND={'高 K':'急性腎障害（AKI）と電解質','低 Na':'急性腎障害（AKI）と電解質','乏尿':'急性腎障害（AKI）と電解質',
     'アシドーシス':'血液ガスの読み方','低酸素':'酸素療法','呼吸が苦しそう':'P-SILI（患者自身の呼吸による肺損傷）',
