@@ -5035,6 +5035,7 @@ KNOW.push({t:'ICU の評価の枠組み：by system（系統別評価）',fig:'b
   '電子カルテに定型文（テンプレート）として登録しておくと、毎回の記載が楽で見落としが減る。当院のテンプレートがあればそれに合わせる'
  ]},
  {h:'看護師の 1 日での使い方',b:[
+  'このアプリの「スコア」タブ →「by system」に、系統ごとに「今の状態・今日の目標・予定」を入れるシートがある。入力した内容から申し送り文を自動で作れ、各系統から関連する知識・計算ツールへ飛べる（保存は端末内のみ。患者が特定できる情報は入れない）',
   '朝の情報収集：by system の順に「今の状態」「今日の目標」「今日の予定」を埋める。例：B「FiO₂ 0.4、PEEP 8、P/F 220。目標：日中に SBT。予定：10 時に鎮静を切って評価」',
   '回診・申し送り：同じ順で話すと聞く側が整理しやすい。「A 挿管 3 日目 22 cm 固定、B …、C ノルアド 0.08γ …」。ISBAR の B（Background）の中身を by system で並べるイメージ',
   '看護記録：系統ごとに「観察 → 判断 → 対応」。問題がない系統は「問題なし・継続」と一言で済ませてよい',
@@ -5077,6 +5078,86 @@ GLOSS.push(
 ['FAST HUG','ファストハグ|FAST HUGS BID','ICU で毎日確認する基本ケアの語呂（Vincent 2005）：Feeding 栄養・Analgesia 鎮痛・Sedation 鎮静・Thromboprophylaxis 血栓予防・Head-up 頭部挙上・Ulcer prophylaxis 潰瘍予防・Glucose 血糖。拡張版は SBT・皮膚・排便・不要なカテーテル抜去・抗菌薬の見直しを足す','ICU の評価の枠組み：by system（系統別評価）']
 );
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
+/* ===== by system シート（系統別の情報収集・申し送り） ===== */
+(function(){
+  const seg=$('scoreSeg');const b=document.createElement('button');b.dataset.s='bys';b.textContent='by system';seg.appendChild(b);
+  const box=document.createElement('div');box.id='s-bys';box.style.display='none';$('s-ohat').insertAdjacentElement('afterend',box);
+  const IDS=['gcs','jcs','rass','cpot','child','nihss','ohat','bys'];
+  seg.querySelectorAll('button').forEach(x=>x.onclick=()=>{seg.querySelectorAll('button').forEach(y=>y.classList.toggle('on',y===x));IDS.forEach(s=>{const e=$('s-'+s);if(e)e.style.display=s===x.dataset.s?'':'none';});});
+  const SYS=[
+    {k:'A',n:'A 気道',hint:'挿管/気切/自然気道、サイズ・深さ・固定、カフ圧、抜管の見込み',chips:['自然気道で問題なし','経口挿管 ○mm 門歯 ○cm','気管切開 ○日目','カフ圧 20〜30 で管理','本日抜管の方針'],know:['vent_first#','trach#'],calc:[]},
+    {k:'B',n:'B 呼吸',hint:'モード・設定（FiO₂/PEEP/PS）、P/F、呼吸数と努力、分泌物、X 線、血ガス、SBT',chips:['自発呼吸・室内気で問題なし','酸素 ○L 経鼻','HFNC ○L/FiO₂ ○','PSV PS○/PEEP○/FiO₂○','SBT 予定','分泌物多く吸引頻回'],know:['vent#','abg#','o2#'],calc:['pf','rsbi','rox']},
+    {k:'C',n:'C 循環',hint:'血圧・HR・リズム、昇圧薬/強心薬（γ）、乳酸、尿量、in/out・体重、エコー、補助循環、ドレーン',chips:['昇圧薬なし・安定','ノルアド ○γ 漸減中','乳酸正常化','尿量 ○mL/kg/h','バランス ＋○','ペーシング待機','ドレーン ○mL/h 漿液性'],know:['vasoactive#','shock#','hemodynamics#'],calc:['gamma','hemodynamics']},
+    {k:'D',n:'D 意識・鎮静・鎮痛',hint:'GCS・瞳孔、RASS と鎮静薬、鎮痛（NRS/CPOT）、CAM-ICU、麻痺・けいれん、頭蓋内圧',chips:['GCS 15・鎮静なし','RASS 目標 −1〜0','CAM-ICU 陰性','CAM-ICU 陽性・せん妄対策中','鎮痛 NRS○/CPOT○','瞳孔左右差なし'],know:['padis#','analgesia#'],calc:[]},
+    {k:'E',n:'E 環境・皮膚・デバイス',hint:'体温、皮膚・褥瘡・MDRPU、ライン/ドレーン/チューブと挿入日、体位・離床、拘縮、家族・治療目標',chips:['皮膚トラブルなし','褥瘡 ○部 DESIGN-R○','ヘッドアップ 30°','本日端座位/立位','体温 ○℃','家族へ説明済み'],know:['position#','catheter#','abcde#'],calc:[]},
+    {k:'I1',n:'I 感染',hint:'発熱、WBC/CRP/PCT、培養、抗菌薬の種類と日数、カテーテル関連感染源、感染対策',chips:['感染徴候なし','抗菌薬 ○ ○日目','培養提出済み・結果待ち','刺入部きれい','接触感染対策中'],know:['sepsis#','antibiotics#'],calc:[]},
+    {k:'I2',n:'I イオン・腎・輸液',hint:'Na・K・Mg・P・Ca、酸塩基、Cr・尿量、CHDF 設定、輸液の内容と速度',chips:['電解質・腎機能問題なし','K ○ 補正中','CHDF 継続','輸液 ○mL/h','乏尿・報告済み'],know:['aki#','abg#','volume#'],calc:['electrolyte','abg','fluid']},
+    {k:'I3',n:'I 血糖・栄養・内分泌',hint:'血糖とインスリン、栄養の経路と量・到達率、胃残・下痢、ステロイドなど',chips:['血糖 140〜180 で安定','インスリン持続 ○U/h','経腸栄養 ○mL/h 到達','絶食中・TPN','胃残多く減速','排便 ○日なし'],know:['nutrition#','drug_basics#'],calc:['nutrition','harris']},
+    {k:'H',n:'血液・凝固・血栓予防',hint:'Hb・Plt・凝固、抗凝固（ヘパリン・APTT）、DVT 予防（フットポンプ・弾性ストッキング・薬剤）、出血',chips:['出血なし・凝固問題なし','ヘパリン持続 APTT○','フットポンプ装着','Hb ○ 輸血なし'],know:['dic#','transfusion#'],calc:['transfusion']}
+  ];
+  const HUG=[['F','栄養は入っているか（Feeding）'],['A','痛みは取れているか（Analgesia）'],['S','鎮静は浅く適切か（Sedation）'],['T','血栓予防（Thromboprophylaxis）'],['H','頭部挙上 30°（Head-up）'],['U','ストレス潰瘍予防（Ulcer prophylaxis）'],['G','血糖（Glucose）'],['S2','SBT できるか・皮膚（Spontaneous breathing/Skin）'],['B','排便（Bowel）'],['I','不要なカテーテルを抜く（Indwelling catheter）'],['D','抗菌薬の見直し（De-escalation）']];
+  const KEY='bysys';let D={sheets:[],cur:null};
+  const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+  const blank=()=>({id:Date.now(),label:'',date:today(),shift:'日勤',sys:Object.fromEntries(SYS.map(s=>[s.k,{st:'',goal:'',plan:''}])),hug:{},dev:[],note:''});
+  const kname=id=>KID[id]||id;
+  box.innerHTML=`
+  <div class="card">
+    <h2>by system シート</h2>
+    <p class="muted" style="font-size:12px;margin:0 0 6px">系統ごとに「今の状態・今日の目標・予定/申し送り」を埋めると、申し送り文が自動で組み上がる。保存はこの端末の中だけ。<b>氏名・ID・生年月日など患者が特定できる情報は入力しない</b>（ベッド番号＋日付で十分）。</p>
+    <div class="row"><div><label>シート</label><select id="bsSel"></select></div><div><label>ラベル（例：3 床）</label><input type="text" id="bsLabel" placeholder="3 床"></div></div>
+    <div class="row"><div><label>日付</label><input type="date" id="bsDate"></div><div><label>勤務</label><select id="bsShift"><option>日勤</option><option>夜勤</option><option>準夜</option><option>深夜</option></select></div></div>
+    <div class="bar"><button class="small primary" id="bsNew">新しいシート</button><button class="small" id="bsCopyPrev">前回の内容を引き継ぐ</button><button class="small danger" id="bsDel">このシートを削除</button></div>
+  </div>
+  <div id="bsSys"></div>
+  <div class="card"><h2>FAST HUGS BID（毎日の基本ケア）</h2><div class="drchips" id="bsHug"></div><p class="muted" style="font-size:12px;margin-top:6px">タップで「確認済み」。グレーのままの項目が、今日まだ見ていないこと。</p></div>
+  <div class="card"><h2>デバイス・ライン（挿入日 → 何日目）</h2><div id="bsDev"></div><div class="row"><div><label>名称</label><input type="text" id="bsDevN" placeholder="例：CV 右内頸"></div><div><label>挿入日</label><input type="date" id="bsDevD"></div></div><div class="bar"><button class="small" id="bsDevAdd">追加</button></div></div>
+  <div class="card"><h2>申し送り文（by system の順）</h2><div class="bar"><button class="small primary" id="bsGen">文を作る</button><button class="small" id="bsCopy">コピー</button></div><textarea id="bsOut" placeholder="「文を作る」を押すと、ここに申し送り文ができます" style="min-height:160px;font-size:13px"></textarea><p class="muted" style="font-size:12px">この文はこの端末にだけ残る。電子カルテへ貼るときは、当院の記録の決まり（患者情報の扱い）に従う。</p></div>`;
+  const sysBox=$('bsSys');
+  sysBox.innerHTML=SYS.map(s=>`<details class="card o2card" data-k="${s.k}"><summary>${s.n}<span class="muted bsdot" data-dot="${s.k}" style="font-weight:400;font-size:12px;margin-left:6px"></span></summary><div class="body">
+    <div class="muted" style="font-size:12px;margin-bottom:4px">見るもの：${s.hint}</div>
+    <div class="drchips" style="margin-bottom:6px">${s.chips.map(c=>`<button type="button" class="drc" data-chip="${s.k}" data-t="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+    <label>今の状態</label><textarea data-f="st" data-k="${s.k}" style="min-height:60px;font-size:14px"></textarea>
+    <div class="row"><div><label>今日の目標</label><input type="text" data-f="goal" data-k="${s.k}"></div><div><label>予定・次の勤務へ</label><input type="text" data-f="plan" data-k="${s.k}"></div></div>
+    <div class="bar">${s.know.map(k=>{const id=k.replace('#','');return KID[id]?`<button class="small" data-kgo="${id}">📖 ${esc(kname(id).replace(/（.*?）/g,'').slice(0,14))}</button>`:'';}).join('')}${s.calc.map(c=>CALC_ID[c]?`<button class="small" data-cgo="${c}">🧮 ${esc(CALC_ID[c])}</button>`:'').join('')}</div>
+  </div></details>`).join('');
+  const hugBox=$('bsHug');hugBox.innerHTML=HUG.map(h=>`<button type="button" class="drc" data-hug="${h[0]}">${h[0].replace('S2','S')}：${h[1]}</button>`).join('');
+  const cur=()=>D.sheets.find(s=>s.id===D.cur);
+  const save=()=>store.set(KEY,D);
+  const dots=()=>{const c=cur();if(!c)return;SYS.forEach(s=>{const v=c.sys[s.k];const n=[v.st,v.goal,v.plan].filter(x=>x&&x.trim()).length;const d=sysBox.querySelector(`[data-dot="${s.k}"]`);d.textContent=n?`● ${n}/3`:'○ 未記入';d.style.color=n?'var(--teal)':'#9aa5aa';});};
+  const renderSel=()=>{const sel=$('bsSel');sel.innerHTML=D.sheets.slice().sort((a,b)=>b.id-a.id).map(s=>`<option value="${s.id}"${s.id===D.cur?' selected':''}>${esc(s.label||'（ラベルなし）')} ${s.date} ${s.shift}</option>`).join('');};
+  const renderDev=()=>{const c=cur();const el=$('bsDev');if(!c||!c.dev.length){el.innerHTML='<div class="muted" style="font-size:12px">未登録</div>';return;}
+    el.innerHTML='<table class="o2" style="font-size:12px"><tr><th>名称</th><th>挿入日</th><th>日数</th><th></th></tr>'+c.dev.map((d,i)=>{const days=d.d?Math.floor((new Date(c.date)-new Date(d.d))/864e5):'';const warn=(typeof days==='number'&&((/CV|中心|PICC/.test(d.n)&&days>=7)||(/末梢|PV/.test(d.n)&&days>=4)||(/尿|バルーン|フォーリー/.test(d.n)&&days>=3)||(/A ?ライン|動脈/.test(d.n)&&days>=5)));return `<tr><td style="text-align:left">${esc(d.n)}</td><td>${d.d||''}</td><td style="${warn?'color:#C0392B;font-weight:700':''}">${days===''?'':days+' 日目'}${warn?' ⚠':''}</td><td><button class="small" data-devdel="${i}">×</button></td></tr>`;}).join('')+'</table><div class="muted" style="font-size:11px;margin-top:4px">⚠ は「必要性を毎日見直す」目安（CV 7 日・末梢 4 日・尿道カテ 3 日・A ライン 5 日。当院の基準が優先）。</div>';
+    el.querySelectorAll('[data-devdel]').forEach(b=>b.onclick=()=>{c.dev.splice(+b.dataset.devdel,1);save();renderDev();});};
+  const render=()=>{const c=cur();if(!c)return;renderSel();$('bsLabel').value=c.label;$('bsDate').value=c.date;$('bsShift').value=c.shift;
+    SYS.forEach(s=>{['st','goal','plan'].forEach(f=>{sysBox.querySelector(`[data-f="${f}"][data-k="${s.k}"]`).value=c.sys[s.k][f]||'';});});
+    hugBox.querySelectorAll('[data-hug]').forEach(b=>b.classList.toggle('on',!!c.hug[b.dataset.hug]));
+    renderDev();dots();};
+  const gen=()=>{const c=cur();if(!c)return '';const L=[];L.push(`【${c.label||'（ラベルなし）'}】${c.date} ${c.shift}　by system`);
+    SYS.forEach(s=>{const v=c.sys[s.k];if(!(v.st||v.goal||v.plan)){L.push(`${s.n}：未記入`);return;}L.push(`${s.n}：${(v.st||'').trim().replace(/\n+/g,' / ')}${v.goal?`　→ 目標：${v.goal}`:''}${v.plan?`　→ 次へ：${v.plan}`:''}`);});
+    const done=HUG.filter(h=>c.hug[h[0]]).map(h=>h[0].replace('S2','S')).join('');const todo=HUG.filter(h=>!c.hug[h[0]]).map(h=>h[1].replace(/（.*?）/,''));
+    L.push(`FAST HUGS BID：確認 ${done||'なし'}${todo.length?`／未確認：${todo.join('・')}`:'／すべて確認'}`);
+    if(c.dev.length)L.push('デバイス：'+c.dev.map(d=>{const days=d.d?Math.floor((new Date(c.date)-new Date(d.d))/864e5):null;return `${d.n}${days!==null?`（${days} 日目）`:''}`;}).join('、'));
+    return L.join('\n');};
+  // events
+  sysBox.addEventListener('input',e=>{const t=e.target;if(!t.dataset.f)return;const c=cur();if(!c)return;c.sys[t.dataset.k][t.dataset.f]=t.value;save();dots();});
+  sysBox.addEventListener('click',e=>{const ch=e.target.closest('[data-chip]');if(ch){const c=cur();const ta=sysBox.querySelector(`[data-f="st"][data-k="${ch.dataset.chip}"]`);ta.value=(ta.value?ta.value.replace(/\s*$/,'')+'\n':'')+ch.dataset.t;c.sys[ch.dataset.chip].st=ta.value;save();dots();return;}
+    const kg=e.target.closest('[data-kgo]');if(kg){openTopic(kg.dataset.kgo,null,'bys');return;}
+    const cg=e.target.closest('[data-cgo]');if(cg){openCalc(cg.dataset.cgo);return;}});
+  hugBox.addEventListener('click',e=>{const b=e.target.closest('[data-hug]');if(!b)return;const c=cur();c.hug[b.dataset.hug]=!c.hug[b.dataset.hug];b.classList.toggle('on',!!c.hug[b.dataset.hug]);save();});
+  $('bsLabel').oninput=e=>{const c=cur();c.label=e.target.value;save();renderSel();};
+  $('bsDate').onchange=e=>{const c=cur();c.date=e.target.value;save();renderSel();renderDev();};
+  $('bsShift').onchange=e=>{const c=cur();c.shift=e.target.value;save();renderSel();};
+  $('bsSel').onchange=e=>{D.cur=+e.target.value;save();render();};
+  $('bsNew').onclick=()=>{const s=blank();D.sheets.push(s);D.cur=s.id;save();render();toast('新しいシート');};
+  $('bsCopyPrev').onclick=()=>{const c=cur();const prev=D.sheets.filter(s=>s.id!==c.id&&(!c.label||s.label===c.label)).sort((a,b)=>b.id-a.id)[0];if(!prev){toast('引き継げる前回のシートがありません');return;}
+    SYS.forEach(s=>{c.sys[s.k]={st:prev.sys[s.k].st,goal:'',plan:''};});c.dev=JSON.parse(JSON.stringify(prev.dev));c.hug={};if(!c.label)c.label=prev.label;save();render();toast('前回の「状態」とデバイスを引き継ぎました');};
+  $('bsDel').onclick=()=>{if(D.sheets.length<=1){toast('最後の 1 枚は削除せず、内容を消して使ってください');return;}D.sheets=D.sheets.filter(s=>s.id!==D.cur);D.cur=D.sheets.sort((a,b)=>b.id-a.id)[0].id;save();render();};
+  $('bsDevAdd').onclick=()=>{const n=$('bsDevN').value.trim(),d=$('bsDevD').value;if(!n){toast('名称を入力');return;}const c=cur();c.dev.push({n,d});$('bsDevN').value='';$('bsDevD').value='';save();renderDev();};
+  $('bsGen').onclick=()=>{$('bsOut').value=gen();};
+  $('bsCopy').onclick=async()=>{const t=$('bsOut').value||gen();$('bsOut').value=t;try{await navigator.clipboard.writeText(t);toast('コピーしました');}catch(e){$('bsOut').select();document.execCommand('copy');toast('コピーしました');}};
+  (async()=>{const d=await store.get(KEY);if(d&&d.sheets&&d.sheets.length){D=d;if(!D.sheets.find(s=>s.id===D.cur))D.cur=D.sheets[0].id;}else{const s=blank();D={sheets:[s],cur:s.id};}render();})();
+  window.__bysOpen=()=>{showPage('score');b.click();window.scrollTo(0,0);};
+})();
 (function(){const bar=$('catBar');bar.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
 
 /* 血液ガス代償計算 */
