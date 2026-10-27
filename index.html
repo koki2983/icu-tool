@@ -4461,7 +4461,8 @@ function handleHash(){
   const q=new URLSearchParams(h);
   if(q.get('k'))openTopic(q.get('k'),q.get('s')||null);
   else if(q.get('c'))openCalc(q.get('c'));
-  else if(q.get('p'))showPage(q.get('p'));
+  else if(q.get('p')&&q.get('p')!=='usage')showPage(q.get('p'));
+  if(q.get('p')==='usage')return;
   try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
 }
 window.addEventListener('hashchange',handleHash);
@@ -6365,6 +6366,62 @@ GLOSS.push(
 
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 loadDrugs(); loadKnow(); calc();
+
+
+/* ===== 利用の記録（端末内のみ・非表示。タイトル 7 回タップ or #p=usage で開く） ===== */
+(function(){
+  const KEY='usage';
+  const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+  let U=null;
+  const load=()=>{try{U=JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){U=null;}
+    if(!U||!U.v){U={v:1,first:today(),opens:0,days:{},page:{},calc:{},score:{},know:{},f:{}};}};
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(U));}catch(e){}};
+  const inc=(g,k)=>{if(!U)return;if(!U[g])U[g]={};U[g][k]=(U[g][k]||0)+1;save();};
+  load();
+  // 起動（同じ日に 30 分以上あいたら 1 回と数える）
+  const now=Date.now();if(!U.last||now-U.last>30*60*1000){U.opens++;U.days[today()]=(U.days[today()]||0)+1;}U.last=now;save();
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){const n=Date.now();if(n-U.last>30*60*1000){U.opens++;U.days[today()]=(U.days[today()]||0)+1;}U.last=n;save();}});
+  // ページ
+  document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>inc('page',b.dataset.p)));
+  // 計算カード（開いたとき）
+  const pc=$('p-calc');if(pc)pc.addEventListener('toggle',e=>{const d=e.target;if(d.tagName==='DETAILS'&&d.open){const s=d.querySelector('summary');if(s)inc('calc',s.textContent.trim().slice(0,24));}},true);
+  // スコア
+  const ss=$('scoreSeg');if(ss)ss.addEventListener('click',e=>{const b=e.target.closest('button');if(b)inc('score',b.textContent.trim());});
+  // 知識（goTopic をラップ）
+  if(typeof goTopic==='function'){const g=goTopic;window.goTopic=function(t,from){inc('know',String(t).slice(0,30));return g.apply(this,arguments);};}
+  // 検索・輸液・by system・用語
+  const sb=$('srBtn');if(sb)sb.addEventListener('click',()=>inc('f','検索'));
+  const gs=$('gSearch');if(gs)gs.addEventListener('change',()=>inc('f','用語検索'));
+  const ivA=$('ivAdd');if(ivA)ivA.addEventListener('click',()=>inc('f','輸液シート：薬剤追加'));
+  const bg=$('bsGen');if(bg)bg.addEventListener('click',()=>inc('f','by system：申し送り作成'));
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-ai]');if(b)inc('f','AI に聞く');});
+  // 表示
+  const sheet=document.createElement('div');sheet.id='usSheet';sheet.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:32;align-items:flex-end';
+  sheet.innerHTML='<div class="sheet" style="background:var(--card);width:100%;max-height:88vh;overflow:auto;border-radius:16px 16px 0 0;padding:12px 14px calc(16px + env(safe-area-inset-bottom))"><div class="sheet-h"><b>利用の記録（この端末のみ）</b><button class="small" id="usClose">閉じる</button></div><div id="usBody"></div></div>';
+  document.body.appendChild(sheet);
+  const top=(o,n)=>Object.entries(o||{}).sort((a,b)=>b[1]-a[1]).slice(0,n);
+  const summary=()=>{const days=Object.keys(U.days).length;const L=[];
+    L.push(`ICU ツール 利用の記録（${U.first}〜${today()}）`);L.push(`開いた回数：${U.opens} 回／使った日数：${days} 日`);
+    const pg={calc:'計算',iv:'輸液',drug:'薬剤',score:'スコア',know:'知識',gloss:'用語',check:'チェック'};
+    L.push('タブ：'+(top(U.page,8).map(([k,v])=>`${pg[k]||k} ${v}`).join('、')||'なし'));
+    L.push('計算：'+(top(U.calc,8).map(([k,v])=>`${k} ${v}`).join('、')||'なし'));
+    L.push('スコア：'+(top(U.score,8).map(([k,v])=>`${k} ${v}`).join('、')||'なし'));
+    L.push('知識：'+(top(U.know,8).map(([k,v])=>`${k} ${v}`).join('、')||'なし'));
+    L.push('その他：'+(top(U.f,8).map(([k,v])=>`${k} ${v}`).join('、')||'なし'));
+    return L.join('\n');};
+  const render=()=>{const t=summary();$('usBody').innerHTML=`<p class="muted" style="font-size:12px">この端末でアプリをどれだけ使ったかの記録。端末の外には送られない。アンケートで求められたら、下の文章をコピーして貼る。</p><textarea id="usTxt" readonly style="min-height:200px;font-size:13px">${t.replace(/</g,'&lt;')}</textarea><div class="bar"><button class="small primary" id="usCopy">コピー</button><button class="small danger" id="usReset">記録を消す</button></div>`;
+    $('usCopy').onclick=async()=>{try{await navigator.clipboard.writeText(summary());toast('コピーしました');}catch(e){$('usTxt').select();document.execCommand('copy');toast('コピーしました');}};
+    $('usReset').onclick=()=>{if(confirm('この端末の利用の記録を消しますか？')){localStorage.removeItem(KEY);load();U.opens=1;U.days[today()]=1;U.last=Date.now();save();render();}};};
+  const open=()=>{render();sheet.style.display='flex';};
+  $('usClose').onclick=()=>sheet.style.display='none';
+  sheet.addEventListener('click',e=>{if(e.target===sheet)sheet.style.display='none';});
+  window.__usageOpen=open;
+  // タイトル 7 回タップ
+  let taps=0,tm=null;const ttl=$('ttl');if(ttl){ttl.style.userSelect='none';ttl.addEventListener('click',()=>{taps++;clearTimeout(tm);tm=setTimeout(()=>taps=0,1500);if(taps>=7){taps=0;open();}});}
+  // #p=usage
+  const chk=()=>{const h=location.hash.slice(1);if(!h)return;try{const q=new URLSearchParams(h);if(q.get('p')==='usage'){open();history.replaceState(null,'',location.pathname+location.search);}}catch(e){}};
+  window.addEventListener('hashchange',chk);setTimeout(chk,120);
+})();
 
 </script>
 </body>
