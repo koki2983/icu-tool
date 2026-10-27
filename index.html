@@ -202,7 +202,7 @@ nav button{font-size:10px}
 </head>
 <body>
 
-<header><h1 id="ttl">ガンマ計算</h1><span class="sub"><button id="srBtn" class="small" title="検索">🔍 検索</button> <button id="fsBtn" class="small" title="文字サイズ">文字 Aa</button></span></header>
+<header><h1 id="ttl">計算ツール</h1><span class="sub"><button id="srBtn" class="small" title="検索">🔍 検索</button> <button id="fsBtn" class="small" title="文字サイズ">文字 Aa</button></span></header>
 
 <main>
 
@@ -547,7 +547,7 @@ const isU=u=>u==='umin'||u==='uh';
 const fmt=(n,d)=>{ if(!isFinite(n))return '－'; return Number(n.toFixed(d)).toLocaleString('ja-JP',{maximumFractionDigits:d}); };
 
 /* ---------- ナビ ---------- */
-const titles={calc:'ガンマ計算',iv:'輸液シート',drug:'薬剤登録',score:'スコア計算',know:'知識メモ',gloss:'用語集'};
+const titles={calc:'計算ツール',iv:'輸液シート',drug:'薬剤登録',score:'スコア計算',know:'知識メモ',gloss:'用語集'};
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
   document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.p));
