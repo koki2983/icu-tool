@@ -91,3 +91,4 @@ by_system,ICU の評価の枠組み：by system（系統別評価）,全身管�
 eras,ERAS と GDFT（術後回復強化と目標指向型輸液）,術後,https://koki2983.github.io/icu-tool/#k=eras,読み方と用語／ERAS とは何か／術前の項目／術中の項目／術後の項目（ICU・病棟で看護師が担う部分）／GDFT：目標指向型輸液とは／ICU 看護師の見方と報告／よくある質問
 hemo_params,循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）,循環,https://koki2983.github.io/icu-tool/#k=hemo_params,まず全体像：4 つの視点／① 流れ：心拍出量系／② 圧：血圧と充満圧／③ 抵抗：血管抵抗／④ 酸素が足りているか：酸素運搬と消費／⑤ 前負荷と輸液反応性の指標／⑥ 組み合わせて読む：ショックの型（Forrester・4 つのショック）／⑦ その他の指標（PiCCO・心仕事量）／看護のポイント：測る・読む・報告する
 ino,一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS,呼吸,https://koki2983.github.io/icu-tool/#k=ino,iNO とは／作用のしくみ／副作用と注意点／当院：INOflo DS の画面と本体（写真の見方）／看護の観察と記録／離脱（ウィーニング）の進め方／他の肺血管拡張薬との違い
+calcium,カルシウム製剤（カルチコール・塩化 Ca）：ICU で使う意味と注意,薬剤・感染,https://koki2983.github.io/icu-tool/#k=calcium,何のために使うか（3 つの目的）／ICU で iCa が下がる場面／iCa が低いと何が起きるか／製剤と量／投与の注意（看護）／高 K のときの使い方／Mg との関係
