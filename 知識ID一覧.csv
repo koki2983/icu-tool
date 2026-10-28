@@ -92,3 +92,8 @@ eras,ERAS と GDFT（術後回復強化と目標指向型輸液）,術後,https:
 hemo_params,循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）,循環,https://koki2983.github.io/icu-tool/#k=hemo_params,まず全体像：4 つの視点／① 流れ：心拍出量系／② 圧：血圧と充満圧／③ 抵抗：血管抵抗／④ 酸素が足りているか：酸素運搬と消費／⑤ 前負荷と輸液反応性の指標／⑥ 組み合わせて読む：ショックの型（Forrester・4 つのショック）／⑦ その他の指標（PiCCO・心仕事量）／看護のポイント：測る・読む・報告する
 ino,一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS,呼吸,https://koki2983.github.io/icu-tool/#k=ino,iNO とは／作用のしくみ／副作用と注意点／当院：INOflo DS の画面と本体（写真の見方）／看護の観察と記録／離脱（ウィーニング）の進め方／他の肺血管拡張薬との違い
 calcium,カルシウム製剤（カルチコール・塩化 Ca）：ICU で使う意味と注意,薬剤・感染,https://koki2983.github.io/icu-tool/#k=calcium,何のために使うか（3 つの目的）／ICU で iCa が下がる場面／iCa が低いと何が起きるか／製剤と量／投与の注意（看護）／高 K のときの使い方／Mg との関係
+cs_common,心外術後の共通管理（人工心肺の影響・低心拍出・出血・不整脈）,心外術後,https://koki2983.github.io/icu-tool/#k=cs_common,このカテゴリの読み方／人工心肺（CPB）が体に残すもの／低心拍出症候群（LOS）／出血とタンポナーデ／不整脈とペーシング／呼吸・抜管・離床／帰室後の時間軸（目安）
+avr,AVR・TAVI（大動脈弁）術後の注意点,心外術後,https://koki2983.github.io/icu-tool/#k=avr,術式の理解／AS を直した後の心臓：前負荷と洞調律に依存／伝導障害と徐脈／TAVI 特有の注意／人工弁の管理（AVR・MVR 共通）／報告の目安
+mvr,MVR・MVP（僧帽弁）術後の注意点,心外術後,https://koki2983.github.io/icu-tool/#k=mvr,術式の理解／MR を直した後：隠れていた左室の弱さが出る／MVP 後の SAM（収縮期前方運動）／肺高血圧と右心不全／出血・損傷・不整脈／報告の目安
+aorta_root,上行・弓部大動脈置換、Bentall・David、急性 A 型解離術後の注意点,心外術後,https://koki2983.github.io/icu-tool/#k=aorta_root,術式の理解／一番守るもの：吻合部と血圧／臓器虚血の観察（1 時間ごと）／出血と凝固／Bentall・David 特有／報告の目安
+tricuspid,三尖弁手術（TAP・TVR）と右心不全・肺高血圧のある術後,心外術後,https://koki2983.github.io/icu-tool/#k=tricuspid,術式と背景／右室を守る 3 原則／右心不全の見分け方／TAP・TVR 特有の注意／報告の目安
