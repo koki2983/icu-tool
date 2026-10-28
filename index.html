@@ -5294,6 +5294,115 @@ GLOSS.push(
 ['カーボローディング','炭水化物飲料|術前炭水化物負荷|carbohydrate loading','手術前夜と 2 時間前に糖質 12.5% の飲料を飲み、術後のインスリン抵抗性と筋蛋白の分解を減らす ERAS の項目。糖尿病では血糖を見ながら','ERAS と GDFT（術後回復強化と目標指向型輸液）']
 );
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
+/* ===== 循環のパラメーター：意味と正常値 ===== */
+FIG.hemo_map=`<svg viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="9">
+<text x="170" y="14" font-size="11" fill="#1F2A30" text-anchor="middle" font-weight="700">パラメーターのつながり：何が何を決めるか</text>
+<rect x="8" y="26" width="98" height="40" rx="6" fill="#E8F1FA" stroke="#3B8BD0" stroke-width="1.5"/><text x="57" y="42" font-size="9" fill="#1E3A5F" text-anchor="middle" font-weight="700">前負荷（充満）</text><text x="57" y="56" font-size="7.5" fill="#1F2A30" text-anchor="middle">CVP・PAWP・GEDI・SVV</text>
+<rect x="121" y="26" width="98" height="40" rx="6" fill="#E8F1FA" stroke="#3B8BD0" stroke-width="1.5"/><text x="170" y="42" font-size="9" fill="#1E3A5F" text-anchor="middle" font-weight="700">収縮力</text><text x="170" y="56" font-size="7.5" fill="#1F2A30" text-anchor="middle">EF・CPO・dPmax・LVSWI</text>
+<rect x="234" y="26" width="98" height="40" rx="6" fill="#E8F1FA" stroke="#3B8BD0" stroke-width="1.5"/><text x="283" y="42" font-size="9" fill="#1E3A5F" text-anchor="middle" font-weight="700">後負荷（抵抗）</text><text x="283" y="56" font-size="7.5" fill="#1F2A30" text-anchor="middle">SVR・PVR・MAP</text>
+<path d="M57 66 L150 96" stroke="#6B7A80" stroke-width="1.2" fill="none"/><path d="M170 66 L170 96" stroke="#6B7A80" stroke-width="1.2" fill="none"/><path d="M283 66 L190 96" stroke="#6B7A80" stroke-width="1.2" fill="none"/>
+<rect x="110" y="98" width="120" height="34" rx="6" fill="#FFF7E6" stroke="#E0A030" stroke-width="1.5"/><text x="170" y="112" font-size="9" fill="#8A4B00" text-anchor="middle" font-weight="700">1 回拍出量 SV（60〜100 mL）</text><text x="170" y="125" font-size="7.5" fill="#1F2A30" text-anchor="middle">× 心拍数 HR（60〜100）</text>
+<path d="M170 132 L170 150" stroke="#6B7A80" stroke-width="1.2" fill="none"/>
+<rect x="95" y="152" width="150" height="34" rx="6" fill="#FFF1E0" stroke="#E0A030" stroke-width="1.5"/><text x="170" y="166" font-size="9" fill="#8A4B00" text-anchor="middle" font-weight="700">心拍出量 CO（4〜8 L/分）</text><text x="170" y="179" font-size="7.5" fill="#1F2A30" text-anchor="middle">÷ 体表面積 ＝ CI（2.5〜4.0 L/分/m²）</text>
+<path d="M95 169 L48 200" stroke="#6B7A80" stroke-width="1.2" fill="none"/><path d="M245 169 L292 200" stroke="#6B7A80" stroke-width="1.2" fill="none"/>
+<rect x="8" y="202" width="130" height="44" rx="6" fill="#E6F4EA" stroke="#2E7D32" stroke-width="1.5"/><text x="73" y="217" font-size="8.5" fill="#1B5E20" text-anchor="middle" font-weight="700">MAP ＝ CO × SVR ＋ CVP</text><text x="73" y="230" font-size="7.2" fill="#1F2A30" text-anchor="middle">CO が落ちても SVR が上がれば</text><text x="73" y="241" font-size="7.2" fill="#1F2A30" text-anchor="middle">血圧は保たれる（血圧だけでは不明）</text>
+<rect x="202" y="202" width="130" height="44" rx="6" fill="#F3E8FA" stroke="#8E44AD" stroke-width="1.5"/><text x="267" y="217" font-size="9" fill="#5B2C6F" text-anchor="middle" font-weight="700">酸素運搬 DO₂ ＝ CO × CaO₂</text><text x="267" y="230" font-size="7.5" fill="#1F2A30" text-anchor="middle">CaO₂ ≒ 1.34 × Hb × SaO₂</text><text x="267" y="241" font-size="7.5" fill="#1F2A30" text-anchor="middle">足りているか → SvO₂・乳酸</text>
+<text x="170" y="266" font-size="8" fill="#1F2A30" text-anchor="middle">評価の 4 つの視点：流れ（CO）・圧（MAP・充満圧）・抵抗（SVR）</text><text x="170" y="277" font-size="8" fill="#1F2A30" text-anchor="middle">・酸素が足りているか（SvO₂・乳酸）</text>
+<text x="170" y="291" font-size="7.5" fill="#6B7A80" text-anchor="middle">正常値は成人の一般的な目安。当院の基準・医師の目標値が優先</text>
+</svg>`;
+KNOW.push({t:'循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）',fig:'hemo_map',s:[
+ {h:'まず全体像：4 つの視点',b:[
+  '循環の数字は多いが、見る視点は 4 つ。①流れ（CO・CI・SV）②圧（血圧 MAP、充満圧 CVP・PAWP）③抵抗（SVR・PVR）④酸素が足りているか（SvO₂・乳酸・DO₂）',
+  '血圧は「流れ × 抵抗」の結果。MAP ≒ CO × SVR ＋ CVP。CO が落ちても血管が締まれば（SVR↑）血圧は保たれる。だから血圧が正常でも末梢が冷たい・乳酸が上がる患者がいる',
+  '1 回拍出量 SV は「前負荷（心臓にどれだけ戻ってくるか）」「収縮力」「後負荷（どれだけ抵抗に逆らって押すか）」で決まる。CO ＝ SV × HR',
+  '読み方：CO シーオー、CI シーアイ、SV エスブイ、SVR エスブイアール、PAWP パウプ（ウェッジ圧）、SvO₂ エスブイオーツー（混合静脈血酸素飽和度）、ScvO₂ エスシーブイオーツー、DO₂ ディーオーツー、CPO シーピーオー、PAPi パピ',
+  '下の正常値は成人の一般的な目安（スワンガンツの標準値）。目標値は患者ごとに医師が決める。「正常範囲か」より「昨日より・1 時間前よりどう動いたか」「他の指標と合うか」で読む'
+ ]},
+ {h:'① 流れ：心拍出量系',b:[
+  'CO（心拍出量、cardiac output）：1 分間に左室が送り出す血液の量。正常 4〜8 L/分。熱希釈法（スワンガンツ）、動脈圧波形解析（FloTrac・PiCCO）、エコー（LVOT VTI）で測る',
+  'CI（心係数、cardiac index）：CO ÷ 体表面積（BSA）。体格で補正した値で、ICU ではこちらで話す。正常 2.5〜4.0 L/分/m²。2.2 未満で低心拍出、2.0 未満＋うっ血で心原性ショックの目安（Forrester）',
+  'SV（1 回拍出量、stroke volume）：1 拍で出る量。正常 60〜100 mL。SVI（1 回拍出係数）＝ SV ÷ BSA、33〜47 mL/拍/m²。頻脈で CO が保たれていても SV が小さければ「無理をしている」',
+  'HR（心拍数）：60〜100/分。CO ＝ SV × HR なので、SV が小さい患者は HR を上げて代償する。逆に 140 超の頻脈は充満時間が足りず CO が落ちる',
+  'EF（駆出率、ejection fraction）：拡張末期容積のうち何 % を出せたか。LVEF 正常 55〜70%（40% 以下で HFrEF）。RVEF 40〜60%。EF は「収縮力」の目安だが、前負荷・後負荷でも変わる',
+  'CPO（心仕事率、cardiac power output）＝ MAP × CO ÷ 451（W）。正常 約 1 W。0.6 W 未満は心原性ショックの死亡と強く相関（SHOCK trial）。「圧 × 流れ」で心臓の実力を 1 つの数字で表す'
+ ]},
+ {h:'② 圧：血圧と充満圧',b:[
+  'MAP（平均血圧）：拡張期圧 ＋ 脈圧 ÷ 3。正常 70〜100 mmHg。臓器灌流の指標で、ICU の目標は原則 65 mmHg 以上（敗血症）、脳・腎の病態や高血圧の既往では高めに設定',
+  '収縮期／拡張期血圧：90〜140／60〜90。脈圧（収縮期 − 拡張期）が狭い（25 未満）＝ SV が小さい、広い＝ 大動脈弁逆流・血管拡張・IABP',
+  'CVP／RAP（中心静脈圧／右房圧）：右心の充満圧。正常 2〜6 mmHg（施設により 2〜8）。呼気終末で読む。「低い＝ 輸液が要る」とは限らない（輸液反応性は SVV・PLR で見る）。高い（12 超）は右心不全・タンポナーデ・PEEP・過剰輸液・三尖弁逆流',
+  'RVP（右室圧）：15〜30／0〜8 mmHg。スワンガンツ挿入時に通過する波形',
+  'PAP（肺動脈圧）：15〜30／8〜15 mmHg、平均 PAP（mPAP）10〜20。安静時 mPAP 20 mmHg 超（かつ PVR 2 WU 超）が肺高血圧（ESC/ERS 2022）。心外術後・ARDS・PE で上がる',
+  'PAWP／PCWP（肺動脈楔入圧、ウェッジ圧）：バルーンで肺動脈を閉塞して測る、左房圧 ≒ 左室拡張末期圧の代用。正常 6〜12 mmHg。15 超で左心不全・容量過剰（肺うっ血）、18 超で肺水腫になりやすい。ARDS の定義では「PAWP 18 以下（心原性でない）」を使っていた',
+  'LAP（左房圧）：心外術後に左房ラインがあるとき直接測る。6〜12 mmHg。PAWP と同じ意味',
+  'PAPi（肺動脈拍動性指数）＝（収縮期 PAP − 拡張期 PAP）÷ RAP。右室機能の指標。心筋梗塞で 0.9 未満、LVAD 後で 1.85 未満が右心不全の目安。RAP が上がって PAP の脈圧が小さい＝右室が押せていない'
+ ]},
+ {h:'③ 抵抗：血管抵抗',b:[
+  'SVR（全身血管抵抗、systemic vascular resistance）＝（MAP − CVP）÷ CO × 80。正常 800〜1,200 dyn·s/cm⁵。SVRI（÷ BSA ではなく × BSA 補正）1,970〜2,390 dyn·s/cm⁵/m²。Wood 単位なら ÷ 80（10〜15 WU）',
+  'SVR が低い（800 未満）：血管が開いている ＝ 敗血症・アナフィラキシー・脊髄損傷（神経原性）・肝不全・人工心肺後の血管麻痺（vasoplegia）。ノルアドレナリン・バソプレシンの適応',
+  'SVR が高い（1,500 超）：血管が締まっている ＝ 心原性・出血性ショックの代償、低体温、痛み・不安、昇圧薬が多すぎる。血圧が保たれていても末梢は冷たく、後負荷が心臓の負担になる',
+  'PVR（肺血管抵抗）＝（mPAP − PAWP）÷ CO × 80。正常 20〜120 dyn·s/cm⁵（0.25〜1.5 WU）。PVRI 255〜285。低酸素・アシドーシス・PEEP・ARDS・PE で上がり、右室の後負荷になる。NO 吸入・PGI₂・酸素化の改善で下げる',
+  '数字の注意：SVR は CO と MAP から「計算した値」なので、CO の測定誤差がそのまま乗る。1 回の値より傾向で見る'
+ ]},
+ {h:'④ 酸素が足りているか：酸素運搬と消費',b:[
+  'CaO₂（動脈血酸素含量）≒ 1.34 × Hb × SaO₂ ＋ 0.003 × PaO₂。正常 17〜20 mL/dL。Hb が半分になると酸素含量も半分。SpO₂ 100% でも Hb 6 では酸素は運べない',
+  'DO₂（酸素運搬量）＝ CO × CaO₂ × 10。正常 950〜1,150 mL/分、DO₂I（÷ BSA）500〜600 mL/分/m²。CO・Hb・SaO₂ の 3 つで決まる。どれを直すのが一番効くかを考える',
+  'VO₂（酸素消費量）：正常 200〜250 mL/分、VO₂I 120〜160。発熱・シバリング・けいれん・呼吸努力・興奮で増え、鎮静・低体温・筋弛緩で減る',
+  'O₂ER（酸素摂取率）＝ VO₂ ÷ DO₂。正常 22〜30%。運搬が減ると摂取率を上げて代償し、50% を超えると嫌気性代謝 → 乳酸が上がる',
+  'SvO₂（混合静脈血酸素飽和度）：肺動脈血＝全身から戻った血の酸素飽和度。正常 60〜80%（目安 65〜75%）。「運んだ酸素のうち使われずに戻ってきた割合」。低い（60% 未満）＝ 供給不足（CO↓・Hb↓・SaO₂↓）か消費増。高い（80% 超）＝ 敗血症で組織が酸素を使えない、シャント、低体温、測定異常',
+  'ScvO₂（中心静脈血酸素飽和度）：CV カテーテルの先（上大静脈）から採血。SvO₂ より 3〜5% 高めに出る。70% 以上が目標（敗血症の初期蘇生の指標として使われた）',
+  '乳酸：2 mmol/L 未満が正常。酸素が足りない（嫌気性代謝）だけでなく、肝クリアランス低下、カテコラミン、けいれん、メトホルミンでも上がる。2 時間ごとの推移（乳酸クリアランス 10〜20%/2 時間）が蘇生の指標'
+ ]},
+ {h:'⑤ 前負荷と輸液反応性の指標',b:[
+  '静的指標（その時点の充満）：CVP、PAWP、GEDI（PiCCO：全心拡張末期容積係数、680〜800 mL/m²）、ITBVI（胸腔内血液容積係数、850〜1,000 mL/m²）、エコーの IVC 径・LVEDA。「輸液したら CO が増えるか」の予測には弱い',
+  '動的指標（輸液反応性）：SVV（1 回拍出量変動）・PPV（脈圧変動）。正常 10〜13% 未満。13% 超なら輸液で CO が増える可能性が高い。条件：人工呼吸（調節換気）・1 回換気量 8 mL/kg 以上・洞調律・開胸していない。自発呼吸・不整脈では使えない',
+  'PLR（受動的下肢挙上）：上半身 45° → 仰臥位で下肢 45° 挙上し、1 分以内に CO（または SV・VTI）が 10% 以上増えれば輸液反応あり。自発呼吸・不整脈でも使える「自己輸液テスト」',
+  '輸液チャレンジ：250〜500 mL を 10〜15 分で入れて SV・CO が 10〜15% 増えるか。増えなければ、それ以上の輸液は浮腫を増やすだけ',
+  'ELWI（PiCCO：肺血管外水分量係数）：正常 3〜7 mL/kg。10 超で肺水腫。PVPI（肺血管透過性係数）1〜3、3 超で透過性亢進（ARDS 型）、心原性なら ELWI↑ で PVPI 正常'
+ ]},
+ {h:'⑥ 組み合わせて読む：ショックの型（Forrester・4 つのショック）',b:[
+  'Forrester 分類（心筋梗塞）：CI 2.2 と PAWP 18 で 4 群。I 群（CI 2.2 超・PAWP 18 以下）正常／II 群（CI 保たれ・PAWP 18 超）うっ血 → 利尿薬・血管拡張薬／III 群（CI 2.2 以下・PAWP 18 以下）脱水 → 輸液／IV 群（CI 2.2 以下・PAWP 18 超）心原性ショック → 強心薬・補助循環',
+  'Nohria-Stevenson（身体所見版）：Warm/Cold（灌流）× Wet/Dry（うっ血）。数字がなくても同じ考え方で分けられる',
+  '心原性ショック：CI↓（2.0〜2.2 未満）、PAWP↑（18 超）、CVP↑、SVR↑、SvO₂↓、CPO 0.6 未満。冷たくて湿っている',
+  '循環血液量減少性（出血・脱水）：CI↓、PAWP↓、CVP↓、SVR↑、SvO₂↓。冷たくて乾いている。SVV・PPV が大きい',
+  '血液分布異常性（敗血症・アナフィラキシー・神経原性）：CI↑（初期）、PAWP 正常〜低、CVP 低、SVR↓↓、SvO₂ 正常〜高。温かい。敗血症が進むと心機能が落ちて CI↓ に転じる',
+  '閉塞性（タンポナーデ・緊張性気胸・肺塞栓）：CI↓、CVP↑↑、SVR↑。タンポナーデでは右房圧 ≒ PAWP（圧の均等化）、PE では PAP↑・PVR↑・PAWP 正常〜低',
+  '右心不全：CVP↑ なのに PAWP 正常〜低、PAPi↓、CI↓。左心だけ見ていると「充満圧が低いから輸液」と間違える'
+ ]},
+ {h:'⑦ その他の指標（PiCCO・心仕事量）',b:[
+  'PiCCO（経肺熱希釈＋動脈圧波形解析）：CI（連続）、GEDI、ITBVI、ELWI、PVPI、SVV・PPV、CFI（心機能係数 4.5〜6.5 /分）、GEF（全心駆出率 25〜35%）、dPmax（左室収縮の速さ 1,200〜2,000 mmHg/秒）、SVRI。大腿動脈の専用カテーテルと CV が要る',
+  'FloTrac／Vigileo・ProAQT：A ライン波形から CO・SV・SVV を連続表示。較正なしなので絶対値より傾向。血管作動薬を急に変えたとき・不整脈・IABP 中は精度が落ちる',
+  'LVSWI（左室 1 回仕事係数）＝ SVI ×（MAP − PAWP）× 0.0136。正常 50〜62 g·m/m²。RVSWI ＝ SVI ×（mPAP − CVP）× 0.0136、5〜10 g·m/m²。「どれだけの圧に逆らってどれだけ出したか」',
+  'エコーで代用できるもの：LVOT VTI（18〜22 cm。SV の代用）、E/e′（左室充満圧、15 超で PAWP 高い）、IVC 径と呼吸性変動（CVP の推定）、TAPSE（右室機能、17 mm 未満で低下）、推定右室圧（TR 圧較差 ＋ RAP）'
+ ]},
+ {h:'看護のポイント：測る・読む・報告する',b:[
+  '測定の前提をそろえる：トランスデューサーの高さ（第 4 肋間・中腋窩線）、ゼロ校正、呼気終末で読む、体位（ヘッドアップ 30° までは許容。測定のたびに同じ条件で）',
+  'CVP・PAP・PAWP は PEEP の影響を受ける。PEEP 10 以上では実際より高く出る（目安：PEEP の 1/3〜1/2 を引いて考える）。PEEP を変えた前後の値を比べない',
+  'PAWP 測定（スワンガンツ）：バルーンを膨らませるのは測定の間だけ（10〜15 秒）。膨らませっぱなしは肺梗塞・肺動脈破裂。波形が常に楔入している（PAP の波形が消えている）ときはすぐ報告',
+  '熱希釈 CO：同じ温度・同じ量の注入液を、呼気終末のタイミングで 3 回測って平均。三尖弁逆流・シャントがあると不正確',
+  '報告の目安（一般例。当院の基準が優先）：CI 2.2 未満、MAP 65 未満（または目標未満）、CVP 12 超、PAWP 18 超、SVR 600 未満または 1,800 超、SvO₂ 60% 未満、乳酸 2 超または上昇傾向、SVV 15% 超＋血圧低下、PAPi 1 未満、CPO 0.6 未満',
+  '報告のしかた：数字を単独で言わず「流れ・圧・抵抗・酸素」をセットで。「MAP 62、CI 1.9、PAWP 20、SvO₂ 55、乳酸 3.5。ノルアド 0.1γ・ドブタミン 3γ 中。末梢冷たく尿量 20 mL/h」',
+  '関連ツール：計算タブ「血行動態」で CI・SVR・DO₂ などを計算できる。知識「ショックの分類と初期対応」「循環作動薬と身体の相互作用」「心エコーの見方」も参照'
+ ]}
+]});
+META['循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）']={cat:'循環',key:['4 つの視点：流れ（CI 2.5〜4.0）・圧（MAP 65 以上、CVP 2〜6、PAWP 6〜12）・抵抗（SVR 800〜1,200）・酸素（SvO₂ 65〜75%、乳酸 2 未満）','MAP ＝ CO × SVR ＋ CVP。血圧が正常でも CO が落ちていることがある','報告は「流れ・圧・抵抗・酸素」をセットで。正常範囲より「どう動いたか」'],secfig:{}};
+(function(){const o=ORDER['循環']||(ORDER['循環']=[]);const i=o.indexOf('ショックの分類と初期対応');o.splice(i<0?0:i,0,'循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）');})();
+KID.hemo_params='循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）';KID_R[KID.hemo_params]='hemo_params';
+XLINK.push(['心係数','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],['PAWP','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],['SVR','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],['SvO₂','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）']);
+(function(){const T='循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）';GLOSS.forEach(g=>{if(['CI','CO','SVR','SvO₂','ScvO₂','DO₂','CVP','MAP','PAWP'].includes(g[0]))g[3]=T;});})();
+GLOSS.push(
+['SV','1 回拍出量|stroke volume|SVI|1 回拍出係数','1 拍で左室が送り出す血液量。正常 60〜100 mL。体表面積で割った SVI は 33〜47 mL/拍/m²。CO ＝ SV × 心拍数','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],
+['PVR','肺血管抵抗|pulmonary vascular resistance','（平均肺動脈圧 − PAWP）÷ CO × 80。正常 20〜120 dyn·s/cm⁵（0.25〜1.5 WU）。低酸素・アシドーシス・ARDS・肺塞栓で上がり右室の負担になる','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],
+['PAP','肺動脈圧|pulmonary artery pressure|mPAP','スワンガンツで測る肺動脈の圧。正常 15〜30／8〜15 mmHg、平均 10〜20。安静時平均 20 mmHg 超が肺高血圧','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],
+['VO₂','酸素消費量|VO2|O₂ER|酸素摂取率','1 分間に組織が使う酸素量。正常 200〜250 mL/分。DO₂ に対する割合が O₂ER（22〜30%）で、50% を超えると嫌気性代謝になり乳酸が上がる','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],
+['CPO','心仕事率|cardiac power output','MAP × CO ÷ 451（W）。正常 約 1 W。0.6 W 未満は心原性ショックの死亡と強く相関。圧と流れを 1 つにした心臓の実力の指標','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],
+['PAPi','肺動脈拍動性指数|pulmonary artery pulsatility index','（収縮期 PAP − 拡張期 PAP）÷ 右房圧。右室機能の指標。心筋梗塞で 0.9 未満、LVAD 後で 1.85 未満が右心不全の目安','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],
+['PiCCO','ピッコ|経肺熱希釈法|GEDI|ITBVI|ELWI|PVPI','大腿動脈カテーテルと CV で、CI・前負荷（GEDI 680〜800、ITBVI 850〜1,000 mL/m²）・肺の水（ELWI 3〜7 mL/kg）・血管透過性（PVPI 1〜3）を測るモニター','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],
+['ELWI','肺血管外水分量係数|extravascular lung water index','PiCCO で測る肺の間質・肺胞の水の量。正常 3〜7 mL/kg、10 超で肺水腫。PVPI が高ければ透過性亢進（ARDS）、正常なら心原性','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],
+['Forrester 分類','フォレスター分類|フォレスター','心筋梗塞の血行動態を CI 2.2 と PAWP 18 で 4 群に分ける。I 正常、II うっ血（利尿・血管拡張）、III 脱水（輸液）、IV 心原性ショック（強心薬・補助循環）','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],
+['CaO₂','動脈血酸素含量|CaO2','1.34 × Hb × SaO₂ ＋ 0.003 × PaO₂。正常 17〜20 mL/dL。Hb が下がれば SpO₂ 100% でも酸素は運べない','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）'],
+['LVSWI','左室 1 回仕事係数|RVSWI|右室 1 回仕事係数','SVI ×（MAP − PAWP）× 0.0136。正常 50〜62 g·m/m²。右室は SVI ×（mPAP − CVP）× 0.0136 で 5〜10。どれだけの圧に逆らってどれだけ出したか','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）']
+);
+GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 (function(){const bar=$('catBar');bar.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
 
 /* 血液ガス代償計算 */
@@ -5739,7 +5848,7 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 
 
 /* よく使う・入口・ステッパー（すべて軽い処理） */
-const KNOW_REV='2026 年 10 月 27 日（ERAS と GDFT・by system・JACCN 重症患者管理クイックガイド・心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
+const KNOW_REV='2026 年 10 月 28 日（循環のパラメーター・ERAS と GDFT・by system・JACCN 重症患者管理クイックガイド・心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
   const SHORT=[['P/F','P/F 比'],['波形','波形の見方'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
@@ -5777,7 +5886,7 @@ const KNOW_REV='2026 年 10 月 27 日（ERAS と GDFT・by system・JACCN 重�
     '脳外科・脳卒中':['脳の解剖と脳ドレーン','重症頭部外傷と びまん性軸索損傷（DAI）','脳梗塞（症状と急性期の看護）','脳の解剖（葉・脳幹・脳室）','CT の見方（ICU で必要な範囲）'],
     '呼吸不全・人工呼吸':['人工呼吸器：はじめての受け持ち（仕組み・モード・1 日の流れ）','呼吸の生理と人工呼吸管理','P-SILI（患者自身の呼吸による肺損傷）','酸素療法','血液ガスの読み方','胸部X線の見方'],
     '敗血症':['敗血症','ショックの分類と初期対応','循環作動薬と身体の相互作用','抗菌薬の基本','DIC と凝固管理'],
-    'PCPS・IABP':['PCPS / VA-ECMO','IABP','カテーテル管理とモニタリング','体液量の評価'],
+    'PCPS・IABP':['循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）','PCPS / VA-ECMO','IABP','カテーテル管理とモニタリング','体液量の評価'],
     'CHDF':['CHDF（持続的血液濾過透析）','急性腎障害（AKI）と電解質','体液量の評価'],
     '大動脈・消化器術後':['胸部・腹部大動脈瘤術後','消化器術後のドレーン管理','ERAS と GDFT（術後回復強化と目標指向型輸液）','脊椎・脊髄と体表の目安','術後鎮痛（多角的鎮痛と神経ブロック）'],
     '急変・当直':['急変の察知と初期対応（ABCDE）','心肺蘇生（ACLS の要点）','電気的除細動とカルディオバージョン','心電図の読み方'],
