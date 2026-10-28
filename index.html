@@ -5403,6 +5403,109 @@ GLOSS.push(
 ['LVSWI','左室 1 回仕事係数|RVSWI|右室 1 回仕事係数','SVI ×（MAP − PAWP）× 0.0136。正常 50〜62 g·m/m²。右室は SVI ×（mPAP − CVP）× 0.0136 で 5〜10。どれだけの圧に逆らってどれだけ出したか','循環のパラメーター：意味と正常値（CO・CI・SVR・PAWP・SvO₂ ほか）']
 );
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
+/* ===== 一酸化窒素吸入療法（iNO）と当院の INOflo DS ===== */
+FIG.ino_screen=`<svg viewBox="0 0 340 330" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="9">
+<text x="170" y="14" font-size="10.5" fill="#1F2A30" text-anchor="middle" font-weight="700">当院の NO 供給装置（INOflo DS）：画面と本体の見方</text>
+<rect x="8" y="22" width="324" height="150" rx="8" fill="#DCE9F2" stroke="#9FB8CC" stroke-width="1.5"/>
+<rect x="14" y="28" width="26" height="16" rx="3" fill="#CFE3F2" stroke="#8FB3CC"/><text x="27" y="40" font-size="8" text-anchor="middle">🔔</text>
+<text x="170" y="40" font-size="8" fill="#1F2A30" text-anchor="middle">患者情報未入力</text>
+<rect x="300" y="28" width="26" height="16" rx="3" fill="#CFE3F2" stroke="#8FB3CC"/><text x="313" y="40" font-size="8" text-anchor="middle">☰</text>
+<rect x="14" y="48" width="100" height="52" rx="4" fill="#F4F8FB" stroke="#B8CCD9"/><text x="20" y="62" font-size="9" font-weight="700">O₂ %</text><text x="20" y="92" font-size="20" font-weight="700">95</text><rect x="80" y="52" width="28" height="18" rx="2" fill="#BFD9EA" stroke="#8FB3CC"/><text x="94" y="65" font-size="8" text-anchor="middle">--</text><rect x="80" y="76" width="28" height="18" rx="2" fill="#BFD9EA" stroke="#8FB3CC"/><text x="94" y="89" font-size="8" text-anchor="middle">20</text>
+<rect x="120" y="48" width="100" height="52" rx="4" fill="#F4F8FB" stroke="#B8CCD9"/><text x="126" y="62" font-size="9" font-weight="700">NO₂ ppm</text><text x="126" y="92" font-size="20" font-weight="700">0.1</text><rect x="186" y="52" width="28" height="18" rx="2" fill="#BFD9EA" stroke="#8FB3CC"/><text x="200" y="65" font-size="8" text-anchor="middle">3.0</text>
+<rect x="226" y="48" width="100" height="52" rx="4" fill="#F4F8FB" stroke="#B8CCD9"/><text x="232" y="62" font-size="9" font-weight="700">NO ppm</text><text x="232" y="92" font-size="20" font-weight="700">0.0</text><rect x="292" y="52" width="28" height="18" rx="2" fill="#BFD9EA" stroke="#8FB3CC"/><text x="306" y="65" font-size="8" text-anchor="middle">60</text><rect x="292" y="76" width="28" height="18" rx="2" fill="#BFD9EA" stroke="#8FB3CC"/><text x="306" y="89" font-size="8" text-anchor="middle">--</text>
+<circle cx="7" cy="74" r="7" fill="#C0392B"/><text x="7" y="77.5" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">1</text>
+<circle cx="120" cy="74" r="7" fill="#C0392B"/><text x="120" y="77.5" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">2</text>
+<circle cx="226" cy="74" r="7" fill="#C0392B"/><text x="226" y="77.5" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">3</text>
+<circle cx="94" cy="47" r="6" fill="#E0A030"/><text x="94" y="50" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">A</text>
+<rect x="14" y="106" width="26" height="60" rx="3" fill="#fff" stroke="#8FB3CC"/><text x="27" y="140" font-size="6" text-anchor="middle" transform="rotate(-90 27 140)">INOflo</text>
+<circle cx="80" cy="136" r="22" fill="#fff" stroke="#8FB3CC"/><circle cx="80" cy="136" r="9" fill="#BFD9EA"/><text x="80" y="139" font-size="6" text-anchor="middle">NO ppm</text><text x="80" y="110" font-size="6" text-anchor="middle">20</text><text x="104" y="139" font-size="6" text-anchor="middle">60</text><text x="80" y="164" font-size="6" text-anchor="middle">0</text>
+<path d="M112 118 L150 118 L150 110 L190 110" stroke="#1F2A30" stroke-width="1.5" fill="none"/><rect x="150" y="104" width="22" height="12" fill="#fff" stroke="#1F2A30"/><text x="161" y="113" font-size="6" text-anchor="middle">注入</text>
+<path d="M190 110 L250 150 L262 150" stroke="#1F2A30" stroke-width="3" fill="none"/>
+<path d="M240 108 L240 140 L252 140" stroke="#3B8BD0" stroke-width="1" fill="none" stroke-dasharray="2 2"/><rect x="232" y="100" width="16" height="12" rx="3" fill="#CFE3F2" stroke="#3B8BD0"/>
+<rect x="262" y="128" width="60" height="40" rx="3" fill="#F4F8FB" stroke="#B8CCD9"/><text x="292" y="150" font-size="7" text-anchor="middle">患者</text>
+<circle cx="27" cy="106" r="7" fill="#C0392B"/><text x="27" y="109.5" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">4</text>
+<circle cx="80" cy="110" r="7" fill="#C0392B"/><text x="80" y="113.5" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">5</text>
+<circle cx="161" cy="99" r="7" fill="#C0392B"/><text x="161" y="102.5" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">6</text>
+<circle cx="224" cy="100" r="7" fill="#C0392B"/><text x="224" y="103.5" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">7</text>
+<rect x="8" y="180" width="324" height="56" rx="8" fill="#EEF2F4" stroke="#B8C4C9" stroke-width="1.5"/>
+<circle cx="40" cy="208" r="12" fill="#fff" stroke="#8FA0A8"/><circle cx="80" cy="208" r="10" fill="#fff" stroke="#8FA0A8"/><text x="60" y="230" font-size="6.5" text-anchor="middle" fill="#1F2A30">インジェクター ／ サンプル</text>
+<circle cx="170" cy="208" r="20" fill="#fff" stroke="#8FA0A8" stroke-width="2"/><text x="170" y="234" font-size="6.5" text-anchor="middle" fill="#1F2A30">設定ノブ</text>
+<circle cx="290" cy="208" r="16" fill="#fff" stroke="#8FA0A8" stroke-width="2"/><text x="290" y="234" font-size="6.5" text-anchor="middle" fill="#1F2A30">バックアップ 250 mL/min</text>
+<circle cx="40" cy="190" r="7" fill="#C0392B"/><text x="40" y="193.5" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">8</text>
+<circle cx="170" cy="186" r="7" fill="#C0392B"/><text x="170" y="189.5" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">9</text>
+<circle cx="290" cy="188" r="7" fill="#C0392B"/><text x="290" y="191.5" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">10</text>
+<text x="12" y="252" font-size="7.5" fill="#1F2A30">① 吸気 O₂ 濃度（実測）② NO₂（実測・上限 3.0 ppm）③ NO（実測・上限 60）</text><text x="12" y="264" font-size="7.5" fill="#1F2A30">A 値の横の四角＝アラームの上限（上）・下限（下）　④ ボンベ残量</text><text x="12" y="276" font-size="7.5" fill="#1F2A30">⑤ 設定 NO 濃度のダイヤル　⑥ インジェクター（吸気回路に NO を混ぜる）</text><text x="12" y="288" font-size="7.5" fill="#1F2A30">⑦ サンプルライン・水トラップ　⑧ 本体コネクター（インジェクター線・サンプル）</text><text x="12" y="300" font-size="7.5" fill="#1F2A30">⑨ NO 設定ノブ（回して押す）　⑩ バックアップ供給 250 mL/min（バッグ換気用）</text><text x="170" y="318" font-size="7" fill="#6B7A80" text-anchor="middle">表示名・操作は実機の取扱説明書と CE の説明が優先。設定変更は医師の指示で</text></svg>`;
+KNOW.push({t:'一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS',fig:'ino_screen',s:[
+ {h:'iNO とは',b:[
+  '読み方：iNO（アイエヌオー、inhaled nitric oxide、一酸化窒素吸入療法）。NO（エヌオー、一酸化窒素）。NO₂（二酸化窒素、有害な副生成物）。MetHb（メトヘモグロビン）。PPHN（新生児遷延性肺高血圧症）',
+  '一酸化窒素のガスを人工呼吸器の吸気に数 ppm〜数十 ppm 混ぜて吸わせる治療。肺の血管だけを広げる「選択的肺血管拡張薬」',
+  '日本での保険適応：①新生児の肺高血圧を伴う低酸素性呼吸不全（PPHN）②心臓手術の周術期における肺高血圧の改善（成人も可）。製剤は アイノフロー（INOflo）吸入用 800 ppm（エア・ウォーター）',
+  'ICU で使う場面：心臓手術後（弁膜症・先天性心疾患・心移植・LVAD 後）の肺高血圧と右心不全、肺塞栓や ARDS の重い低酸素で一時的に酸素化を改善したいとき（ARDS では適応外・死亡率は改善しない）、VA-ECMO からの離脱時の右心のサポート',
+  '当院の装置は INOflo DS（インジェクター方式）。NO 800 ppm のボンベから、人工呼吸器の吸気流量に比例して NO を注入し、患者の手前でサンプリングして NO・NO₂・O₂ を実測する'
+ ]},
+ {h:'作用のしくみ',b:[
+  'NO は血管内皮が作る「血管を緩める伝達物質」そのもの。平滑筋の cGMP を増やして血管を拡張する',
+  '吸入すると「換気されている肺胞」の周りの血管だけが広がる → 換気のよい所に血流が集まる → 換気血流比（V/Q）が改善して酸素化が上がる。全身に入った NO はヘモグロビンに数秒で捕まって失活するので、血圧は下がらない（静注の血管拡張薬との違い）',
+  '肺血管抵抗（PVR）と肺動脈圧（PAP）が下がる → 右室の後負荷が減り、右心不全が改善する。右室が楽になると左室への血流も増えて心拍出量が上がる',
+  '効く量：5〜20 ppm が標準。多くは 20 ppm で開始し、効けば 5〜10 ppm に下げられる。40 ppm 超で効果はほぼ頭打ちで副作用が増える（添付文書の最大は新生児 20 ppm、心臓手術では 20 ppm 開始・最大 40 ppm）',
+  '効果判定：開始 30 分以内に PaO₂（P/F）、SpO₂、PAP（スワンガンツがあれば）、CI、右心の所見（エコー）を見る。「反応あり」の目安は PaO₂ 20% 以上の上昇、PAP 10% 以上の低下',
+  '効かない・悪化する場合：左心不全（左室が弱いと肺血流が増えて肺水腫になる＝僧帽弁狭窄・重い左室不全では慎重）、肺胞が開いていない無気肺（吸入 NO が届かない。リクルートメント・PEEP・腹臥位と合わせる）'
+ ]},
+ {h:'副作用と注意点',b:[
+  '!メトヘモグロビン血症：NO がヘモグロビンの鉄を酸化し、酸素を運べない MetHb が増える。SpO₂ が実際より高く（または 85% 付近に）表示される。開始 4〜8 時間後と、その後 1 日 1 回 MetHb を測る（血液ガス分析器の CO オキシメトリ）。2.5% 超で注意、5% 超で減量・中止を医師と相談。高用量・長期・新生児・MetHb 還元酵素の異常でリスク',
+  '!NO₂（二酸化窒素）：NO が酸素と反応してできる有害ガス。気道の炎症・肺水腫を起こす。FiO₂ が高い、NO 濃度が高い、回路内の滞留時間が長い（低流量・長い回路）ほど増える。実測 NO₂ は 0.5〜1 ppm 未満が望ましく、上限アラームは 3 ppm（当院の画面の設定）。NO₂ が上がったら回路の長さ・流量・吸収剤（ソーダライム）を CE と確認',
+  '!離脱時のリバウンド（反跳性肺高血圧）：NO を吸うと体内の NO 産生が抑えられるため、急に止めると肺動脈圧が跳ね上がり、低酸素・右心不全・心停止になりうる。絶対に急に止めない・回路を外さない。離脱は段階的に（下記）',
+  '血小板機能の低下：NO は血小板の凝集を抑える。出血傾向・術後出血・抗凝固中は出血に注意（臨床的に問題になることは多くない）',
+  '左心不全の悪化：肺血流が増えて左房圧・PAWP が上がり肺水腫になる。PAWP・左房圧が高い患者では少量から',
+  '腎障害：ARDS 患者でのメタ解析で急性腎障害の増加が報告されている。長期・高用量で腎機能を見る',
+  '環境への漏れ：NO・NO₂ は医療者にも有害。呼気は人工呼吸器の呼気ポートから排気（必要に応じて排気処理）。室内の濃度基準は NO 25 ppm・NO₂ 3 ppm（作業環境の許容濃度）。回路を外した状態で NO を流し続けない',
+  '!バッグ換気のときの注意：回路を外してバッグで換気すると NO が止まり、リバウンドする。本体のバックアップ供給（250 mL/min）をバッグの酸素ラインにつないで NO を流しながら換気する（手順は CE・医師と事前に確認）。回路を外す判断は医師・先輩が行う'
+ ]},
+ {h:'当院：INOflo DS の画面と本体（写真の見方）',b:[
+  '上段 3 つは「実測値」：左 O₂（吸気酸素濃度 %）、中 NO₂（ppm）、右 NO（ppm）。写真では O₂ 95%、NO₂ 0.1 ppm、NO 0.0 ppm（投与前または設定 0 の状態）',
+  '各実測値の横の小さな四角はアラームの上限（上）と下限（下）：O₂ は上限「--」（なし）・下限 20、NO₂ は上限 3.0 ppm、NO は上限 60・下限「--」。アラーム値の変更は医師・CE の指示で',
+  '画面中央の INOflo のボンベ絵と目盛り：ボンベ残量と、設定した NO 濃度（ダイヤルの針）。写真は 0 ppm',
+  '回路の絵：ボンベ → 本体 → インジェクター（人工呼吸器の吸気側に付ける、NO を混ぜる部品）→ 吸気回路 → サンプルライン（患者側 Y ピースの手前からガスを吸ってきて実測する。水トラップの絵）→ 患者',
+  '本体下段：左 2 つのコネクター（インジェクターの流量センサー線と、サンプルライン）、中央の大きなノブ（回して値を選び、押して確定。NO 設定の操作）、右のノブ（バックアップ供給 250 mL/min：バッグ換気用。通常は 0 の位置）',
+  '左上の🔔はアラーム消音・一覧、右上のアイコンはメニュー（校正・設定・ログ）。「患者情報未入力」は患者 ID を入れていない表示で、治療には影響しない',
+  '緑のランプ：電源・動作中。本体の電源は無停電電源につなぐ',
+  '!表示名・ボタンの名称は実機の取扱説明書で確認する。校正（低濃度・高濃度）、ボンベ交換、回路の組み立ては CE が行い、看護師は「数値を読む・アラームに気づく・異常を報告する」が役割（当院の分担に従う）'
+ ]},
+ {h:'看護の観察と記録',b:[
+  '毎時：設定 NO（ppm）、実測 NO、NO₂、O₂、ボンベ残量（圧力ゲージ。残り少ないとアラーム。予備ボンベの場所を確認）、人工呼吸器の設定（流量が変わると NO の注入量も変わる）',
+  '患者：SpO₂・PaO₂（P/F）、PAP・CVP・CI（あれば）、血圧、尿量、末梢の色。MetHb を 4〜8 時間後と毎日。SpO₂ と SaO₂（血ガス）がずれたら MetHb を疑う',
+  'アラームの意味：NO₂ 高 → 回路の滞留・高 FiO₂、CE 連絡／NO 高・低 → 注入異常、設定との乖離、インジェクターの向き・接続／O₂ 低 → 酸素供給／サンプルライン閉塞・水 → 水トラップを確認／ボンベ残量低 → 交換の準備',
+  '回路のトラブル：サンプルラインの水、インジェクターの向き（矢印が患者側）、ネブライザーや加湿器との位置関係（インジェクターは加湿器の手前・ドライ側）。回路交換・体位変換・吸引のとき NO が途切れないように',
+  '搬送（CT・手術室）：搬送用の供給（本体を一緒に運ぶか、バックアップ供給）を CE・医師と事前に決める。途切れると搬送中にリバウンドする',
+  '記録：設定・実測・アラーム・MetHb・患者の反応。開始時刻と変更の時刻',
+  '家族への説明の補助：「肺の血管だけを広げて、心臓の右側の負担を減らし、酸素を取り込みやすくする吸入のガス」'
+ ]},
+ {h:'離脱（ウィーニング）の進め方',b:[
+  '条件（医師が判断）：原因（肺高血圧・右心不全・低酸素）が改善、FiO₂ 0.4〜0.5 以下、血行動態が安定、NO を下げても悪化しない',
+  '一般的な手順：20 → 10 → 5 ppm と段階的に下げ、各段階で 30〜60 分観察（SpO₂・PaO₂・PAP・血圧・CI）。5 ppm 以下は 1 ppm ずつ、最後は 1 ppm で 30 分〜数時間おいてから中止。中止後 1〜2 時間は観察を密に',
+  '離脱時の悪化のサイン：SpO₂ 低下、PAP 上昇、血圧低下、CVP 上昇、頻脈、不穏。→ 直前の濃度に戻して報告',
+  '離脱を助ける薬：シルデナフィル（レバチオ）などの経口肺血管拡張薬、PGI₂、ミルリノン。離脱が難しい患者で医師が使う',
+  '!中止後も、回路の NO 装置はすぐ外さない（再開できるように）。装置の片付けは CE と'
+ ]},
+ {h:'他の肺血管拡張薬との違い',b:[
+  'iNO：選択的（換気されている肺胞だけ）、血圧を下げない、効果は即時、止めると反跳。装置と費用が要る',
+  'PGI₂ 吸入（エポプロステノール・イロプロスト）：ネブライザーで吸入。iNO に近い効果で安価、反跳が少ない。日本では適応外使用が多い',
+  '静注の肺血管拡張薬（PGI₂・ミルリノン・ニトログリセリン）：肺だけでなく全身の血管も広がるので血圧が下がる。無気肺の血管も広げて V/Q を悪くすることがある',
+  '経口（シルデナフィル・ボセンタン・マシテンタンなど）：慢性期・離脱の補助'
+ ]}
+]});
+META['一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS']={cat:'呼吸',key:['換気のよい肺胞の血管だけ広げる → 酸素化↑・PAP↓・右室の負担↓。血圧は下がらない','副作用：MetHb（4〜8 時間後と毎日測る）、NO₂（3 ppm 未満）、急な中止でリバウンド','絶対に急に止めない・回路を外さない。バッグ換気はバックアップ供給で。離脱は 1 ppm ずつ'],secfig:{}};
+(function(){const o=ORDER['呼吸']||(ORDER['呼吸']=[]);const i=o.indexOf('P-SILI（患者自身の呼吸による肺損傷）');o.splice(i<0?o.length:i+1,0,'一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS');})();
+KID.ino='一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS';KID_R[KID.ino]='ino';
+XLINK.push(['一酸化窒素','一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS'],['iNO','一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS'],['NO 吸入','一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS']);
+GLOSS.push(
+['iNO','一酸化窒素吸入療法|アイエヌオー|inhaled nitric oxide|NO 吸入|アイノフロー|INOflo','NO ガスを人工呼吸の吸気に 5〜20 ppm 混ぜ、換気されている肺胞の血管だけを広げて酸素化を改善し、肺動脈圧と右室の負担を下げる治療。血圧は下がらない。急な中止でリバウンドする','一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS'],
+['メトヘモグロビン','MetHb|メトヘモグロビン血症','ヘモグロビンの鉄が酸化されて酸素を運べなくなったもの。iNO、局所麻酔薬、亜硝酸薬などで増える。SpO₂ が当てにならなくなる。2.5% 超で注意、5% 超で減量・中止を検討。CO オキシメトリで測る','一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS'],
+['NO₂','二酸化窒素|NO2','NO が酸素と反応してできる有害ガス。気道炎症・肺水腫を起こす。iNO 中は実測 NO₂ を 1 ppm 未満が望ましく、上限アラーム 3 ppm','一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS'],
+['リバウンド（iNO）','反跳性肺高血圧|rebound pulmonary hypertension','iNO を急に止めたとき、肺動脈圧が跳ね上がり低酸素・右心不全になる現象。体内の NO 産生が抑えられているため。1 ppm ずつ段階的に離脱し、回路を外すときはバックアップ供給で NO を続ける','一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS'],
+['PPHN','新生児遷延性肺高血圧症|persistent pulmonary hypertension of the newborn','出生後も胎児型の肺高血圧が続き、肺に血が流れず低酸素になる新生児の病態。iNO の第一の適応','一酸化窒素吸入療法（iNO）：作用・副作用・当院の INOflo DS']
+);
+GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 (function(){const bar=$('catBar');bar.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
 
 /* 血液ガス代償計算 */
@@ -5848,7 +5951,7 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 
 
 /* よく使う・入口・ステッパー（すべて軽い処理） */
-const KNOW_REV='2026 年 10 月 28 日（循環のパラメーター・ERAS と GDFT・by system・JACCN 重症患者管理クイックガイド・心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
+const KNOW_REV='2026 年 10 月 28 日（iNO・循環のパラメーター・ERAS と GDFT・by system・JACCN 重症患者管理クイックガイド・心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
   const SHORT=[['P/F','P/F 比'],['波形','波形の見方'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],
