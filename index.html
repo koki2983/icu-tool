@@ -573,9 +573,11 @@ const PRESET=[
 ];
 let drugs=[]; let editIdx=-1;
 async function loadDrugs(){ drugs=(await store.get('drugs'))||[]; renderDrugs(); }
+window.DRUGK=window.DRUGK||{};
 function renderDrugs(){
   const L=$('drugList'); L.innerHTML='';
-  PRESET.forEach(d=>{const el=document.createElement('div');el.className='item preset';el.innerHTML=`<div><div class="t"><span class="tag c">共通</span>${esc(d.name)}</div><div class="d">${d.mg} ${isU(d.unit)?'単位':'mg'} / ${d.ml} mL（${isU(d.unit)?fmt(d.mg/d.ml,3)+' 単位/mL':fmt(d.mg*1000/d.ml,1)+' μg/mL'}）・${UNITS[d.unit]}</div>${d.rt?`<div class="d">目安：${esc(d.rt)}</div>`:''}${d.note?`<div class="d">${esc(d.note)}</div>`:''}</div>`;L.appendChild(el);});
+  PRESET.forEach(d=>{const el=document.createElement('div');el.className='item preset';el.innerHTML=`<div><div class="t"><span class="tag c">共通</span>${esc(d.name)}</div><div class="d">${d.mg} ${isU(d.unit)?'単位':'mg'} / ${d.ml} mL（${isU(d.unit)?fmt(d.mg/d.ml,3)+' 単位/mL':fmt(d.mg*1000/d.ml,1)+' μg/mL'}）・${UNITS[d.unit]}</div>${d.rt?`<div class="d">目安：${esc(d.rt)}</div>`:''}${d.note?`<div class="d">${esc(d.note)}</div>`:''}${(window.DRUGK&&DRUGK[d.name])?`<div class="bar" style="margin-top:4px"><button class="small" data-dk="${DRUGK[d.name]}">📖 作用・副作用</button></div>`:''}</div>`;L.appendChild(el);});
+  L.querySelectorAll('[data-dk]').forEach(b=>b.onclick=()=>{if(window.openTopic)openTopic(b.dataset.dk,null,'drug');});
   if(!drugs.length){const e=document.createElement('div');e.className='empty';e.textContent='自分の希釈はまだありません。上のフォームから登録できます。';L.appendChild(e);}
   drugs.forEach((d,i)=>{
     const el=document.createElement('div'); el.className='item';
@@ -5929,6 +5931,92 @@ GLOSS.push(
 ['DPC','動的圧制御|dynamic pressure control','V.A.C.Ulta の間欠モードの一種。125 と 25 mmHg を行き来して、完全に陰圧を切らずに間欠的な刺激を与える。従来の間欠（ON/OFF）より痛みと漏れが少ない','陰圧閉鎖療法（NPWT・VAC）：ガイドラインと当院の V.A.C.Ulta の使い方']
 );
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
+/* ===== 薬剤各論：プレセデックス（デクスメデトミジン） ===== */
+window.DRUGK=window.DRUGK||{};
+FIG.dex=`<svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="9">
+<text x="170" y="14" font-size="11" fill="#1F2A30" text-anchor="middle" font-weight="700">プレセデックス：効き方と副作用は同じ受容体から</text>
+<rect x="110" y="26" width="120" height="34" rx="7" fill="#E8F1FA" stroke="#3B8BD0" stroke-width="1.5"/><text x="170" y="41" font-size="9.5" fill="#1E3A5F" text-anchor="middle" font-weight="700">α₂ 受容体を刺激</text><text x="170" y="53" font-size="7.5" fill="#1F2A30" text-anchor="middle">「交感神経のブレーキ」を踏む</text>
+<path d="M140 60 L70 86" stroke="#6B7A80" stroke-width="1.2" fill="none"/><path d="M170 60 L170 86" stroke="#6B7A80" stroke-width="1.2" fill="none"/><path d="M200 60 L270 86" stroke="#6B7A80" stroke-width="1.2" fill="none"/>
+<rect x="8" y="88" width="104" height="62" rx="6" fill="#E6F4EA" stroke="#2E7D32" stroke-width="1.5"/><text x="60" y="103" font-size="9" fill="#1B5E20" text-anchor="middle" font-weight="700">脳幹（青斑核）</text><text x="60" y="116" font-size="7.5" fill="#1F2A30" text-anchor="middle">ノルアドレナリン放出↓</text><text x="60" y="128" font-size="7.5" fill="#1F2A30" text-anchor="middle">→ 自然な眠りに近い鎮静</text><text x="60" y="140" font-size="7.2" fill="#1F2A30" text-anchor="middle">起こせる・呼吸は保たれる</text>
+<rect x="118" y="88" width="104" height="62" rx="6" fill="#E6F4EA" stroke="#2E7D32" stroke-width="1.5"/><text x="170" y="103" font-size="9" fill="#1B5E20" text-anchor="middle" font-weight="700">脊髄・末梢</text><text x="170" y="116" font-size="7.5" fill="#1F2A30" text-anchor="middle">痛みの伝わりを弱める</text><text x="170" y="128" font-size="7.5" fill="#1F2A30" text-anchor="middle">→ 鎮痛の「補助」</text><text x="170" y="140" font-size="7.5" fill="#1F2A30" text-anchor="middle">オピオイドを減らせる</text>
+<rect x="228" y="88" width="104" height="62" rx="6" fill="#FDECEA" stroke="#C0392B" stroke-width="1.5"/><text x="280" y="103" font-size="9" fill="#C0392B" text-anchor="middle" font-weight="700">心臓・血管</text><text x="280" y="116" font-size="7.5" fill="#1F2A30" text-anchor="middle">交感神経↓ → 徐脈・低血圧</text><text x="280" y="128" font-size="7.5" fill="#1F2A30" text-anchor="middle">急速投与では血管収縮</text><text x="280" y="140" font-size="7.5" fill="#1F2A30" text-anchor="middle">→ 一過性の高血圧</text>
+<rect x="8" y="160" width="324" height="40" rx="6" fill="#FFF7E6" stroke="#E0A030" stroke-width="1.5"/><text x="16" y="175" font-size="8.5" fill="#8A4B00" font-weight="700">当院の希釈：200 μg/2 mL ＋ 生食 48 mL ＝ 200 μg/50 mL（4 μg/mL）</text><text x="16" y="190" font-size="8" fill="#1F2A30">維持 0.2〜0.7 μg/kg/h ＝ 60 kg で 3〜10.5 mL/h。0.4 μg/kg/h なら 6 mL/h。ICU では負荷投与を省くことが多い</text>
+<rect x="8" y="208" width="324" height="34" rx="6" fill="#F4F8FB" stroke="#B8CCD9" stroke-width="1.5"/><text x="16" y="222" font-size="8" fill="#1F2A30">できること：浅い鎮静（RASS −2〜0）、せん妄を減らす、NPPV・抜管前後の不穏、鎮痛の補助</text><text x="16" y="235" font-size="8" fill="#C0392B">できないこと：深い鎮静（RASS −4〜−5）、挿管時の鎮静の単独使用、健忘、筋弛緩</text>
+</svg>`;
+KNOW.push({t:'薬剤各論：プレセデックス（デクスメデトミジン）',fig:'dex',s:[
+ {h:'基本情報',b:[
+  '読み方：プレセデックス（商品名）、デクスメデトミジン（一般名、DEX「デックス」と略す）。英語 dexmedetomidine',
+  '分類：α₂ アドレナリン受容体作動薬（選択的）。鎮静薬だが、ベンゾジアゼピンやプロポフォールとは効き方が違う',
+  '製剤：プレセデックス静注液 200 μg／2 mL（1 mL ＝ 100 μg）。後発品あり。当院の共通希釈：200 μg ＋ 生食 48 mL ＝ 200 μg/50 mL（4 μg/mL）',
+  '適応（日本の添付文書）：①集中治療における人工呼吸中および離脱後の鎮静 ②局所麻酔下の非挿管での手術・処置の鎮静（成人）③小児の集中治療における人工呼吸中の鎮静',
+  '用量：維持 0.2〜0.7 μg/kg/h（小児は 0.2〜1.4）。初期負荷 6 μg/kg/h を 10 分（＝1 μg/kg）は「省略可」で、ICU では徐脈・低血圧を避けるため省くのが一般的。効果が出るまで 15〜30 分、切ってから覚めるまで 1〜2 時間',
+  '鎮静の期間に制限はない（以前の「24 時間まで」は 2010 年に撤廃）。長期では離脱に注意（下記）'
+ ]},
+ {h:'作用のしくみ：交感神経のブレーキ',b:[
+  '脳幹の青斑核にある α₂ 受容体を刺激し、ノルアドレナリンの放出を減らす。青斑核は「覚醒のスイッチ」なので、ここが静まると自然な睡眠（ノンレム睡眠）に近い状態になる',
+  'だから、呼びかければ起きて指示に従え、放っておくとまた眠る。「眠っているが、起こせる」のが最大の特徴。人工呼吸との同調・せん妄評価・リハビリがやりやすい',
+  '呼吸抑制がほとんどない：呼吸中枢には作用しない。抜管後・NPPV 中・ハイフロー中にも使える唯一の持続鎮静薬',
+  '鎮痛作用：脊髄後角の α₂ 受容体で痛みの伝達を弱める。単独では弱いが、オピオイド（フェンタニル）の必要量を 30〜50% 減らせる。「鎮痛薬の代わり」ではない',
+  '抗せん妄：ベンゾジアゼピンと比べてせん妄が少なく、せん妄の治療にも使える（DahLIA 試験）。交感神経の過活動（頻脈・高血圧・発汗）も抑える',
+  '健忘作用はほぼない：処置の記憶が残ることがある。侵襲的な処置ではミダゾラムやフェンタニルを併用'
+ ]},
+ {h:'副作用：効き方の裏返し',b:[
+  '!徐脈：最も重要。交感神経が抑えられて HR が落ちる。50/分未満になることがあり、高度徐脈・洞停止・心停止の報告がある。もともと徐脈・房室ブロック・β 遮断薬内服・高齢・低体温・迷走神経刺激（吸引・排便）が重なると危険',
+  '!低血圧：交感神経↓と血管拡張。循環血液量が少ない・心機能が悪い・敗血症初期で顕著。開始後 30〜60 分と増量時に出やすい',
+  '高血圧（一過性）：負荷投与や急な増量で、末梢血管の α₂B 受容体が先に反応して血管が締まる。その後に下がる。負荷投与を省けばほぼ出ない',
+  '離脱症状：長期（5 日以上・高用量）のあとに急に止めると、頻脈・高血圧・不穏・発汗・嘔気（クロニジンの離脱と同じ）。漸減するか、クロニジン内服に置き換える',
+  '口渇、悪心、発熱、高血糖（インスリン分泌↓）、低体温（体温調節↓・シバリング抑制。TTM では利点）、利尿、まれに肝機能障害',
+  '「効きが弱い」：深い鎮静は得られない。不穏が強い患者で増やし続けると副作用だけが増える。RASS −3 より深くしたいならプロポフォールなどを併用'
+ ]},
+ {h:'使わない・慎重にする患者',b:[
+  '禁忌：本剤に過敏症。それ以外に明確な禁忌はないが、下は慎重投与',
+  '徐脈・房室ブロック（2 度以上）・洞不全・ペースメーカーなし → 原則避けるか低用量で心電図を見ながら',
+  '重い心機能低下（EF 30% 未満）、循環血液量減少、ショック（昇圧薬が多い）→ 血圧がさらに下がる',
+  '肝機能障害：肝代謝なので効果が長引く。減量',
+  '高齢者：効きやすく徐脈・低血圧が出やすい。低用量から',
+  '他の鎮静薬・オピオイド・麻酔薬との併用で相加的に効く。併用時はどちらも減量',
+  '深い鎮静・筋弛緩が要る状況（重症 ARDS の肺保護・頭蓋内圧亢進・てんかん重積）では主役にならない'
+ ]},
+ {h:'ICU での使いどころ',b:[
+  '人工呼吸中の浅い鎮静の第一選択候補（PADIS 2018：ベンゾジアゼピンより プロポフォールかデクスメデトミジン）。SPICE III（2019）では早期からの単独使用で死亡率は変わらず、65 歳以上では有利・若年では不利な傾向。「万能」ではなく、患者を選ぶ',
+  '抜管前後：抜管前にプロポフォールから切り替えておくと、抜管後も呼吸を抑えずに不穏を抑えられる。抜管直後の興奮・NPPV のマスク不耐にも',
+  'せん妄（特に過活動型）：ハロペリドールの代替・併用。夜間だけ低用量（0.1〜0.2 μg/kg/h）で睡眠を助ける使い方',
+  'アルコール離脱：ベンゾジアゼピンの補助（交感神経症状に）。単独ではけいれんを防げない',
+  '心臓手術後：徐脈になりやすいので注意しつつ、早期抜管と POAF 減少の報告',
+  '心停止後の体温管理（TTM）：シバリングを抑え、低体温と相性がよい'
+ ]},
+ {h:'投与と観察（看護）',b:[
+  '開始時：心電図・血圧を連続で。開始後 1 時間は 15 分ごとに HR・BP。負荷投与は原則省略（医師の指示で行う場合は 10 分かけて、血圧上昇 → 低下を観察）',
+  '調節：0.1〜0.2 μg/kg/h ずつ、30 分以上あけて。目標 RASS（多くは −2〜0）と CPOT／NRS を同時に評価。「起きてしまう」だけで増やさず、痛み・尿意・体位・不安を先に見る',
+  '上限 0.7 μg/kg/h で足りなければ「薬の限界」。プロポフォールの少量併用か、別の原因（痛み・せん妄・離脱）を考える',
+  '!報告の目安：HR 50 未満または 20% 以上の低下、収縮期血圧 90 未満または MAP 65 未満、新しい房室ブロック、RASS が目標より深い（−3 以下）、呼吸数 8 未満（併用薬の影響）',
+  '徐脈への対応：まず減量・中止（半減期は約 2 時間、効果は 1〜2 時間で薄れる）。症候性ならアトロピン、必要ならペーシング（医師）。吸引・体位変換の前後は特に見る',
+  '中止のしかた：5 日未満なら急に止めてよいことが多い。長期・高用量は 12〜24 時間かけて漸減、必要ならクロニジン（カタプレス）内服へ',
+  'ルート：専用ルートが望ましいが、当院の配合変化表では ○ が多い（フェンタニル・プロポフォール・ノルアドレナリン・ニカルジピンなど同一ルート可）。×：ミダゾラム、ニコランジル。確認は計算タブ「配合変化」の当院の表で',
+  '記録：開始・変更の時刻と量、RASS・CPOT、HR・BP、睡眠の状況、せん妄評価（CAM-ICU）',
+  '家族への説明の補助：「眠っているように見えますが、声をかけると目を開けます。自然な眠りに近い薬なので、呼吸は自分でできています」'
+ ]},
+ {h:'他の鎮静薬との比較',b:[
+  'プロポフォール：深い鎮静まで可能、覚醒が速い、呼吸抑制・低血圧・脂質、PRIS。挿管中の第一選択の一つ。デクスメデトミジンと併用して互いの量を減らすことが多い',
+  'ミダゾラム：蓄積しやすく、せん妄・離脱・覚醒遅延。長期の持続は避ける（PADIS）。けいれん・アルコール離脱・健忘が要るときには有用',
+  'デクスメデトミジン：浅い鎮静・呼吸抑制なし・抗せん妄。徐脈・低血圧・深くできない・効果発現が遅い・高価',
+  '使い分けの例：挿管直後〜不安定期はプロポフォール（±フェンタニル）→ 安定したら デクスメデトミジンに移行 → 抜管前後は デクスメデトミジン単独'
+ ]},
+ {h:'主な根拠',b:[
+  'プレセデックス静注液 添付文書（ファイザー／ホスピーラ）、PADIS ガイドライン 2018、J-PAD ガイドライン 2014、MENDS 2007・SEDCOM 2009（vs ベンゾジアゼピン）、MIDEX/PRODEX 2012、DahLIA 2016（せん妄）、SPICE III 2019（早期単独使用）。用量・希釈は当院の共通希釈と医師の指示が優先'
+ ]}
+]});
+META['薬剤各論：プレセデックス（デクスメデトミジン）']={cat:'薬剤・感染',key:['α₂ 作動薬＝交感神経のブレーキ。起こせる浅い鎮静・呼吸抑制なし・抗せん妄','副作用は裏返し：徐脈・低血圧（負荷投与で一過性の高血圧）。HR 50 未満・SBP 90 未満で報告','当院 200 μg/50 mL（4 μg/mL）、0.2〜0.7 μg/kg/h。負荷は省略が原則。深い鎮静はできない'],secfig:{}};
+(function(){const o=ORDER['薬剤・感染']||(ORDER['薬剤・感染']=[]);const i=o.indexOf('カルシウム製剤（カルチコール・塩化 Ca）：ICU で使う意味と注意');o.splice(i<0?o.length:i+1,0,'薬剤各論：プレセデックス（デクスメデトミジン）');})();
+KID.dex='薬剤各論：プレセデックス（デクスメデトミジン）';KID_R[KID.dex]='dex';
+DRUGK['プレセデックス（デクスメデトミジン）']='dex';
+XLINK.push(['デクスメデトミジン','薬剤各論：プレセデックス（デクスメデトミジン）'],['プレセデックス','薬剤各論：プレセデックス（デクスメデトミジン）']);
+GLOSS.push(
+['デクスメデトミジン','プレセデックス|DEX|dexmedetomidine|α2 作動薬','脳幹の α₂ 受容体を刺激して交感神経を抑える鎮静薬。呼びかけで起きる浅い鎮静、呼吸抑制なし、せん妄が少ない。副作用は徐脈・低血圧。0.2〜0.7 μg/kg/h、深い鎮静はできない','薬剤各論：プレセデックス（デクスメデトミジン）'],
+['α₂ 作動薬','アルファツー作動薬|α2 アゴニスト|クロニジン','交感神経の放出を抑える受容体（α₂）を刺激する薬。デクスメデトミジン（鎮静）、クロニジン（降圧・離脱症状）。徐脈・低血圧、急な中止で離脱（頻脈・高血圧）','薬剤各論：プレセデックス（デクスメデトミジン）']
+);
+GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
+renderDrugs();
 (function(){const bar=$('catBar');bar.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
 
 /* 血液ガス代償計算 */
@@ -6374,7 +6462,7 @@ GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 
 
 /* よく使う・入口・ステッパー（すべて軽い処理） */
-const KNOW_REV='2026 年 11 月 1 日（NPWT・VAC と当院の V.A.C.Ulta・心外術後カテゴリ・術式別の注意点・カルシウム製剤・iNO・循環のパラメーター・ERAS と GDFT・by system・JACCN 重症患者管理クイックガイド・心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
+const KNOW_REV='2026 年 11 月 3 日（薬剤各論：プレセデックス・NPWT・VAC と当院の V.A.C.Ulta・心外術後カテゴリ・術式別の注意点・カルシウム製剤・iNO・循環のパラメーター・ERAS と GDFT・by system・JACCN 重症患者管理クイックガイド・心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
   const SHORT=[['P/F','P/F 比'],['波形','波形の見方'],['RSBI','RSBI'],['電解質','電解質の補正'],['ROX','ROX'],['予測体重','予測体重'],

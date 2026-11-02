@@ -119,3 +119,4 @@
 | `aorta_root` | 上行・弓部大動脈置換、Bentall・David、急性 A 型解離術後の注意点 | 心外術後 | https://koki2983.github.io/icu-tool/#k=aorta_root | 術式の理解／一番守るもの：吻合部と血圧／臓器虚血の観察（1 時間ごと）／出血と凝固／Bentall・David 特有／報告の目安 |
 | `tricuspid` | 三尖弁手術（TAP・TVR）と右心不全・肺高血圧のある術後 | 心外術後 | https://koki2983.github.io/icu-tool/#k=tricuspid | 術式と背景／右室を守る 3 原則／右心不全の見分け方／TAP・TVR 特有の注意／報告の目安 |
 | `npwt` | 陰圧閉鎖療法（NPWT・VAC）：ガイドラインと当院の V.A.C.Ulta の使い方 | 全身管理 | https://koki2983.github.io/icu-tool/#k=npwt | NPWT とは／ガイドラインが言っていること／禁忌と注意（ここで事故が起きる）／当院：V.A.C.Ulta の画面と基本操作／設定の目安（医師の指示が優先）／看護の観察（毎勤務）／当院：陰圧創傷治療システムチェックリスト（毎勤務の確認）／報告の目安 |
+| `dex` | 薬剤各論：プレセデックス（デクスメデトミジン） | 薬剤・感染 | https://koki2983.github.io/icu-tool/#k=dex | 基本情報／作用のしくみ：交感神経のブレーキ／副作用：効き方の裏返し／使わない・慎重にする患者／ICU での使いどころ／投与と観察（看護）／他の鎮静薬との比較／主な根拠 |
