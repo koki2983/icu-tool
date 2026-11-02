@@ -576,8 +576,8 @@ async function loadDrugs(){ drugs=(await store.get('drugs'))||[]; renderDrugs();
 window.DRUGK=window.DRUGK||{};
 function renderDrugs(){
   const L=$('drugList'); L.innerHTML='';
-  PRESET.forEach(d=>{const el=document.createElement('div');el.className='item preset';el.innerHTML=`<div><div class="t"><span class="tag c">共通</span>${esc(d.name)}</div><div class="d">${d.mg} ${isU(d.unit)?'単位':'mg'} / ${d.ml} mL（${isU(d.unit)?fmt(d.mg/d.ml,3)+' 単位/mL':fmt(d.mg*1000/d.ml,1)+' μg/mL'}）・${UNITS[d.unit]}</div>${d.rt?`<div class="d">目安：${esc(d.rt)}</div>`:''}${d.note?`<div class="d">${esc(d.note)}</div>`:''}${(window.DRUGK&&DRUGK[d.name])?`<div class="bar" style="margin-top:4px"><button class="small" data-dk="${DRUGK[d.name]}">📖 作用・副作用</button></div>`:''}</div>`;L.appendChild(el);});
-  L.querySelectorAll('[data-dk]').forEach(b=>b.onclick=()=>{if(window.openTopic)openTopic(b.dataset.dk,null,'drug');});
+  PRESET.forEach(d=>{const el=document.createElement('div');el.className='item preset';el.innerHTML=`<div><div class="t"><span class="tag c">共通</span>${esc(d.name)}</div><div class="d">${d.mg} ${isU(d.unit)?'単位':'mg'} / ${d.ml} mL（${isU(d.unit)?fmt(d.mg/d.ml,3)+' 単位/mL':fmt(d.mg*1000/d.ml,1)+' μg/mL'}）・${UNITS[d.unit]}</div>${d.rt?`<div class="d">目安：${esc(d.rt)}</div>`:''}${d.note?`<div class="d">${esc(d.note)}</div>`:''}${(window.DRUGK&&DRUGK[d.name])?`<div class="bar" style="margin-top:4px"><button class="small" data-dk="${DRUGK[d.name]}">📖 作用・副作用・使い方 ▼</button></div>`:''}</div>`;L.appendChild(el);});
+  L.querySelectorAll('[data-dk]').forEach(b=>b.onclick=()=>window.__drugDetail&&window.__drugDetail(b.dataset.dk,b));
   if(!drugs.length){const e=document.createElement('div');e.className='empty';e.textContent='自分の希釈はまだありません。上のフォームから登録できます。';L.appendChild(e);}
   drugs.forEach((d,i)=>{
     const el=document.createElement('div'); el.className='item';
@@ -5933,16 +5933,14 @@ GLOSS.push(
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 /* ===== 薬剤各論：プレセデックス（デクスメデトミジン） ===== */
 window.DRUGK=window.DRUGK||{};
-FIG.dex=`<svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="9">
+FIG.dex=`<svg viewBox="0 0 340 262" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="9">
 <text x="170" y="14" font-size="11" fill="#1F2A30" text-anchor="middle" font-weight="700">プレセデックス：効き方と副作用は同じ受容体から</text>
 <rect x="110" y="26" width="120" height="34" rx="7" fill="#E8F1FA" stroke="#3B8BD0" stroke-width="1.5"/><text x="170" y="41" font-size="9.5" fill="#1E3A5F" text-anchor="middle" font-weight="700">α₂ 受容体を刺激</text><text x="170" y="53" font-size="7.5" fill="#1F2A30" text-anchor="middle">「交感神経のブレーキ」を踏む</text>
 <path d="M140 60 L70 86" stroke="#6B7A80" stroke-width="1.2" fill="none"/><path d="M170 60 L170 86" stroke="#6B7A80" stroke-width="1.2" fill="none"/><path d="M200 60 L270 86" stroke="#6B7A80" stroke-width="1.2" fill="none"/>
 <rect x="8" y="88" width="104" height="62" rx="6" fill="#E6F4EA" stroke="#2E7D32" stroke-width="1.5"/><text x="60" y="103" font-size="9" fill="#1B5E20" text-anchor="middle" font-weight="700">脳幹（青斑核）</text><text x="60" y="116" font-size="7.5" fill="#1F2A30" text-anchor="middle">ノルアドレナリン放出↓</text><text x="60" y="128" font-size="7.5" fill="#1F2A30" text-anchor="middle">→ 自然な眠りに近い鎮静</text><text x="60" y="140" font-size="7.2" fill="#1F2A30" text-anchor="middle">起こせる・呼吸は保たれる</text>
 <rect x="118" y="88" width="104" height="62" rx="6" fill="#E6F4EA" stroke="#2E7D32" stroke-width="1.5"/><text x="170" y="103" font-size="9" fill="#1B5E20" text-anchor="middle" font-weight="700">脊髄・末梢</text><text x="170" y="116" font-size="7.5" fill="#1F2A30" text-anchor="middle">痛みの伝わりを弱める</text><text x="170" y="128" font-size="7.5" fill="#1F2A30" text-anchor="middle">→ 鎮痛の「補助」</text><text x="170" y="140" font-size="7.5" fill="#1F2A30" text-anchor="middle">オピオイドを減らせる</text>
 <rect x="228" y="88" width="104" height="62" rx="6" fill="#FDECEA" stroke="#C0392B" stroke-width="1.5"/><text x="280" y="103" font-size="9" fill="#C0392B" text-anchor="middle" font-weight="700">心臓・血管</text><text x="280" y="116" font-size="7.5" fill="#1F2A30" text-anchor="middle">交感神経↓ → 徐脈・低血圧</text><text x="280" y="128" font-size="7.5" fill="#1F2A30" text-anchor="middle">急速投与では血管収縮</text><text x="280" y="140" font-size="7.5" fill="#1F2A30" text-anchor="middle">→ 一過性の高血圧</text>
-<rect x="8" y="160" width="324" height="40" rx="6" fill="#FFF7E6" stroke="#E0A030" stroke-width="1.5"/><text x="16" y="175" font-size="8.5" fill="#8A4B00" font-weight="700">当院の希釈：200 μg/2 mL ＋ 生食 48 mL ＝ 200 μg/50 mL（4 μg/mL）</text><text x="16" y="190" font-size="8" fill="#1F2A30">維持 0.2〜0.7 μg/kg/h ＝ 60 kg で 3〜10.5 mL/h。0.4 μg/kg/h なら 6 mL/h。ICU では負荷投与を省くことが多い</text>
-<rect x="8" y="208" width="324" height="34" rx="6" fill="#F4F8FB" stroke="#B8CCD9" stroke-width="1.5"/><text x="16" y="222" font-size="8" fill="#1F2A30">できること：浅い鎮静（RASS −2〜0）、せん妄を減らす、NPPV・抜管前後の不穏、鎮痛の補助</text><text x="16" y="235" font-size="8" fill="#C0392B">できないこと：深い鎮静（RASS −4〜−5）、挿管時の鎮静の単独使用、健忘、筋弛緩</text>
-</svg>`;
+<rect x="8" y="160" width="324" height="44" rx="6" fill="#FFF7E6" stroke="#E0A030" stroke-width="1.5"/><text x="16" y="175" font-size="8.5" fill="#8A4B00" font-weight="700">当院の希釈：200 μg ＋ 生食 48 mL ＝ 200 μg/50 mL（4 μg/mL）</text><text x="16" y="188" font-size="8" fill="#1F2A30">維持 0.2〜0.7 μg/kg/h（60 kg で 3〜10.5 mL/h、0.4 なら 6 mL/h）</text><text x="16" y="199" font-size="8" fill="#1F2A30">ICU では負荷投与を省くことが多い</text><rect x="8" y="210" width="324" height="44" rx="6" fill="#F4F8FB" stroke="#B8CCD9" stroke-width="1.5"/><text x="16" y="225" font-size="8" fill="#1F2A30">できる：浅い鎮静（RASS −2〜0）、せん妄↓、抜管前後・NPPV、鎮痛の補助</text><text x="16" y="238" font-size="8" fill="#C0392B">できない：深い鎮静（RASS −4〜−5）、挿管時の単独鎮静、</text><text x="16" y="249" font-size="8" fill="#C0392B">健忘（処置の記憶が残る）、筋弛緩</text></svg>`;
 KNOW.push({t:'薬剤各論：プレセデックス（デクスメデトミジン）',fig:'dex',s:[
  {h:'基本情報',b:[
   '読み方：プレセデックス（商品名）、デクスメデトミジン（一般名、DEX「デックス」と略す）。英語 dexmedetomidine',
@@ -7146,6 +7144,40 @@ loadDrugs(); loadKnow(); calc();
   window.addEventListener('hashchange',chk);setTimeout(chk,120);
 })();
 
+
+/* ===== 薬剤タブの中で薬剤各論を開く（知識タブには出さない） ===== */
+(function(){
+  const DT=()=>new Set(Object.values(window.DRUGK||{}).map(id=>KID[id]).filter(Boolean));
+  // 知識タブの一覧から外す：カテゴリを「薬剤詳細」に（CATS に無いので「すべて」でも出さないようフィルタ）
+  DT().forEach(t=>{(META[t]=META[t]||{}).cat='薬剤詳細';Object.keys(ORDER).forEach(c=>{ORDER[c]=(ORDER[c]||[]).filter(x=>x!==t);});});
+  const _rk=window.renderKnow;
+  window.renderKnow=function(){_rk.apply(this,arguments);const L=$('kList');const set=DT();
+    L.querySelectorAll('details[data-key]').forEach(d=>{const t=d.dataset.key.slice(2);if(set.has(t))d.remove();});
+    L.querySelectorAll('.cath').forEach(h=>{if(h.textContent==='薬剤詳細')h.remove();});};
+  const nameOf=id=>Object.keys(DRUGK).find(n=>DRUGK[n]===id);
+  const html=title=>{const k=KNOW.find(x=>x.t===title);if(!k)return '<p class="muted">内容が見つかりません</p>';const m=META[title]||{};
+    const li=x=>{const w=x.startsWith('!');return `<li${w?' class="w"':''}>${esc(w?x.slice(1):x)}</li>`;};
+    const key=m.key&&m.key.length?`<div class="keybox"><div class="kh">まず押さえる</div><ol>${m.key.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>`:'';
+    const fig=k.fig?`<div class="fig">${FIG[k.fig]}</div>`:'';
+    const secs=k.s.map(sec=>`${sec.h?`<h3>${esc(sec.h)}</h3>`:''}<ul>${sec.b.filter(x=>x.trim()).map(li).join('')}</ul>`).join('');
+    return `<div class="body">${key}${fig}${secs}<div class="bar" style="margin-top:10px"><button class="small" data-dkclose="1">▲ 閉じる</button><button class="small ai" data-ai="${esc(title)}">AI に聞く</button></div></div>`;};
+  window.__drugDetail=function(id,btn,forceOpen){
+    const title=KID[id];if(!title){toast('詳細が見つかりません');return;}
+    if(!btn){btn=document.querySelector(`#drugList [data-dk="${id}"]`);}
+    if(!btn)return;
+    const item=btn.closest('.item');let pn=item.nextElementSibling;
+    if(pn&&pn.classList.contains('dkpanel')){if(forceOpen){pn.scrollIntoView({behavior:'smooth',block:'start'});return;}pn.remove();btn.textContent='📖 作用・副作用・使い方 ▼';return;}
+    pn=document.createElement('div');pn.className='dkpanel card';pn.style.cssText='margin:-4px 0 10px;padding:4px 12px 12px';pn.innerHTML=html(title);
+    item.insertAdjacentElement('afterend',pn);btn.textContent='📖 作用・副作用・使い方 ▲';
+    pn.querySelector('[data-dkclose]').onclick=()=>{pn.remove();btn.textContent='📖 作用・副作用・使い方 ▼';item.scrollIntoView({behavior:'smooth',block:'center'});};
+    if(forceOpen)setTimeout(()=>item.scrollIntoView({behavior:'smooth',block:'start'}),60);
+  };
+  const openInDrug=title=>{const id=KID_R[title];showPage('drug');setTimeout(()=>window.__drugDetail(id,null,true),80);return true;};
+  // 知識・用語集・検索・本文リンクから来ても薬剤タブで開く
+  const _ot=window.openTopic;window.openTopic=function(ref,sec,from){const t=KID[ref]||ref;if(DT().has(t))return openInDrug(t);return _ot.apply(this,arguments);};
+  const _gt=window.goTopic;window.goTopic=function(t,from){if(DT().has(t))return openInDrug(t);return _gt.apply(this,arguments);};
+  if($('kList'))renderKnow();
+})();
 </script>
 </body>
 </html>
