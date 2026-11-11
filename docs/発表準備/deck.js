@@ -51,9 +51,9 @@ tx(s,'計算（γ・配合変化・P/F ほか）',{x:0.5,y:4.93,w:1.8,h:0.25,fon
 tx(s,'知識（図つき・当院の運用）',{x:2.45,y:4.93,w:1.8,h:0.25,fontSize:8,color:C.accent5,align:'center'});
 tx(s,'スコア（基準を選ぶだけ）',{x:4.4,y:4.93,w:1.8,h:0.25,fontSize:8,color:C.accent5,align:'center'});
 stat(s,6.4,1.25,1.6,'20','計算ツール');stat(s,8.0,1.25,1.6,'8','スコア');
-stat(s,6.4,2.5,1.6,'71','知識メモ');stat(s,8.0,2.5,1.6,'399','用語集');
+stat(s,6.4,2.5,1.6,'81','知識メモ');stat(s,8.0,2.5,1.6,'448','用語集');
 tx(s,'当院の運用 6 項目：心外帰室の流れ、TTM、配合変化表（46 剤）、抗菌薬 × 輸液、嚥下スクリーニング、ECMO 画面',{x:6.4,y:3.8,w:3.2,h:0.7,fontSize:10.5,color:C.text1});
-tx(s,'ほかに：輸液シート、by system 申し送りシート、全文検索、各項目への直リンク',{x:6.4,y:4.5,w:3.2,h:0.6,fontSize:10.5,color:C.text1});
+tx(s,'ほかに：薬剤各論 7 剤、輸液シート、by system 申し送りシート、全文検索、圏外でも動作、間違いの報告ボタン',{x:6.4,y:4.5,w:3.2,h:0.6,fontSize:10.5,color:C.text1});
 s.addNotes('アプリの中身。数字は発表時点のものに更新する。');
 // 5 method: how built
 s=pres.addSlide({masterName:'LIGHT',sectionTitle:'方法'});s.addText('方法②　作り方と、内容の担保',{placeholder:'title'});
