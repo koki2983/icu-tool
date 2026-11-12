@@ -7505,7 +7505,37 @@ dfig('アドレナリン：心停止とアナフィラキシーの薬',['α₁�
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 renderDrugs();
 })();
-(function(){const bar=$('catBar');bar.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};bar.appendChild(b);});})();
+/* ===== 疾患を診療科のカテゴリに分ける（2026-11-12） ===== */
+window.DEPTS=['循環器内科','心臓血管外科','呼吸器','呼吸器外科','消化器外科','脳神経外科','脳神経内科','整形外科','外傷'];
+(function(){
+  const cv=(ORDER['心外術後']||[]).filter(t=>!t.startsWith('当院：'));
+  const ad='急性大動脈解離（Stanford A・B）：分類と内科的管理';
+  const i=cv.findIndex(t=>t.startsWith('上行・弓部'));cv.splice(i<0?cv.length:i,0,ad);
+  const MAP={
+   '循環器内科':['心不全の急性期管理','急性心筋梗塞（STEMI・NSTEMI）','不整脈の管理（ICU で出会う順に）','肺血栓塞栓症（PE）と深部静脈血栓症','高血圧性緊急症（血圧が高い＋臓器が傷んでいる）'],
+   '心臓血管外科':cv,
+   '呼吸器':['間質性肺炎の急性増悪','重症喘息発作（喘息重積）'],
+   '呼吸器外科':['肺切除後の術後管理（肺葉切除・区域切除・肺全摘）と当院のルーチン','胸腔ドレーンと気胸'],
+   '消化器外科':['腸切除・胃切除の術後管理','膵頭十二指腸切除（PD）の術後管理','消化器術後のドレーン管理'],
+   '脳神経外科':['くも膜下出血（SAH）','脳出血（高血圧性脳出血）','重症頭部外傷と びまん性軸索損傷（DAI）','脳の解剖と脳ドレーン'],
+   '脳神経内科':['脳梗塞（症状と急性期の看護）','てんかん重積状態（けいれんの ICU 管理）','ギラン・バレー症候群とフィッシャー症候群'],
+   '整形外科':['脊髄損傷（頸髄損傷を中心に）'],
+   '外傷':['外傷の初期対応とダメージコントロール']
+  };
+  const moved=new Set();
+  Object.entries(MAP).forEach(([c,list])=>{const ok=list.filter(t=>KNOW.some(k=>k.t===t));ORDER[c]=ok;ok.forEach(t=>{(META[t]=META[t]||{}).cat=c;moved.add(t);});});
+  Object.keys(ORDER).forEach(c=>{if(!MAP[c])ORDER[c]=(ORDER[c]||[]).filter(t=>!moved.has(t));});
+  delete ORDER['心外術後'];
+  const base=CATS.filter(c=>c!=='すべて'&&c!=='当院'&&c!=='心外術後'&&!MAP[c]);
+  CATS.length=0;CATS.push('すべて','当院',...window.DEPTS,...base);
+})();
+(function(){const bar=$('catBar');bar.innerHTML='';bar.className='';
+  const st=document.createElement('style');st.textContent='#catBar{padding:2px 0 6px}#catBar .cats{padding:2px 0 6px;align-items:center}#catBar .catl{flex:none;font-size:11px;font-weight:700;color:var(--muted);margin-right:2px;letter-spacing:.04em}';document.head.appendChild(st);
+  const row=(label,cats)=>{const r=document.createElement('div');r.className='cats';const l=document.createElement('span');l.className='catl';l.textContent=label;r.appendChild(l);
+    cats.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.className=c===curCat?'on':'';b.onclick=()=>{curCat=c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderKnow();};r.appendChild(b);});bar.appendChild(r);};
+  row('疾患',['すべて',...window.DEPTS]);
+  row('共通',CATS.filter(c=>c!=='すべて'&&!window.DEPTS.includes(c)));
+})();
 
 /* 血液ガス代償計算 */
 (function(){
@@ -8701,7 +8731,7 @@ loadDrugs(); loadKnow(); calc();
 
 /* ===== 分野の色分け（知識のカテゴリ・薬剤の種類） ===== */
 (function(){
-  const CC={'当院':['#0E6F80','#E1F0F3'],'呼吸':['#2F6FB0','#E3EEF9'],'循環':['#C0392B','#FBE6E3'],'補助療法':['#7B4BA8','#EFE6F7'],'術後':['#C2700F','#FBEEDC'],'心外術後':['#B8336A','#F9E4EC'],'神経・鎮静':['#4B58B8','#E6E8F8'],'薬剤・感染':['#2E7D32','#E3F2E4'],'全身管理':['#8A6D1F','#F4EEDB'],'解剖':['#5B6B73','#EAEEF0'],'基準値':['#6B7A80','#EEF1F2']};
+  const CC={'当院':['#0E6F80','#E1F0F3'],'循環器内科':['#C0392B','#FBE6E3'],'心臓血管外科':['#B8336A','#F9E4EC'],'呼吸器':['#2F6FB0','#E3EEF9'],'呼吸器外科':['#1787A6','#DDF1F6'],'消化器外科':['#C2700F','#FBEEDC'],'脳神経外科':['#4B58B8','#E6E8F8'],'脳神経内科':['#7B4BA8','#EFE6F7'],'整形外科':['#3E8E5A','#E2F3E8'],'外傷':['#9C4A1A','#F6E7DC'],'呼吸':['#5B8FD0','#EAF2FB'],'循環':['#D46A5F','#FCEDEB'],'補助療法':['#5B6B73','#EAEEF0'],'術後':['#D08A3A','#FCF2E3'],'神経・鎮静':['#7A84D0','#ECEEFA'],'薬剤・感染':['#2E7D32','#E3F2E4'],'全身管理':['#8A6D1F','#F4EEDB'],'解剖':['#7D8A90','#EEF1F2'],'基準値':['#8E979B','#F0F2F3']};
   const DC={'昇圧・強心':['#C0392B','#FBE6E3'],'降圧・血管拡張':['#2F6FB0','#E3EEF9'],'心拍・抗不整脈':['#7B4BA8','#EFE6F7'],'鎮静・鎮痛':['#4B58B8','#E6E8F8'],'利尿':['#C2700F','#FBEEDC'],'抗凝固':['#B8336A','#F9E4EC']};
   const DRULE=[[/ノルアド|ドパミン|ドブタミン|ピトレシン|バソプレシン|アドレナリン|ミルリ/,'昇圧・強心'],[/ニカルジピン|ペルジピン|ミリスロール|ニトログリセリン|ハンプ|カルペリチド|ニコランジル|シグマート|ジルチアゼム|ヘルベッサー/,'降圧・血管拡張'],[/オノアクト|ランジオロール|アンカロン|アミオダロン/,'心拍・抗不整脈'],[/プロポフォール|プレセデックス|デクスメデ|フェンタニル|ドルミカム|ミダゾラム|モルヒネ|ケタミン/,'鎮静・鎮痛'],[/ラシックス|フロセミド/,'利尿'],[/ヘパリン/,'抗凝固']];
   const dclass=n=>{const r=DRULE.find(x=>x[0].test(n));return r?r[1]:'';};
