@@ -87,7 +87,7 @@
 | ID | ツール | URL |
 |---|---|---|
 | `gamma` | ガンマ計算 | https://koki2983.github.io/icu-tool/#c=gamma |
-| `steroid` | ステロイドの力価換算 | https://koki2983.github.io/icu-tool/#c=steroid |
+| `steroid` | ステロイドカバーの確認（内服中の人）と力価換算 | https://koki2983.github.io/icu-tool/#c=steroid |
 | `pf` | P/F 比・A-aDO₂・酸素早見表 | https://koki2983.github.io/icu-tool/#c=pf |
 | `rhythm` | 波形の見方チェッカー | https://koki2983.github.io/icu-tool/#c=rhythm |
 | `rsbi` | RSBI | https://koki2983.github.io/icu-tool/#c=rsbi |

@@ -2353,21 +2353,29 @@ const CALC_HTML=`
   </div>
 </details>
 <details class="card o2card">
-  <summary>ステロイドの力価換算</summary>
+  <summary>ステロイドカバーの確認（内服中の人）と力価換算</summary>
   <div class="body">
-  <p class="muted">ステロイドを別の薬に替えるとき、「同じ強さ（抗炎症作用）」になる量の目安を出します。1 日の合計量で入れてください。</p>
-  <div class="row"><div><label>今の薬</label><select id="stDrug"></select></div>
-  <div><label>1 日量</label><div class="unit"><input type="number" inputmode="decimal" id="stDose" placeholder="例 200"><span>mg/日</span></div></div></div>
+  <p class="muted">ステロイドを内服している人が、手術・重い病気・絶食になったときに、点滴での補充（ステロイドカバー）を考える対象かどうかと、量の目安を出します。量を決めるのは医師です。確認と相談のための道具として使ってください。</p>
+  <div class="row"><div><label>内服している薬</label><select id="stDrug"></select></div>
+  <div><label>1 日量（合計）</label><div class="unit"><input type="number" inputmode="decimal" id="stDose" placeholder="例 10"><span>mg/日</span></div></div></div>
   <div class="drchips" id="stChips"></div>
-  <div class="result"><div class="muted" style="font-size:12px">プレドニゾロン換算</div><div class="big"><span id="stPsl">－</span><em>mg/日</em></div>
-  <div class="sub" id="stSub">薬と 1 日量を入力</div></div>
-  <div id="stTbl" style="display:none;margin-top:10px"></div>
-  <div id="stNote" class="rangebox" style="display:none"></div>
-  <p class="muted">換算の比（同じ抗炎症作用になる量）：ヒドロコルチゾン 20 ＝ コルチゾン 25 ＝ プレドニゾロン 5 ＝ メチルプレドニゾロン 4 ＝ トリアムシノロン 4 ＝ デキサメタゾン 0.75 ＝ ベタメタゾン 0.75（mg）。<br>
-  あくまで目安です。効く時間の長さ（1 日の回数）、塩分と水をためる作用（鉱質コルチコイド作用）、病気ごとの使い方は薬によって違い、実際の量は医師が決めます。<br>
-  注射と内服は、ほぼ同じ量として換算します。注射薬は、表示がステロイド本体の量か、塩（エステル）としての量かを確かめてください（例：デカドロン注射液は、デキサメタゾンとして 1.65 mg・3.3 mg・6.6 mg の表示）。<br>
-  副腎不全の補充では、塩分をためる作用のあるヒドロコルチゾンが基本です。デキサメタゾン・ベタメタゾンにはその作用がありません。</p>
-  <div class="bar"><button class="small" id="stGo">「薬剤各論：ステロイド」を読む</button></div>
+  <label style="margin-top:10px">飲んでいる期間</label>
+  <div class="drchips" id="stDur"></div>
+  <label style="margin-top:10px">今回の状況</label>
+  <div class="drchips" id="stSit"></div>
+  <div class="result"><div class="muted" style="font-size:12px">ふだんの量（プレドニゾロン換算）</div><div class="big"><span id="stPsl">－</span><em>mg/日</em></div>
+  <div class="sub" id="stSub">薬・1 日量・期間・状況を選ぶ</div></div>
+  <div id="stJudge" class="rangebox" style="display:none"></div>
+  <div id="stCover" class="rangebox" style="display:none"></div>
+  <details id="stTblWrap" style="display:none;margin-top:10px"><summary style="font-size:14px">ほかの薬に換算した量（力価換算の表）</summary><div id="stTbl"></div></details>
+  <p class="muted"><b>考え方</b><br>
+  ・長くステロイドを飲んでいると、自分の副腎が休んでしまい、手術や重い病気のときに必要なホルモンを出せない。そこで、体にかかる負担の大きさに合わせて、ヒドロコルチゾンを点滴で補う。<br>
+  ・対象の目安：プレドニゾロン換算で 1 日 5 mg 以上を 3 週間以上（指針によっては 4 週間以上）。最近やめた人、顔が丸い・皮膚が薄いなどステロイドの影響が見た目に出ている人、大量の吸入・塗り薬・関節注射を続けている人も、抑えられていることがある。<br>
+  ・いちばん大事なのは、ふだんの量を途切れさせないこと。手術の朝も飲む。飲めないなら、同じ強さの量を点滴で入れる。<br>
+  ・ふだんの量が、すでにカバーの量より多い人は、追加は要らないことが多い。<br>
+  ・量の目安は、体への負担の大きさで変える従来の方法（Coursin 2002 など）によります。英国の 2020 年の指針は、手術の大きさにかかわらず「麻酔の導入時に 100 mg、その後 200 mg/日 を持続」を基本にしていて、施設・医師によって方法が違います。当院の決まりと医師の指示が優先です。<br>
+  ・換算の比：ヒドロコルチゾン 20 ＝ コルチゾン 25 ＝ プレドニゾロン 5 ＝ メチルプレドニゾロン 4 ＝ トリアムシノロン 4 ＝ デキサメタゾン 0.75 ＝ ベタメタゾン 0.75（mg）。セレスタミンは 1 錠にベタメタゾン 0.25 mg。</p>
+  <div class="bar"><button class="small" id="stGo">「薬剤各論：ステロイド」を読む</button><button class="small" id="stGo2">「副腎クリーゼ」を読む</button></div>
   </div>
   </details>
   <details class="card o2card">
@@ -4454,7 +4462,7 @@ dka:'糖尿病性ケトアシドーシス（DKA）と高血糖高浸透圧状態
 };
 const KID_R=Object.fromEntries(Object.entries(KID).map(([a,b])=>[b,a]));
 /* 計算ツールの固定ID → カードの見出しに含まれる文字 */
-const CALC_ID={gamma:'__gamma',steroid:'ステロイドの力価',pf:'P/F 比',rhythm:'波形の見方',rsbi:'RSBI',dose:'投与量の目安',rox:'ROX',pbw:'予測体重',nutrition:'栄養：必要',harris:'ハリス',iwl:'不感蒸泄',
+const CALC_ID={gamma:'__gamma',steroid:'ステロイドカバー',pf:'P/F 比',rhythm:'波形の見方',rsbi:'RSBI',dose:'投与量の目安',rox:'ROX',pbw:'予測体重',nutrition:'栄養：必要',harris:'ハリス',iwl:'不感蒸泄',
   abg:'血液ガス：予測',meylon:'メイロン',electrolyte:'電解質の補正',buncr:'BUN/Cr',transfusion:'輸血：予測',hemodynamics:'血行動態',compat:'配合変化',cop:'膠質浸透圧',periop:'周術期',fluid:'体液の見える化'};
 const kidOf=t=>KID_R[t]||null;
 function showPage(p){const b=document.querySelector(`nav button[data-p="${p}"]`);if(b)b.click();return !!b;}
@@ -8421,7 +8429,7 @@ dfig('ステロイド：炎症と免疫を抑える。急にやめない',['副�
   'メチルプレドニゾロン（ソル・メドロール、内服のメドロール）：抗炎症が強く、塩分をためる作用が弱い。大量に使いやすい。ステロイドパルス、ARDS、喘息、脊髄・神経の病気に',
   'デキサメタゾン（デカドロン、デキサート）・ベタメタゾン（リンデロン）：抗炎症が最も強く、長く効く（36〜72 時間）。塩分をためる作用がない。脳腫瘍のまわりのむくみ、細菌性髄膜炎、抜管後の喉頭浮腫、吐き気止め、新型コロナの肺炎に',
   '!同じ効き目の量（力価の換算）：ヒドロコルチゾン 20 mg ＝ プレドニゾロン 5 mg ＝ メチルプレドニゾロン 4 mg ＝ デキサメタゾン・ベタメタゾン 0.75 mg。薬が替わるとき、内服から点滴に替わるときの目安',
-  '換算は、計算タブ（薬剤）の「ステロイドの力価換算」で、薬と 1 日量を入れると一覧で出せる',
+  '計算タブ（薬剤）の「ステロイドカバーの確認」で、内服している薬と量・期間・今回の状況から、カバーを考える対象かどうかと量の目安、ほかの薬への換算を確認できる',
   'ICU でよく使う量：敗血症性ショック＝ヒドロコルチゾン 200 mg/日（50 mg を 6 時間ごと、または持続）。副腎クリーゼ＝100 mg 静注のあと 200 mg/日。ステロイドパルス＝メチルプレドニゾロン 500〜1,000 mg/日 を 3 日間。喘息・COPD の増悪＝プレドニゾロン 30〜40 mg/日 相当を 5〜7 日。髄膜炎＝デキサメタゾンを 6 時間ごと 2〜4 日（量は体重で）'
  ]},
  {h:'作用のしくみ',b:[
@@ -10310,7 +10318,7 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
   const GROUPS={
     '呼吸':['P/F 比','RSBI','ROX','予測体重','血液ガス'],
     '循環':['波形の見方','血行動態','輸血：予測'],
-    '薬剤':['__gamma','投与量の目安','ステロイドの力価','配合変化'],
+    '薬剤':['__gamma','投与量の目安','ステロイドカバー','配合変化'],
     '電解質':['電解質の補正','メイロン','BUN/Cr'],
     '栄養':['栄養：必要','ハリス','不感蒸泄'],
     '輸液':['体液の見える化','膠質浸透圧','周術期']
@@ -10932,45 +10940,92 @@ loadDrugs(); loadKnow(); calc();
 })();
 
 
-/* ===== ステロイドの力価換算 ===== */
+/* ===== ステロイドカバーの確認（内服中の人）と力価換算 ===== */
 (function(){
   if(!$('stDrug'))return;
-  // eq：プレドニゾロン 5 mg と同じ抗炎症作用になる量（mg）。mc：鉱質コルチコイド作用（ヒドロコルチゾンを 1 として）。dur：効く時間
+  // eq：プレドニゾロン 5 mg と同じ抗炎症作用になる量（mg）
   const D=[
-   {k:'hc',n:'ヒドロコルチゾン',b:'ソル・コーテフ、水溶性ハイドロコートン、コートリル',eq:20,mc:'あり（1）',dur:'短い（8〜12 時間）'},
-   {k:'cort',n:'コルチゾン',b:'コートン',eq:25,mc:'あり（0.8）',dur:'短い（8〜12 時間）'},
-   {k:'psl',n:'プレドニゾロン',b:'プレドニン、水溶性プレドニン',eq:5,mc:'少し（0.8）',dur:'中くらい（12〜36 時間）'},
-   {k:'mpsl',n:'メチルプレドニゾロン',b:'ソル・メドロール、メドロール',eq:4,mc:'わずか（0.5）',dur:'中くらい（12〜36 時間）'},
-   {k:'tri',n:'トリアムシノロン',b:'レダコート、ケナコルト',eq:4,mc:'なし',dur:'中くらい（12〜36 時間）'},
+   {k:'psl',n:'プレドニゾロン',b:'プレドニン、プレドニゾロン錠',eq:5,mc:'少し（0.8）',dur:'中くらい（12〜36 時間）'},
+   {k:'mpsl',n:'メチルプレドニゾロン',b:'メドロール、ソル・メドロール',eq:4,mc:'わずか（0.5）',dur:'中くらい（12〜36 時間）'},
+   {k:'hc',n:'ヒドロコルチゾン',b:'コートリル、ソル・コーテフ、水溶性ハイドロコートン',eq:20,mc:'あり（1）',dur:'短い（8〜12 時間）'},
    {k:'dex',n:'デキサメタゾン',b:'デカドロン、デキサート',eq:0.75,mc:'なし',dur:'長い（36〜72 時間）'},
-   {k:'bet',n:'ベタメタゾン',b:'リンデロン',eq:0.75,mc:'なし',dur:'長い（36〜72 時間）'}];
-  const sel=$('stDrug'),inp=$('stDose');
+   {k:'bet',n:'ベタメタゾン',b:'リンデロン、セレスタミン（1 錠 0.25 mg）',eq:0.75,mc:'なし',dur:'長い（36〜72 時間）'},
+   {k:'tri',n:'トリアムシノロン',b:'レダコート',eq:4,mc:'なし',dur:'中くらい（12〜36 時間）'},
+   {k:'cort',n:'コルチゾン',b:'コートン',eq:25,mc:'あり（0.8）',dur:'短い（8〜12 時間）'}];
+  const DUR=[['lt','3 週間未満'],['ge','3 週間以上'],['off','最近やめた（3 か月以内）']];
+  const SIT=[['npo','絶食・内服できない（手術なし）'],['minor','小さい処置・小手術'],['mod','中くらいの手術'],['major','大きい手術'],['crit','重症（敗血症・ショックなど）']];
+  const SITEX={npo:'嘔吐、意識障害、検査や治療のための絶食、経管が使えない、など',
+   minor:'局所麻酔の処置、内視鏡、抜歯、1 時間以内の体表の手術など',
+   mod:'開腹での胆のう摘出、結腸の部分切除、人工関節、下肢の血行再建など',
+   major:'心臓・大血管の手術、開胸、食道・膵頭十二指腸・肝臓の切除、長時間の手術など',
+   crit:'敗血症性ショック、重い外傷・熱傷、多臓器不全など'};
+  const sel=$('stDrug'),inp=$('stDose');let dur='',sit='';
   sel.innerHTML=D.map(d=>`<option value="${d.k}">${d.n}（${d.b.split('、')[0]}）</option>`).join('');
-  const PRE=[['hc',200,'ソル・コーテフ 200'],['hc',100,'ソル・コーテフ 100'],['mpsl',1000,'ソル・メドロール 1000'],['mpsl',80,'ソル・メドロール 80'],['psl',30,'プレドニン 30'],['psl',5,'プレドニン 5'],['dex',6.6,'デカドロン 6.6']];
+  const PRE=[['psl',5,'プレドニン 5'],['psl',10,'プレドニン 10'],['psl',20,'プレドニン 20'],['mpsl',4,'メドロール 4'],['hc',20,'コートリル 20'],['dex',0.5,'デカドロン 0.5'],['bet',0.5,'リンデロン 0.5'],['bet',0.25,'セレスタミン 1 錠']];
   $('stChips').innerHTML=PRE.map((p,i)=>`<button type="button" class="drc" data-i="${i}">${p[2]}</button>`).join('');
+  $('stDur').innerHTML=DUR.map(x=>`<button type="button" class="drc" data-v="${x[0]}">${x[1]}</button>`).join('');
+  $('stSit').innerHTML=SIT.map(x=>`<button type="button" class="drc" data-v="${x[0]}">${x[1]}</button>`).join('');
   const fmt=v=>{if(!isFinite(v))return '－';if(v>=100)return String(Math.round(v));if(v>=10)return (Math.round(v*10)/10).toString();return (Math.round(v*100)/100).toString();};
+  const ul=a=>'<ul style="margin:6px 0 0 18px;padding:0">'+a.map(n=>'<li>'+n+'</li>').join('')+'</ul>';
   const calc=()=>{
     const d=D.find(x=>x.k===sel.value),v=parseFloat(inp.value);
     $('stChips').querySelectorAll('.drc').forEach(b=>{const p=PRE[b.dataset.i];b.classList.toggle('on',p[0]===sel.value&&p[1]===v);});
-    if(!d||!(v>0)){$('stPsl').textContent='－';$('stSub').textContent='薬と 1 日量を入力';$('stTbl').style.display='none';$('stNote').style.display='none';return;}
-    const psl=v/d.eq*5;
+    $('stDur').querySelectorAll('.drc').forEach(b=>b.classList.toggle('on',b.dataset.v===dur));
+    $('stSit').querySelectorAll('.drc').forEach(b=>b.classList.toggle('on',b.dataset.v===sit));
+    const J=$('stJudge'),C=$('stCover'),T=$('stTblWrap');
+    if(!d||!(v>0)){$('stPsl').textContent='－';$('stSub').textContent='薬・1 日量・期間・状況を選ぶ';J.style.display=C.style.display=T.style.display='none';return;}
+    const psl=v/d.eq*5,hc=psl*4;
     $('stPsl').textContent=fmt(psl);
-    $('stSub').textContent=`${d.n} ${fmt(v)} mg/日 は、プレドニゾロン ${fmt(psl)} mg/日 に相当`;
+    $('stSub').innerHTML=esc(d.n)+' '+fmt(v)+' mg/日'+(d.k==='psl'?'':' ＝ プレドニゾロン '+fmt(psl)+' mg/日')+(d.k==='hc'?'':' ＝ <b>ヒドロコルチゾン '+fmt(hc)+' mg/日</b>')+' に相当';
     $('stTbl').innerHTML='<table class="o2 dose"><tr><th>薬</th><th>同じ強さの量</th><th>塩分をためる作用／効く時間</th></tr>'+D.map(x=>`<tr${x.k===d.k?' style="background:var(--teal-soft)"':''}><td>${x.n}<br><small>${x.b}</small></td><td><b>${fmt(psl/5*x.eq)}</b> mg/日</td><td><small>${x.mc}<br>${x.dur}</small></td></tr>`).join('')+'</table>';
-    $('stTbl').style.display='';
-    const hc=psl/5*20,notes=[];
-    if(psl>=250)notes.push('大量（パルス療法に近い量）。点滴は 30 分以上かけ、血糖・血圧・心電図・感染・せん妄に注意');
-    else if(psl>=40)notes.push('多い量。高血糖、感染、消化管出血、不眠・せん妄に注意。血糖を定時に測る');
-    if(hc>=180&&hc<=320)notes.push('ヒドロコルチゾン換算で約 '+fmt(hc)+' mg/日。敗血症性ショックや副腎クリーゼで使う量（200〜300 mg/日）に相当');
-    if(psl>=5)notes.push('プレドニゾロン換算 5 mg/日 以上を 3 週間以上使っている人は、急にやめると副腎クリーゼの危険。絶食・手術・重い病気のときは補充（ステロイドカバー）を医師に確認');
-    else notes.push('プレドニゾロン換算 5 mg/日 未満。体が 1 日に作る量（ヒドロコルチゾン 20 mg 前後）と同じくらいか、それ以下');
-    if((d.k==='dex'||d.k==='bet'||d.k==='tri'))notes.push(d.n+'には塩分と水をためる作用がない。副腎不全の補充に替えるときは、その点を医師に確認');
-    $('stNote').innerHTML='<b>目安</b><ul style="margin:6px 0 0 18px;padding:0">'+notes.map(n=>'<li>'+esc(n)+'</li>').join('')+'</ul>';
-    $('stNote').style.display='';
+    T.style.display='';
+    // ① カバーを考える対象か
+    if(!dur){J.className='rangebox low';J.innerHTML='<b>① カバーを考える対象か</b><br>飲んでいる期間を選んでください';J.style.display='';C.style.display='none';return;}
+    let risk,jt;
+    if(psl>=5&&dur==='ge'){risk=2;jt='<b>対象になる</b>：プレドニゾロン換算 5 mg/日 以上を 3 週間以上。副腎が抑えられている可能性が高い';}
+    else if(psl>=5&&dur==='off'){risk=2;jt='<b>対象になりうる</b>：やめて間もない人は、副腎の働きがまだ戻っていないことがある（戻るのに数か月〜1 年かかる人もいる）。やめる前の量と期間を医師に伝える';}
+    else if(dur==='lt'){risk=0;jt='<b>可能性は低い</b>：3 週間未満の使用では、副腎はふつう抑えられない。ふだんの量を続ける';}
+    else{risk=1;jt='<b>可能性は低いが、否定はできない</b>：プレドニゾロン換算 5 mg/日 未満は、体が作る量と同じくらい。ただし、長く飲んでいる・以前はもっと多かった・夜に飲んでいる人では抑えられていることがある';}
+    J.className='rangebox'+(risk===2?'':' low');
+    J.innerHTML='<b>① カバーを考える対象か</b><br>'+jt+ul(['見た目にステロイドの影響（丸い顔、薄い皮膚、皮下出血）がある人、大量の吸入・塗り薬・関節注射を続けている人は、量や期間にかかわらず対象として考える','対象かどうかに迷うときは、対象として医師に確認する（入れすぎの害は小さく、足りない害は大きい）']);
+    J.style.display='';
+    // ② 量の目安
+    if(!sit){C.className='rangebox low';C.innerHTML='<b>② 量の目安</b><br>今回の状況を選んでください';C.style.display='';return;}
+    const keep=dur==='off'?'やめる前の量に相当する補充が要るかを、医師に確認する':'ふだんの内服は、医師の指示がなければ当日の朝も飲む。飲めない間は、カバーの点滴がふだんの量の代わりも兼ねる。カバーが終わるときに、ふだんの量（ヒドロコルチゾン換算 '+fmt(hc)+' mg/日）が再開されているかを確かめる';
+    const R={npo:[hc,hc,'ふだんの量と同じ強さを点滴で：ヒドロコルチゾンなら <b>'+fmt(hc)+' mg/日</b>（2〜4 回に分ける）。同じ薬の注射剤があれば、同じ量でもよい','発熱・感染・強い痛みなど、体に負担がかかっているときは、2〜3 倍に増やすか、下の「重症」の量を考える'],
+      minor:[0,25,'追加は不要、または当日だけ <b>ヒドロコルチゾン 25 mg</b> 程度','翌日からは、ふだんの量だけに戻す'],
+      mod:[50,75,'当日 <b>ヒドロコルチゾン 50〜75 mg/日</b>（ふだんの量を含めた 1 日の合計の目安。例：麻酔の導入時に 50 mg、その後 8 時間ごとに 25 mg）','1〜2 日で、ふだんの量に戻す'],
+      major:[100,150,'当日 <b>ヒドロコルチゾン 100〜150 mg/日</b>（ふだんの量を含めた 1 日の合計の目安。例：麻酔の導入時に 100 mg、その後 8 時間ごとに 50 mg）','2〜3 日かけて半分ずつ減らし、ふだんの量に戻す。合併症（感染・出血・再手術）があれば、減らすのを待つ'],
+      crit:[200,300,'<b>ヒドロコルチゾン 200 mg/日</b>（50 mg を 6 時間ごと、または持続）。副腎クリーゼが疑われるとき（昇圧薬に反応しない低血圧・低血糖・低 Na）は、まず 100 mg を静注','状態が落ち着いたら、数日かけて減らし、ふだんの量に戻す']}[sit];
+    const items=[];
+    if(dur==='off'&&sit==='npo'){
+      items.push('すでにやめている薬なので、絶食だけなら点滴での置き換えは要らない');
+      items.push('ただし、感染・手術・強い痛みなど体に負担がかかるときは、副腎の働きが戻っておらず、補充が必要になることがある。だるさ・食欲低下・血圧低下・低血糖・低 Na があれば医師へ');
+    }else if(risk===0&&sit!=='npo'&&sit!=='crit'){
+      items.push('追加のカバーは、ふつう要らない。ふだんの量（ヒドロコルチゾン換算 '+fmt(hc)+' mg/日）を続ける。飲めなければ、同じ強さの量を点滴で入れる');
+      items.push('ただし、説明のつかない血圧低下・低血糖・低 Na・発熱・嘔吐があれば、副腎不全を考えて医師へ');
+    }else{
+      if(sit!=='npo'&&sit!=='minor'&&dur!=='off'&&hc>=R[1]){
+        items.push('ふだんの量（ヒドロコルチゾン換算 '+fmt(hc)+' mg/日）が、この状況のカバーの量（'+R[0]+'〜'+R[1]+' mg/日）以上。<b>追加は要らないことが多い</b>。ふだんの量を、途切れさせずに続ける（飲めなければ同じ強さを点滴で）');
+      }else{
+        items.push(R[2]);items.push(R[3]);
+        if(sit!=='npo')items.push(keep);
+      }
+      if(risk===1)items.push('副腎が抑えられている可能性は高くないので、カバーをするかどうかは医師の判断');
+    }
+    items.push('状況の例：'+SITEX[sit]);
+    if(d.k==='dex'||d.k==='bet'||d.k==='tri')items.push(esc(d.n)+'には塩分と水をためる作用がない。点滴のヒドロコルチゾンに替えると、その作用が加わる（むくみ・血圧・K）');
+    C.className='rangebox';
+    C.innerHTML='<b>② 量の目安（医師に確認する内容）</b>'+ul(items)+'<div class="muted" style="font-size:12px;margin-top:6px">カバー中は血糖を定時に測る。血圧低下・低血糖・低 Na・発熱・嘔吐は、量が足りないサインのことがある</div>';
+    C.style.display='';
   };
   sel.onchange=calc;inp.addEventListener('input',calc);
   $('stChips').querySelectorAll('.drc').forEach(b=>b.onclick=()=>{const p=PRE[b.dataset.i];sel.value=p[0];inp.value=p[1];calc();});
+  $('stDur').querySelectorAll('.drc').forEach(b=>b.onclick=()=>{dur=b.dataset.v;calc();});
+  $('stSit').querySelectorAll('.drc').forEach(b=>b.onclick=()=>{sit=b.dataset.v;calc();});
   $('stGo').onclick=()=>openTopic('steroid');
+  $('stGo2').onclick=()=>openTopic('endocrine');
+  window.__stCalc=(k,v,du,si)=>{sel.value=k;inp.value=v;dur=du;sit=si;calc();};
 })();
 
 /* ===== オフライン対応（Service Worker） ===== */
