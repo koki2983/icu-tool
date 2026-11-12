@@ -2238,7 +2238,7 @@ function renderKnow(){
   const all=[...kUser.map((u,i)=>({t:u.t,s:[{h:'',b:u.b.split('\n')}],user:i,cat:'自分'})),...KNOW.map(k=>Object.assign({},k,META[k.t]||{}))];
   const li=x=>{const w=x.startsWith('!');return `<li${w?' class="w"':''}>${esc(w?x.slice(1):x)}</li>`;};
   let lastCat=null;
-  all.filter(k=>(curCat==='すべて'||k.cat===curCat||(curCat==='当院'&&k.hosp)||(k.user!==undefined))&&(!q||k.t.includes(q)||kText(k).includes(q))).sort((a,b)=>(a.user!==undefined?-1:kOrder(a))-(b.user!==undefined?-1:kOrder(b))).forEach(k=>{
+  all.filter(k=>(curCat==='すべて'||k.cat===curCat||(curCat==='当院'&&k.hosp)||(k.user!==undefined))&&(!q||[q].concat(window.__qAlt?window.__qAlt(q):[]).some(z=>k.t.includes(z)||kText(k).includes(z)))).sort((a,b)=>(a.user!==undefined?-1:kOrder(a))-(b.user!==undefined?-1:kOrder(b))).forEach(k=>{
     const gc=k.user!==undefined?'自分の項目':k.cat;
     if(gc!==lastCat){const hd=document.createElement('div');hd.className='cath';hd.textContent=gc;L.appendChild(hd);lastCat=gc;}
     const key='k:'+k.t; const d=document.createElement('details');
@@ -2947,7 +2947,7 @@ const GLOSS=[
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));
 function renderGloss(){
   const q=($('gSearch').value||'').trim().toLowerCase(); const L=$('gList'); L.innerHTML='';
-  const hit=GLOSS.filter(([t,al,d])=>!q||t.toLowerCase().includes(q)||al.toLowerCase().includes(q)||d.toLowerCase().includes(q));
+  const qz=q?[q].concat(window.__qAlt?window.__qAlt(q):[]):[];const hit=GLOSS.filter(([t,al,d])=>!q||qz.some(z=>t.toLowerCase().includes(z)||al.toLowerCase().includes(z)||d.toLowerCase().includes(z)));
   $('gCount').textContent=`${hit.length} 語`;
   hit.forEach(([t,al,d,link])=>{const el=document.createElement('div');el.className='gitem';
     el.innerHTML=`<div class="gt">${esc(t)}<span class="gal">${esc(al.split('|').filter(x=>x&&x!==t).join('・'))}</span></div><div class="gd">${esc(d)}</div>${link?`<button class="small relb" data-glink="${esc(link)}">→ ${esc(link.replace(/（.*?）/g,''))}</button>`:''}`;
@@ -4791,7 +4791,7 @@ const secs=[
   '④ SGLT2 阻害薬：フォシーガ（ダパグリフロジン）、ジャディアンス（エンパグリフロジン）。心不全の保険適応があるのはこの 2 つ。カナグル（カナグリフロジン）・スーグラ（イプラグリフロジン）・ルセフィ（ルセオグリフロジン）・デベルザ/アプルウェイ（トホグリフロジン）は糖尿病のみ',
   '＋α：コララン（イバブラジン）、ベリキューボ（ベルイシグアト）、フェインジェクト（カルボキシマルトース第二鉄）／モノヴァー（デルイソマルトース第二鉄）、ジゴシン（ジゴキシン）、ハンプ（カルペリチド：急性期の点滴）',
   '利尿薬（症状の薬）：ラシックス（フロセミド）、ダイアート（アゾセミド）、ルプラック（トラセミド）、サムスカ（トルバプタン）、フルイトラン（トリクロルメチアジド）',
-  '急性期の点滴：ミリスロール（ニトログリセリン）、ハンプ（カルペリチド）、ドブトレックス/ドブタミン（ドブタミン）、ミルリーラ（ミルリノン）、イノバン（ドパミン）、ノルアドレナリン（ノルアドレナリン）',
+  '急性期の点滴：ミリスロール（ニトログリセリン）、ハンプ（カルペリチド）、ドブトレックス（ドブタミン）、ミルリーラ（ミルリノン）、イノバン（ドパミン）、ノルアドリナリン（ノルアドレナリン）',
   '病棟・外来で「エンレスト・アーチスト・アルダクトン・フォシーガ」のように商品名で呼ばれるので、一般名と行き来できるようにしておく。ジェネリックは一般名＋メーカー名（例：カルベジロール錠「サワイ」）'
  ]},
  {h:'① ARNI：エンレスト（サクビトリル/バルサルタン）',b:[
@@ -10147,7 +10147,7 @@ window.DEPTS=['循環器内科','心臓血管外科','呼吸器','呼吸器外�
 
 /* よく使う・入口・ステッパー（すべて軽い処理） */
 /* APP_BUILD：公開するたびに書き換える版の印（日本時間）。画面の「版」に出る。stamp は公開の直前に自動で付ける */
-const APP_BUILD='2026-11-12 14:33';
+const APP_BUILD='2026-11-12 17:31';
 const KNOW_REV='2026 年 11 月 12 日（血液浄化の各論（種類と使い分け・血漿交換・PMX・ECUM）・腫瘍崩壊症候群・発熱性好中球減少症・急性中毒・内分泌の緊急症・重症熱傷・高 K 血症・横紋筋融解症・胸部外傷・骨盤骨折・コンパートメント症候群と脂肪塞栓・髄膜炎と脳炎・重症筋無力症クリーゼ・薬剤各論（インスリン・KCL・ステロイド・抗けいれん薬・筋弛緩薬）・心タンポナーデ・感染性心内膜炎・心筋炎とたこつぼ型心筋症・重症肺炎・COPD 増悪・消化管出血・急性膵炎・肝不全と肝性脳症・アナフィラキシー・熱中症と低体温・ARDS・急性大動脈解離・高血圧性緊急症・急性心不全の深掘り・抗血栓薬・循環器の内服薬・薬剤各論 17 剤（ドブタミン・ドパミン・バソプレシン・ニトログリセリン・ハンプ・フロセミド・ミルリノン・アミオダロン・ヘパリン・アドレナリン・ノルアドレナリン・プロポフォール・フェンタニル・ミダゾラム・ニカルジピン・オノアクト・プレセデックス）・肺切除後の術後管理と当院のルーチン・NPWT・VAC と当院の V.A.C.Ulta・心外術後カテゴリ・術式別の注意点・カルシウム製剤・iNO・循環のパラメーター・ERAS と GDFT・by system・JACCN 重症患者管理クイックガイド・心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
@@ -10548,7 +10548,7 @@ const COMPAT=[{"n": "ノルアドレナリン", "b": "ノルアドリナリン",
     if(!IDX)build();
     const terms=raw.split(/[\s　]+/).filter(Boolean);const tn=terms.map(norm).filter(Boolean);
     const hits=[];
-    IDX.forEach(o=>{if(!tn.every(q=>o.n.includes(q)))return;
+    IDX.forEach(o=>{if(!tn.every(q=>o.n.includes(q)||(window.__qAlt?window.__qAlt(q).some(z=>o.n.includes(norm(z))):false)))return;
       let sc=o.w*10;const tt=norm(o.title);tn.forEach(q=>{if(tt.includes(q))sc+=20;if(o.head&&norm(o.head).includes(q))sc+=25;if(tt===q)sc+=30;});
       hits.push({o,sc});});
     hits.sort((a,b)=>b.sc-a.sc);
@@ -11029,6 +11029,178 @@ loadDrugs(); loadKnow(); calc();
   $('stGo').onclick=()=>openTopic('steroid');
   $('stGo2').onclick=()=>openTopic('endocrine');
   window.__stCalc=(k,v,du,si)=>{sel.value=k;inp.value=v;dur=du;sit=si;calc();};
+})();
+
+/* ===== 薬の一般名と商品名の併記（2026-11-12） =====
+   目的：一般名だけ・商品名だけで書かれた所を、読む人がどちらの名前でも分かるようにする。
+   やり方：画面に出た文章を見て、同じまとまり（見出し 1 つ分の箇条書き・表・用語 1 件など）の中に相方の名前が無いときだけ、
+           最初に出てきた所へ「（相方）」を足す。全部の行に足すと読みにくくなるので、まとまりごとに 1 回。
+   元の文章（KNOW など）は書き換えない。図（SVG）は幅からはみ出すので対象外。自分で入れた項目・点滴表も対象外。
+   表の書き方：[一般名, [商品名…], {g:一般名の正規表現, b:商品名の正規表現, s:検索用の別の書き方}]。足すときは商品名の 1 つ目を使う。 */
+(function(){
+  const NG='(?!受容体|作動|拮抗|換算|中毒|喘息|抵抗|起因|誘発|様|系|負荷|アレルギー)';
+  const P=[
+   ['ノルアドレナリン',['ノルアドリナリン']],
+   ['アドレナリン',['ボスミン'],{g:'(?<!ノル)アドレナリン'}],
+   ['ドブタミン',['ドブトレックス','ドブポン']],
+   ['ドパミン',['イノバン','カタボン']],
+   ['バソプレシン',['ピトレシン']],
+   ['ミルリノン',['ミルリーラ']],
+   ['オルプリノン',['コアテック']],
+   ['フェニレフリン',['ネオシネジン']],
+   ['イソプレナリン',['プロタノール'],{g:'(?:イソプレナリン|イソプロテレノール)'}],
+   ['ニカルジピン',['ペルジピン']],
+   ['ニトログリセリン',['ミリスロール','ミオコール','ニトロペン']],
+   ['硝酸イソソルビド',['ニトロール']],
+   ['ニコランジル',['シグマート']],
+   ['ニフェジピン',['アダラート']],
+   ['アムロジピン',['ノルバスク','アムロジン']],
+   ['カルペリチド',['ハンプ']],
+   ['フロセミド',['ラシックス']],
+   ['トルバプタン',['サムスカ']],
+   ['スピロノラクトン',['アルダクトン']],
+   ['カンレノ酸カリウム',['ソルダクトン'],{g:'カンレノ酸(?:カリウム)?'}],
+   ['アセタゾラミド',['ダイアモックス']],
+   ['ランジオロール',['オノアクト']],
+   ['アミオダロン',['アンカロン']],
+   ['ニフェカラント',['シンビット']],
+   ['リドカイン',['キシロカイン']],
+   ['ベラパミル',['ワソラン']],
+   ['ジルチアゼム',['ヘルベッサー']],
+   ['プロプラノロール',['インデラル']],
+   ['ビソプロロール',['メインテート','ビソノ']],
+   ['カルベジロール',['アーチスト']],
+   ['エナラプリル',['レニベース']],
+   ['サクビトリルバルサルタン',['エンレスト'],{g:'サクビトリル(?:[・／/]?バルサルタン)?'}],
+   ['ダパグリフロジン',['フォシーガ']],
+   ['エンパグリフロジン',['ジャディアンス']],
+   ['イバブラジン',['コララン']],
+   ['ベルイシグアト',['ベリキューボ']],
+   ['プロポフォール',['ディプリバン']],
+   ['ミダゾラム',['ドルミカム']],
+   ['デクスメデトミジン',['プレセデックス']],
+   ['ケタミン',['ケタラール']],
+   ['ロクロニウム',['エスラックス']],
+   ['スガマデクス',['ブリディオン']],
+   ['ネオスチグミン',['ワゴスチグミン']],
+   ['アセトアミノフェン',['アセリオ','カロナール'],{d:'アセリオ・カロナール'}],
+   ['フルルビプロフェン',['ロピオン']],
+   ['ロキソプロフェン',['ロキソニン']],
+   ['ペンタゾシン',['ソセゴン']],
+   ['ブプレノルフィン',['レペタン']],
+   ['トラマドール',['トラマール']],
+   ['ハロペリドール',['セレネース']],
+   ['クエチアピン',['セロクエル']],
+   ['リスペリドン',['リスパダール']],
+   ['スボレキサント',['ベルソムラ']],
+   ['レンボレキサント',['デエビゴ']],
+   ['ラメルテオン',['ロゼレム']],
+   ['レベチラセタム',['イーケプラ']],
+   ['ホスフェニトイン',['ホストイン']],
+   ['フェニトイン',['アレビアチン'],{g:'(?<!ホス)フェニトイン'}],
+   ['ジアゼパム',['セルシン','ホリゾン'],{d:'セルシン・ホリゾン'}],
+   ['フェノバルビタール',['フェノバール','ノーベルバール']],
+   ['ラコサミド',['ビムパット']],
+   ['バルプロ酸',['デパケン']],
+   ['ヒドロコルチゾン',['ソル・コーテフ','コートリル','サクシゾン'],{s:['ソルコーテフ']}],
+   ['メチルプレドニゾロン',['ソル・メドロール','メドロール'],{s:['ソルメドロール']}],
+   ['プレドニゾロン',['プレドニン'],{g:'(?<!メチル)プレドニゾロン'}],
+   ['デキサメタゾン',['デカドロン','デキサート']],
+   ['ベタメタゾン',['リンデロン']],
+   ['フルマゼニル',['アネキセート']],
+   ['トラネキサム酸',['トランサミン']],
+   ['ワルファリン',['ワーファリン']],
+   ['ナファモスタット',['フサン']],
+   ['アルガトロバン',['ノバスタン','スロンノン']],
+   ['フォンダパリヌクス',['アリクストラ']],
+   ['エノキサパリン',['クレキサン']],
+   ['アピキサバン',['エリキュース']],
+   ['エドキサバン',['リクシアナ']],
+   ['リバーロキサバン',['イグザレルト']],
+   ['ダビガトラン',['プラザキサ']],
+   ['イダルシズマブ',['プリズバインド']],
+   ['アンデキサネット',['オンデキサ']],
+   ['クロピドグレル',['プラビックス']],
+   ['プラスグレル',['エフィエント']],
+   ['チカグレロル',['ブリリンタ']],
+   ['シロスタゾール',['プレタール']],
+   ['アスピリン',['バイアスピリン'],{g:'(?<!バイ)アスピリン'}],
+   ['アルテプラーゼ',['グルトパ','アクチバシン']],
+   ['トロンボモジュリン',['リコモジュリン']],
+   ['炭酸水素ナトリウム',['メイロン']],
+   ['グルコン酸カルシウム',['カルチコール']],
+   ['濃グリセリン',['グリセオール']],
+   ['ラスブリカーゼ',['ラスリテック']],
+   ['フェブキソスタット',['フェブリク']],
+   ['アロプリノール',['ザイロリック']],
+   ['フィルグラスチム',['グラン'],{b:'(?<!スタ)グラン(?!ジ)'}],
+   ['チアマゾール',['メルカゾール']],
+   ['レボチロキシン',['チラーヂン']],
+   ['ピリドスチグミン',['メスチノン']],
+   ['ダントロレン',['ダントリウム']],
+   ['オクトレオチド',['サンドスタチン']],
+   ['エクリズマブ',['ソリリス']],
+   ['オメプラゾール',['オメプラール']],
+   ['ランソプラゾール',['タケプロン']],
+   ['エソメプラゾール',['ネキシウム']],
+   ['ファモチジン',['ガスター']],
+   ['メトクロプラミド',['プリンペラン']],
+   ['リファキシミン',['リフキシマ']],
+   ['メロペネム',['メロペン']],
+   ['タゾバクタム・ピペラシリン',['ゾシン'],{g:'(?:タゾバクタム[・／/]?ピペラシリン|ピペラシリン[・／/]?タゾバクタム)',b:'(?<![サタ])ゾシン'}],
+   ['アンピシリン・スルバクタム',['ユナシン','スルバシリン'],{g:'(?:アンピシリン[・／/]?スルバクタム|スルバクタム[・／/]?アンピシリン)'}],
+   ['セファゾリン',['セファメジン']],
+   ['セフトリアキソン',['ロセフィン']],
+   ['セフェピム',['マキシピーム']],
+   ['リネゾリド',['ザイボックス']],
+   ['ダプトマイシン',['キュビシン']],
+   ['テイコプラニン',['タゴシッド']],
+   ['レボフロキサシン',['クラビット']],
+   ['ミカファンギン',['ファンガード']],
+   ['アシクロビル',['ゾビラックス']],
+   ['サルブタモール',['ベネトリン','サルタノール']],
+   ['プロカテロール',['メプチン']],
+   ['アミノフィリン',['ネオフィリン']]
+  ];
+  const rx=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const G=P.map(([g,bs,o])=>{o=o||{};
+    return {g,bs,d:o.d||bs[0],s:o.s||[],
+      gre:new RegExp((o.g||rx(g))+NG),
+      bre:new RegExp(o.b||bs.map(rx).join('|'))};});
+  window.__drugPairs=G;
+  /* 検索語の言い換え：商品名で探しても一般名の項目が当たるように、相方の名前に置き換えた語も返す */
+  const nrm=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[\s　・]/g,'');
+  const AL=G.map(x=>[x.g].concat(x.bs,x.s));
+  window.__qAlt=q=>{const out=[];const nq=nrm(q);if(nq.length<3)return out;
+    AL.forEach(names=>{const hit=names.find(n=>nq.includes(nrm(n)));if(!hit)return;
+      names.forEach(n=>{if(n!==hit)out.push(q.split(hit).length>1?q.split(hit).join(n):n);});});
+    return out;};
+  /* 画面への併記 */
+  const ROOTS=['kList','gList','drugList','p-calc'];
+  const SKIP='svg,script,style,textarea,select,button,input,mark,nav,.memo,[data-nopair]';
+  const SCOPE='ul,ol,table,p,h3,h4,summary,dd,dt,figcaption,.gitem,.keybox,.rangebox,.item,.d';
+  const quick=new RegExp(G.map(x=>x.gre.source+'|'+x.bre.source).join('|'));
+  const sweep=()=>{
+    ROOTS.forEach(id=>{const root=document.getElementById(id);if(!root||!root.offsetParent)return;
+      const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const map=new Map();let n;
+      while((n=w.nextNode())){if(n.nodeValue.length<3||!quick.test(n.nodeValue))continue;
+        const pe=n.parentElement;if(!pe||pe.closest(SKIP))continue;
+        if(id==='drugList'&&!pe.closest('.preset,.dkpanel'))continue;
+        const det=pe.closest('#kList details');if(det&&det.querySelector('summary .tag:not(.c)'))continue;
+        const sc=pe.closest(SCOPE)||pe;(map.get(sc)||map.set(sc,[]).get(sc)).push(n);}
+      map.forEach((nodes,sc)=>{const all=sc.textContent;
+        G.forEach(x=>{const hg=x.gre.test(all),hb=x.bre.test(all);if(hg===hb)return;
+          const re=hg?x.gre:x.bre,add=hg?x.d:x.g;
+          for(const nd of nodes){const v=nd.nodeValue,m=re.exec(v);if(!m)continue;
+            const e=m.index+m[0].length,rest=v.slice(e);
+            let nx=null;if(!rest){let q=nd;while(q&&!q.nextSibling&&q.parentElement&&q.parentElement!==sc)q=q.parentElement;nx=q&&q.nextSibling;if(!(nx&&nx.nodeType===3&&nx.nodeValue[0]==='（'))nx=null;}
+            if(nx)nx.nodeValue='（'+add+'、'+nx.nodeValue.slice(1);
+            else nd.nodeValue=v.slice(0,e)+(rest[0]==='（'?'（'+add+'、'+rest.slice(1):'（'+add+'）'+rest);break;}});});});
+  };
+  let tm=null;const kick=()=>{if(tm)return;tm=setTimeout(()=>{tm=null;try{sweep();}catch(e){console.error(e);}},90);};
+  new MutationObserver(kick).observe(document.body,{childList:true,subtree:true});
+  document.addEventListener('click',kick,true);
+  kick();
 })();
 
 /* ===== オフライン対応（Service Worker） ===== */
