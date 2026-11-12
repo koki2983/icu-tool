@@ -8919,6 +8919,20 @@ loadDrugs(); loadKnow(); calc();
 /* ===== オフライン対応（Service Worker） ===== */
 (function(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
+  /* 新しい版が届いたら「更新する」を出す。sw.js が、保存版より新しい本体を受け取ったときに知らせてくる */
+  const bar=document.createElement('div');bar.id='updBar';bar.style.cssText='display:none;position:fixed;left:10px;right:10px;bottom:calc(74px + env(safe-area-inset-bottom));z-index:40;background:#12414C;color:#fff;border-radius:12px;padding:10px 12px;box-shadow:0 4px 16px rgba(0,0,0,.25);font-size:14px;align-items:center;gap:10px';
+  bar.innerHTML='<span style="flex:1">新しい内容があります</span><button type="button" id="updGo" style="background:#fff;color:#12414C;border:0;border-radius:8px;padding:7px 14px;font-weight:700;font-size:14px">更新する</button><button type="button" id="updNo" aria-label="閉じる" style="background:transparent;color:#fff;border:0;font-size:18px;padding:4px 6px">×</button>';
+  document.body.appendChild(bar);
+  bar.querySelector('#updGo').onclick=()=>location.reload();
+  bar.querySelector('#updNo').onclick=()=>{bar.style.display='none';};
+  navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='icu-updated')bar.style.display='flex';});
+  try{navigator.serviceWorker.startMessages();}catch(e){}
+  /* アプリを開きっぱなしにしていても気づけるように、画面に戻ってきたとき（10 分に 1 回まで）に最新を確認する */
+  let last=Date.now();
+  const check=()=>{if(document.visibilityState!=='visible'||!navigator.onLine||Date.now()-last<600000)return;last=Date.now();
+    navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{});
+    fetch('./',{cache:'no-cache'}).catch(()=>{});};
+  document.addEventListener('visibilitychange',check);
   window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
 })();
 </script>
