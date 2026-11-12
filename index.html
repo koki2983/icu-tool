@@ -4473,7 +4473,8 @@ function handleHash(){
   try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
 }
 window.addEventListener('hashchange',handleHash);
-setTimeout(handleHash,80);
+/* 最初のリンク処理は、後ろのスクリプト（薬剤各論の振り分けなど）が全部読み込まれてから行う */
+if(document.readyState==='complete')setTimeout(handleHash,80);else window.addEventListener('load',()=>setTimeout(handleHash,80));
 /* 本文中の「リンク」ボタン：この項目への URL をコピー */
 $('kList').addEventListener('click',async e=>{
   const b=e.target.closest('[data-lnk]'); if(!b)return;
