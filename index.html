@@ -2237,11 +2237,11 @@ function renderKnow(){
   const all=[...kUser.map((u,i)=>({t:u.t,s:[{h:'',b:u.b.split('\n')}],user:i,cat:'自分'})),...KNOW.map(k=>Object.assign({},k,META[k.t]||{}))];
   const li=x=>{const w=x.startsWith('!');return `<li${w?' class="w"':''}>${esc(w?x.slice(1):x)}</li>`;};
   let lastCat=null;
-  all.filter(k=>(curCat==='すべて'||k.cat===curCat||(k.user!==undefined))&&(!q||k.t.includes(q)||kText(k).includes(q))).sort((a,b)=>(a.user!==undefined?-1:kOrder(a))-(b.user!==undefined?-1:kOrder(b))).forEach(k=>{
+  all.filter(k=>(curCat==='すべて'||k.cat===curCat||(curCat==='当院'&&k.hosp)||(k.user!==undefined))&&(!q||k.t.includes(q)||kText(k).includes(q))).sort((a,b)=>(a.user!==undefined?-1:kOrder(a))-(b.user!==undefined?-1:kOrder(b))).forEach(k=>{
     const gc=k.user!==undefined?'自分の項目':k.cat;
     if(gc!==lastCat){const hd=document.createElement('div');hd.className='cath';hd.textContent=gc;L.appendChild(hd);lastCat=gc;}
     const key='k:'+k.t; const d=document.createElement('details');
-    d.innerHTML=`<summary><span>${k.user!==undefined?'<span class="tag">自分</span>':(k.cat?`<span class="tag c">${k.cat}</span>`:'')}${esc(k.t)}</span></summary>`;
+    d.innerHTML=`<summary><span>${k.user!==undefined?'<span class="tag">自分</span>':(k.cat?`<span class="tag c">${k.cat}</span>`:'')+(k.hosp?'<span class="tag c">当院</span>':'')}${esc(k.t)}</span></summary>`;
     let built=false;
     const build=()=>{
       if(built)return; built=true;
@@ -7527,6 +7527,17 @@ window.DEPTS=['循環器内科','心臓血管外科','呼吸器','呼吸器外�
   Object.entries(MAP).forEach(([c,list])=>{const ok=list.filter(t=>KNOW.some(k=>k.t===t));ORDER[c]=ok;ok.forEach(t=>{(META[t]=META[t]||{}).cat=c;moved.add(t);});});
   Object.keys(ORDER).forEach(c=>{if(!MAP[c])ORDER[c]=(ORDER[c]||[]).filter(t=>!moved.has(t));});
   delete ORDER['心外術後'];
+  /* 当院の項目：内容に合うカテゴリに入れ、「当院」タグは残す（当院ボタンではまとめて出る） */
+  const HOSP=[['当院：心外術後の受け入れ準備（ベッド作成〜帰室時）','心臓血管外科',null],
+   ['当院：デバイス管理台帳（ペースメーカーのチェック表）の読み方','循環','ペースメーカー（一時・恒久）'],
+   ['当院：各科ドレーンの取り扱い（J-VAC・S-B バッグ・脳外ドレーン）','術後',null],
+   ['当院：嚥下スクリーニング検査（RSST・MWST）','全身管理','栄養管理']];
+  const hl=[];
+  HOSP.forEach(([t,c,after])=>{if(!KNOW.some(k=>k.t===t))return;const m=(META[t]=META[t]||{});m.cat=c;m.hosp=true;hl.push(t);
+    Object.keys(ORDER).forEach(k=>{ORDER[k]=(ORDER[k]||[]).filter(x=>x!==t);});
+    const o=ORDER[c]||(ORDER[c]=[]);const i=after?o.indexOf(after):-1;if(after&&i>=0)o.splice(i+1,0,t);else o.unshift(t);});
+  KNOW.forEach(k=>{const m=META[k.t];if(m&&!m.hosp&&m.cat!=='薬剤詳細'&&/当院/.test(k.t)){m.hosp=true;hl.push(k.t);}});
+  ORDER['当院']=hl;
   const base=CATS.filter(c=>c!=='すべて'&&c!=='当院'&&c!=='心外術後'&&!MAP[c]);
   CATS.length=0;CATS.push('すべて','当院',...window.DEPTS,...base);
 })();
