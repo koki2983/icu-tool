@@ -164,6 +164,10 @@ osmotic,薬剤各論：脳圧を下げる薬（グリセオール・マンニト
 magnesium,薬剤各論：硫酸マグネシウム（硫酸 Mg 補正液・マグネゾール）,薬剤（薬剤タブ）,https://koki2983.github.io/icu-tool/#k=magnesium,基本情報／作用と、使う場面／使い方／副作用と、入れすぎ（高 Mg 血症）／看護／主な根拠
 ali,急性下肢虚血と血行再建後の管理（再灌流障害）,心臓血管外科,https://koki2983.github.io/icu-tool/#k=ali,病態と原因／症状と重さの判断／治療／血流を戻したあとに起きること（再灌流障害）／ICU での看護
 upper_airway,上気道閉塞と抜管後の喉頭浮腫,呼吸器,https://koki2983.github.io/icu-tool/#k=upper_airway,上気道と、狭くなる原因／気づくためのサイン／抜管後の喉頭浮腫／起きたときの対応／ICU での看護
+abd_trauma,腹部外傷（肝損傷・脾損傷を中心に）,外傷,https://koki2983.github.io/icu-tool/#k=abd_trauma,けがの起き方と、傷つく臓器／治療の方針／臓器ごとの、あとから起きること／ICU での看護
+meropenem,薬剤各論：メロペン（メロペネム）,薬剤（薬剤タブ）,https://koki2983.github.io/icu-tool/#k=meropenem,基本情報／作用と、効く菌・効かない菌／使い方／副作用と、使えない人／看護／主な根拠
+tazopipe,薬剤各論：ゾシン（タゾバクタム・ピペラシリン）,薬剤（薬剤タブ）,https://koki2983.github.io/icu-tool/#k=tazopipe,基本情報／作用と、効く菌・効かない菌／使い方／副作用と、使えない人／看護／主な根拠
+vancomycin,薬剤各論：バンコマイシン（MRSA の薬と TDM）,薬剤（薬剤タブ）,https://koki2983.github.io/icu-tool/#k=vancomycin,基本情報／作用と、効く菌・効かない菌／使い方／血中濃度の測定（TDM）／副作用／看護／主な根拠
 aortic_dissection,急性大動脈解離（Stanford A・B）：分類と内科的管理,心臓血管外科,https://koki2983.github.io/icu-tool/#k=aortic_dissection,病態と読み方／分類／症状と診断／A 型：手術までの管理／B 型：内科治療の中身／臓器灌流障害（マルパーフュージョン）を見つける／急性期に起きやすいこと／安静度とリハビリ／看護の観察と報告の目安
 htn_emergency,高血圧性緊急症（血圧が高い＋臓器が傷んでいる）,循環器内科,https://koki2983.github.io/icu-tool/#k=htn_emergency,定義／緊急症に含まれる病気／下げ方の原則と例外／使う注射薬／「血圧が高い」ときにまず確かめること／看護の観察と報告
 antithrombotic,抗血栓薬（抗凝固薬・抗血小板薬）：注射と内服、休薬と拮抗,薬剤・感染,https://koki2983.github.io/icu-tool/#k=antithrombotic,2 種類の血栓と 2 種類の薬／抗凝固薬：注射／抗凝固薬：内服／抗血小板薬／血栓溶解薬／処置・手術の前の休薬（一般的な目安）／出血したとき・拮抗薬／HIT（ヘパリン起因性血小板減少症）／ICU での静脈血栓予防と看護
