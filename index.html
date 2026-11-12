@@ -10146,6 +10146,8 @@ window.DEPTS=['循環器内科','心臓血管外科','呼吸器','呼吸器外�
 
 
 /* よく使う・入口・ステッパー（すべて軽い処理） */
+/* APP_BUILD：公開するたびに書き換える版の印（日本時間）。画面の「版」に出る。stamp は公開の直前に自動で付ける */
+const APP_BUILD='2026-11-12 14:33';
 const KNOW_REV='2026 年 11 月 12 日（血液浄化の各論（種類と使い分け・血漿交換・PMX・ECUM）・腫瘍崩壊症候群・発熱性好中球減少症・急性中毒・内分泌の緊急症・重症熱傷・高 K 血症・横紋筋融解症・胸部外傷・骨盤骨折・コンパートメント症候群と脂肪塞栓・髄膜炎と脳炎・重症筋無力症クリーゼ・薬剤各論（インスリン・KCL・ステロイド・抗けいれん薬・筋弛緩薬）・心タンポナーデ・感染性心内膜炎・心筋炎とたこつぼ型心筋症・重症肺炎・COPD 増悪・消化管出血・急性膵炎・肝不全と肝性脳症・アナフィラキシー・熱中症と低体温・ARDS・急性大動脈解離・高血圧性緊急症・急性心不全の深掘り・抗血栓薬・循環器の内服薬・薬剤各論 17 剤（ドブタミン・ドパミン・バソプレシン・ニトログリセリン・ハンプ・フロセミド・ミルリノン・アミオダロン・ヘパリン・アドレナリン・ノルアドレナリン・プロポフォール・フェンタニル・ミダゾラム・ニカルジピン・オノアクト・プレセデックス）・肺切除後の術後管理と当院のルーチン・NPWT・VAC と当院の V.A.C.Ulta・心外術後カテゴリ・術式別の注意点・カルシウム製剤・iNO・循環のパラメーター・ERAS と GDFT・by system・JACCN 重症患者管理クイックガイド・心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
@@ -10210,7 +10212,8 @@ const KNOW_REV='2026 年 11 月 12 日（血液浄化の各論（種類と使い
         +list.map((n,i)=>`<button type="button" class="drc" data-go2="${esc(n)}">${i+1}. ${esc(n.replace(/（.*?）/g,''))}</button>`).join('');
       pick.querySelectorAll('[data-go2]').forEach(x=>x.onclick=()=>goTopic(x.dataset.go2,null));});
     f.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{f.querySelectorAll('.drc').forEach(x=>x.classList.toggle('on',x===b));goTopic(FIND[b.dataset.f],null);});
-    $('kRev').textContent='内容の最終確認：'+KNOW_REV+'（出典・参考ガイドラインは「基準値」カテゴリの最後にあります）';
+    $('kRev').innerHTML='<b>版：'+esc(APP_BUILD)+'</b>　<button type="button" class="small" id="updChk" style="font-size:11px;padding:3px 8px">最新版を確認</button><br>内容の最終確認：'+esc(KNOW_REV)+'（出典・参考ガイドラインは「基準値」カテゴリの最後にあります）';
+    const uc=$('updChk');if(uc)uc.onclick=()=>window.__forceUpdate&&window.__forceUpdate();
   }
 })();
 
@@ -10875,7 +10878,7 @@ loadDrugs(); loadKnow(); calc();
   document.body.appendChild(sheet);
   const KINDS=['間違い','古い情報','当院と違う','わかりにくい','追加してほしい'];
   let cur='',kind=KINDS[0];
-  const ver=()=>{try{return KNOW_REV.split('（')[0];}catch(e){return '';}};
+  const ver=()=>{try{return APP_BUILD;}catch(e){return '';}};
   const text=()=>{const id=KID_R[cur];const body=($('repTxt').value||'').trim();
     return ['【ICU ツール 報告】','項目：'+cur,id?('リンク：https://koki2983.github.io/icu-tool/#k='+id):'','種類：'+kind,'内容：'+(body||'（未記入）'),'版：'+ver()].filter(Boolean).join('\n');};
   const render=()=>{$('repBody').innerHTML=`<p class="muted" style="font-size:12px;margin:4px 0 8px">項目：<b>${esc(cur)}</b></p>
@@ -11039,12 +11042,21 @@ loadDrugs(); loadKnow(); calc();
   bar.querySelector('#updNo').onclick=()=>{bar.style.display='none';};
   navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='icu-updated')bar.style.display='flex';});
   try{navigator.serviceWorker.startMessages();}catch(e){}
-  /* アプリを開きっぱなしにしていても気づけるように、画面に戻ってきたとき（10 分に 1 回まで）に最新を確認する */
+  /* アプリを開きっぱなしにしていても気づけるように、最新を確認する。
+     きっかけ：画面に戻ってきたとき・ウィンドウを選んだとき・開いている間は 3 分ごと（確認は 1 分に 1 回まで）。
+     新しい版が見つかると、sw.js から知らせが来て「更新する」が出る */
   let last=Date.now();
-  const check=()=>{if(document.visibilityState!=='visible'||!navigator.onLine||Date.now()-last<600000)return;last=Date.now();
+  const check=()=>{if(document.visibilityState!=='visible'||!navigator.onLine||Date.now()-last<60000)return;last=Date.now();
     navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{});
     fetch('./',{cache:'no-cache'}).catch(()=>{});};
   document.addEventListener('visibilitychange',check);
+  window.addEventListener('focus',check);
+  setInterval(check,180000);
+  /* 手動：「最新版を確認」ボタン。最新を取り直して保存し、画面を読み込み直す */
+  window.__forceUpdate=()=>{if(!navigator.onLine){toast('通信できません。電波のある所で試してください');return;}
+    toast('最新版を確認しています…');
+    navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{});
+    fetch('./',{cache:'reload'}).then(()=>setTimeout(()=>location.reload(),300)).catch(()=>toast('確認できませんでした'));};
   window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
 })();
 </script>
