@@ -1,6 +1,6 @@
 # 知識メモ ID 一覧（チェックリスト連動用）
 
-更新：2026-11-12　知識メモ 106 項目＋薬剤各論 22（薬剤タブで開く）／計算ツール 20
+更新：2026-11-12　知識メモ 112 項目＋薬剤各論 22（薬剤タブで開く）／計算ツール 21
 
 ## 使い方
 
@@ -87,6 +87,7 @@
 | ID | ツール | URL |
 |---|---|---|
 | `gamma` | ガンマ計算 | https://koki2983.github.io/icu-tool/#c=gamma |
+| `steroid` | ステロイドの力価換算 | https://koki2983.github.io/icu-tool/#c=steroid |
 | `pf` | P/F 比・A-aDO₂・酸素早見表 | https://koki2983.github.io/icu-tool/#c=pf |
 | `rhythm` | 波形の見方チェッカー | https://koki2983.github.io/icu-tool/#c=rhythm |
 | `rsbi` | RSBI | https://koki2983.github.io/icu-tool/#c=rsbi |
@@ -163,6 +164,12 @@
 | `compartment` | コンパートメント症候群と脂肪塞栓症候群 | 整形外科 | https://koki2983.github.io/icu-tool/#k=compartment | コンパートメント症候群の病態／起きやすい状況／サインと評価／対応と筋膜切開後の管理／脂肪塞栓症候群／看護の観察と報告 |
 | `meningitis` | 細菌性髄膜炎と脳炎 | 脳神経内科 | https://koki2983.github.io/icu-tool/#k=meningitis | 細菌性髄膜炎とは／症状と、急ぐ理由／検査と治療の順番／合併症／脳炎／看護と報告 |
 | `mg_crisis` | 重症筋無力症クリーゼ | 脳神経内科 | https://koki2983.github.io/icu-tool/#k=mg_crisis | 重症筋無力症とクリーゼ／悪くなるサイン：SpO₂ より先に見るもの／治療／悪化させる薬／看護 |
+| `bp_overview` | 血液浄化療法の種類と使い分け（HD・ECUM・CHDF・血漿交換・吸着） | 補助療法 | https://koki2983.github.io/icu-tool/#k=bp_overview | 4 つのしくみ／方法の一覧と使い分け／共通する準備：アクセスと抗凝固／共通する合併症／看護で共通して見ること |
+| `plasma_exchange` | 血漿交換（PE）・二重濾過血漿交換（DFPP）・血漿吸着 | 補助療法 | https://koki2983.github.io/icu-tool/#k=plasma_exchange | しくみと種類／ICU で行う主な病気／量・時間・置換液／合併症／看護 |
+| `pmx` | PMX-DHP（エンドトキシン吸着療法）と当院の運用 | 補助療法・当院 | https://koki2983.github.io/icu-tool/#k=pmx | PMX-DHP とは／エビデンスとガイドラインでの位置づけ／当院：PMX-DHP の運用／看護の観察と報告 |
+| `ecum` | ECUM（体外限外濾過）と、ICU での間欠的血液透析（HD） | 補助療法 | https://koki2983.github.io/icu-tool/#k=ecum | ECUM とは／なぜ HD より血圧が下がりにくいのか／どんなときに行うか／合併症／ICU での間欠的血液透析（HD）／看護 |
+| `tls` | 腫瘍崩壊症候群（TLS） | 救急・集中治療 | https://koki2983.github.io/icu-tool/#k=tls | 病態／起きやすい人と、診断／予防と治療／看護 |
+| `fn` | 発熱性好中球減少症（FN） | 救急・集中治療 | https://koki2983.github.io/icu-tool/#k=fn | 定義と、急ぐ理由／最初の 1 時間にすること／感染のもとを探す：毎日見る場所／予防と、生活の援助／ICU での看護と報告 |
 | `aortic_dissection` | 急性大動脈解離（Stanford A・B）：分類と内科的管理 | 心臓血管外科 | https://koki2983.github.io/icu-tool/#k=aortic_dissection | 病態と読み方／分類／症状と診断／A 型：手術までの管理／B 型：内科治療の中身／臓器灌流障害（マルパーフュージョン）を見つける／急性期に起きやすいこと／安静度とリハビリ／看護の観察と報告の目安 |
 | `htn_emergency` | 高血圧性緊急症（血圧が高い＋臓器が傷んでいる） | 循環器内科 | https://koki2983.github.io/icu-tool/#k=htn_emergency | 定義／緊急症に含まれる病気／下げ方の原則と例外／使う注射薬／「血圧が高い」ときにまず確かめること／看護の観察と報告 |
 | `antithrombotic` | 抗血栓薬（抗凝固薬・抗血小板薬）：注射と内服、休薬と拮抗 | 薬剤・感染 | https://koki2983.github.io/icu-tool/#k=antithrombotic | 2 種類の血栓と 2 種類の薬／抗凝固薬：注射／抗凝固薬：内服／抗血小板薬／血栓溶解薬／処置・手術の前の休薬（一般的な目安）／出血したとき・拮抗薬／HIT（ヘパリン起因性血小板減少症）／ICU での静脈血栓予防と看護 |
