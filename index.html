@@ -8698,6 +8698,49 @@ loadDrugs(); loadKnow(); calc();
   window.__reportOpen=open;
 })();
 
+
+/* ===== 分野の色分け（知識のカテゴリ・薬剤の種類） ===== */
+(function(){
+  const CC={'当院':['#0E6F80','#E1F0F3'],'呼吸':['#2F6FB0','#E3EEF9'],'循環':['#C0392B','#FBE6E3'],'補助療法':['#7B4BA8','#EFE6F7'],'術後':['#C2700F','#FBEEDC'],'心外術後':['#B8336A','#F9E4EC'],'神経・鎮静':['#4B58B8','#E6E8F8'],'薬剤・感染':['#2E7D32','#E3F2E4'],'全身管理':['#8A6D1F','#F4EEDB'],'解剖':['#5B6B73','#EAEEF0'],'基準値':['#6B7A80','#EEF1F2']};
+  const DC={'昇圧・強心':['#C0392B','#FBE6E3'],'降圧・血管拡張':['#2F6FB0','#E3EEF9'],'心拍・抗不整脈':['#7B4BA8','#EFE6F7'],'鎮静・鎮痛':['#4B58B8','#E6E8F8'],'利尿':['#C2700F','#FBEEDC'],'抗凝固':['#B8336A','#F9E4EC']};
+  const DRULE=[[/ノルアド|ドパミン|ドブタミン|ピトレシン|バソプレシン|アドレナリン|ミルリ/,'昇圧・強心'],[/ニカルジピン|ペルジピン|ミリスロール|ニトログリセリン|ハンプ|カルペリチド|ニコランジル|シグマート|ジルチアゼム|ヘルベッサー/,'降圧・血管拡張'],[/オノアクト|ランジオロール|アンカロン|アミオダロン/,'心拍・抗不整脈'],[/プロポフォール|プレセデックス|デクスメデ|フェンタニル|ドルミカム|ミダゾラム|モルヒネ|ケタミン/,'鎮静・鎮痛'],[/ラシックス|フロセミド/,'利尿'],[/ヘパリン/,'抗凝固']];
+  const dclass=n=>{const r=DRULE.find(x=>x[0].test(n));return r?r[1]:'';};
+  window.__catColor=c=>CC[c];
+  const st=document.createElement('style');st.textContent=`
+#catBar button[data-cc]::before,.cath[data-cc]::before,#dcBar button[data-cc]::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--cc);margin-right:6px;vertical-align:middle;position:relative;top:-1px}
+#catBar button[data-cc].on,#dcBar button[data-cc].on{background:var(--cc);border-color:var(--cc);color:#fff}
+#catBar button[data-cc].on::before,#dcBar button[data-cc].on::before{background:#fff}
+.cath[data-cc]{color:var(--cc);border-bottom:2px solid var(--cs);padding-bottom:3px}
+#kList details[data-cc]{border-left:5px solid var(--cc)}
+#kList details[data-cc]>summary{background:linear-gradient(90deg,var(--cs),#fff 70%);border-radius:5px 10px 10px 5px}
+#kList details[data-cc][open]>summary{border-radius:5px 10px 0 0}
+.tag.c[data-cc]{background:var(--cs);color:var(--cc);font-weight:700}
+.tocb[data-cc]{border-left:4px solid var(--cc)}
+#drugList .item[data-cc]{border-left:5px solid var(--cc)}
+#drugList .tag.dc{background:var(--cs);color:var(--cc);font-weight:700}
+#dcBar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+#dcBar button{border:1px solid var(--line);background:#fff;border-radius:16px;padding:5px 11px;font-size:13px;color:var(--ink)}
+`;document.head.appendChild(st);
+  const paint=(el,c)=>{el.dataset.cc=1;el.style.setProperty('--cc',c[0]);el.style.setProperty('--cs',c[1]);};
+  let dcur='';
+  const sweep=()=>{
+    document.querySelectorAll('#catBar button:not([data-cc])').forEach(b=>{const c=CC[b.textContent.trim()];if(c)paint(b,c);});
+    document.querySelectorAll('.cath:not([data-cc])').forEach(hd=>{const c=CC[hd.textContent.trim()];if(!c)return;paint(hd,c);let n=hd.nextElementSibling;while(n&&!n.classList.contains('cath')){if(n.classList.contains('tocb'))paint(n,c);n=n.nextElementSibling;}});
+    document.querySelectorAll('.tag.c:not([data-cc])').forEach(t=>{const c=CC[t.textContent.trim()];if(!c)return;paint(t,c);const d=t.closest('#kList details');if(d&&!d.dataset.cc)paint(d,c);});
+    const L=$('drugList');if(L){
+      L.querySelectorAll('.item:not([data-dcx])').forEach(it=>{it.dataset.dcx=1;const tt=it.querySelector('.t');if(!tt)return;const k=dclass(tt.textContent);if(!k)return;const c=DC[k];paint(it,c);it.dataset.dclass=k;
+        if(!tt.querySelector('.tag.dc')){const s=document.createElement('span');s.className='tag dc';s.textContent=k;const first=tt.querySelector('.tag');if(first)first.after(s);else tt.prepend(s);}});
+      if(!$('dcBar')&&L.querySelector('.item[data-dclass]')){const bar=document.createElement('div');bar.id='dcBar';
+        [''].concat(Object.keys(DC)).forEach(k=>{const b=document.createElement('button');b.type='button';b.textContent=k||'すべて';b.dataset.k=k;if(k)paint(b,DC[k]);else b.className='on';
+          b.onclick=()=>{dcur=k;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));flt();};bar.appendChild(b);});
+        L.parentNode.insertBefore(bar,L);}
+      flt();}
+  };
+  const flt=()=>{const L=$('drugList');if(!L)return;L.querySelectorAll('.item').forEach(it=>{const hide=dcur&&it.dataset.dclass!==dcur;it.style.display=hide?'none':'';const p=it.nextElementSibling;if(p&&p.classList.contains('dkpanel'))p.style.display=hide?'none':'';});};
+  let tm=null;new MutationObserver(()=>{if(tm)return;tm=setTimeout(()=>{tm=null;sweep();},50);}).observe(document.body,{childList:true,subtree:true});
+  sweep();
+})();
+
 /* ===== オフライン対応（Service Worker） ===== */
 (function(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
