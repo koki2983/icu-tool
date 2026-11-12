@@ -1,0 +1,15 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844},deviceScaleFactor:2});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+const U=process.argv[2]||'file:///home/claude/icu-tool/index.html';
+await p.goto(U);await p.waitForTimeout(900);
+await p.evaluate(()=>showPage('know'));await p.waitForTimeout(500);await p.screenshot({path:'s1_know.png'});
+console.log('types',await p.evaluate(()=>document.querySelectorAll('#kType .drc').length),'find',await p.evaluate(()=>document.querySelectorAll('#kFind .drc').length),'new',await p.evaluate(()=>document.querySelectorAll('#kNew [data-new]').length));
+await p.evaluate(()=>{document.querySelector('#kNew details').open=true});await p.click('#kNew [data-new="exfix"]');await p.waitForTimeout(1200);
+console.log('ver',await p.evaluate(()=>{const d=[...document.querySelectorAll('#kList details[open]')].pop();return d.querySelector('.verline')?.innerText}));
+const d=await p.$$('#kList details[open]');await d[d.length-1].screenshot({path:'s1_topic.png',clip:undefined});
+await p.evaluate(()=>showPage('drug'));await p.waitForTimeout(700);
+console.log(await p.evaluate(()=>[...document.querySelectorAll('#drugList .dch')].map(x=>x.textContent).join(' | ')));
+await p.evaluate(()=>document.querySelector('#drugList .dch').scrollIntoView());await p.screenshot({path:'s1_drug.png'});
+await p.evaluate(()=>window.__drugDetail('vancomycin',null,true));await p.waitForTimeout(600);console.log('dver',await p.evaluate(()=>document.querySelector('.dkpanel .verline')?.innerText.slice(0,30)));
+await p.click('#dcBar button[data-k="抗菌薬"]');await p.waitForTimeout(300);console.log('visible',await p.evaluate(()=>[...document.querySelectorAll('#drugList .item,#drugList .dch')].filter(x=>x.style.display!=='none').length));
+console.log('ERR',errs);await b.close();})();
