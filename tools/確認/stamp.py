@@ -10,6 +10,8 @@ assert n==1 and h2.startswith('<!')
 try:
     out=subprocess.run(['git','-C',root,'log','-150','--pretty=%ad\t%s','--date=format-local:%Y-%m-%d %H:%M'],capture_output=True,text=True,env=dict(os.environ,TZ='Asia/Tokyo')).stdout
     hist=[l.split('\t',1) for l in out.split('\n') if '\t' in l]
+    # 題に入った医師の個人名は、履歴に出さない（理由：アプリは公開されていて、履歴は画面に出るから）。「当院：○○医師の」を科の名前に置きかえる
+    hist=[[d,re.sub(r'当院：[一-龥]{1,4}医師の','当院：呼吸器外科の',t)] for d,t in hist]
     if len(sys.argv)>1 and sys.argv[1].strip() and (not hist or hist[0][1]!=sys.argv[1].strip()): hist.insert(0,[t,sys.argv[1].strip()])
     if hist:
         line='const HIST='+json.dumps(hist,ensure_ascii=False)+';'
