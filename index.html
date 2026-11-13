@@ -11400,6 +11400,16 @@ G([
 GLOSS.sort((a,b)=>a[0].localeCompare(b[0],'ja'));renderGloss();
 })();
 
+/* ===== 行の途中に入った「!」を直す（2026-11-13） =====
+   「!」は、行の先頭に付けると注意の行（赤）になる印。行の途中（「。!」「、!」）に書いた所は、印がそのまま字として出ていた。
+   ここで、「。!」は 2 行に分けて後ろを注意の行にし、それ以外（「、!」など）は印を取って行全体を注意の行にする。本文を足すときは、「!」を行の先頭だけに書く。 */
+(function(){
+  const fix=x=>{x=String(x);if(!/.!\S/.test(x.slice(1)))return [x];
+    if(/[^。）!]!\S/.test(x.slice(1)))x=(x.startsWith('!')?'':'!')+x[0]+x.slice(1).replace(/([^。）!])!(?=\S)/g,'$1');
+    const out=[];let warn=x.startsWith('!');x.split(/(?<=[。）])!(?=\S)/).forEach((seg,i)=>{out.push(i===0?seg:'!'+seg);});return out;};
+  KNOW.forEach(k=>k.s.forEach(s=>{if(Array.isArray(s.b))s.b=s.b.flatMap(fix);}));
+})();
+
 /* ===== すぐ報告する目安：まだ無かった項目に足す（2026-11-13） =====
    書き方：REP[固定 ID]='本文'。項目のいちばん最後に「すぐ報告する目安」の節として入る（前の節の番号は変わらない）。
    数字は、その項目の本文にあるものだけを使う。当院の基準と医師の指示が優先。 */
@@ -12961,7 +12971,7 @@ window.DEPTS=['循環器内科','心臓血管外科','呼吸器','呼吸器外�
 
 /* よく使う・入口・ステッパー（すべて軽い処理） */
 /* APP_BUILD：公開するたびに書き換える版の印（日本時間）。画面の「版」に出る。stamp は公開の直前に自動で付ける */
-const APP_BUILD='2026-11-13 19:06';
+const APP_BUILD='2026-11-13 19:12';
 const KNOW_REV='2026 年 11 月 13 日（お気に入り・すぐ報告する目安を全項目に・サムスカ・サムタス・農薬中毒・30 秒で読む版・すぐ報告の一覧・病態関連図の詳しい版 21・体の絵 6・図 84 枚・照合の印・原本との照合（薬 14、疾患 3）・創外固定・骨接合術の術後管理・腹部外傷（肝・脾損傷）・抗菌薬の各論（メロペン・ゾシン・バンコマイシンと TDM）・急性下肢虚血と血行再建後・上気道閉塞と抜管後の喉頭浮腫・腸閉塞と腸管虚血・消化管穿孔と腹膜炎・腹部コンパートメント症候群・胆管炎と胆嚢炎・肝切除術後・開頭術後と頭蓋内圧亢進・Na の異常・壊死性軟部組織感染症・PICS と ICU-AW・大腿骨近位部骨折・薬剤各論 4 つ（ヘルベッサー・シグマート・グリセオールとマンニトール・硫酸マグネシウム）・血液浄化の各論（種類と使い分け・血漿交換・PMX・ECUM）・腫瘍崩壊症候群・発熱性好中球減少症・急性中毒・内分泌の緊急症・重症熱傷・高 K 血症・横紋筋融解症・胸部外傷・骨盤骨折・コンパートメント症候群と脂肪塞栓・髄膜炎と脳炎・重症筋無力症クリーゼ・薬剤各論（インスリン・KCL・ステロイド・抗けいれん薬・筋弛緩薬）・心タンポナーデ・感染性心内膜炎・心筋炎とたこつぼ型心筋症・重症肺炎・COPD 増悪・消化管出血・急性膵炎・肝不全と肝性脳症・アナフィラキシー・熱中症と低体温・ARDS・急性大動脈解離・高血圧性緊急症・急性心不全の深掘り・抗血栓薬・循環器の内服薬・薬剤各論 17 剤（ドブタミン・ドパミン・バソプレシン・ニトログリセリン・ハンプ・フロセミド・ミルリノン・アミオダロン・ヘパリン・アドレナリン・ノルアドレナリン・プロポフォール・フェンタニル・ミダゾラム・ニカルジピン・オノアクト・プレセデックス）・肺切除後の術後管理と当院のルーチン・NPWT・VAC と当院の V.A.C.Ulta・心外術後カテゴリ・術式別の注意点・カルシウム製剤・iNO・循環のパラメーター・ERAS と GDFT・by system・JACCN 重症患者管理クイックガイド・心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
@@ -14222,8 +14232,8 @@ loadDrugs(); loadKnow(); calc();
    VERH の書きかえ：確認の印を付けた・付け直したときだけ、 node tools/確認/verhash.js --write を走らせる。
    ふだんの直しでは走らせない（走らせると「直した」ことが隠れる）。
    HIST は stamp.py が git の記録から作る（手で書かない）。 */
-const VERH={"diltiazem":"2826aade","nicorandil":"3022e7a1","osmotic":"c1e2d4d7","meropenem":"672f40a8","tazopipe":"ee87a652","tolvaptan":"741ecea7","vancomycin":"20edc7dc","magnesium":"1dfb5469","pics":"05b82659","iah":"3d43aedd","amiodarone":"83289ad1","landiolol":"bc2a4fc4","milrinone":"bebc6fc1","hanp":"d1a8ebb2","dex":"ea7e1ff1","midazolam":"f94ed349","kcl":"582e30de","propofol":"a6467639","nicardipine":"dac76987","ntg":"d847d450","dobutamine":"14752eb8","dopamine":"a8c63cb5","aed":"378bdf93","nmb":"bd064e56","hyperk":"dea03dc0","anaphylaxis":"609f88c8","se":"d4173c7d","stroke":"a0f24b28","fn":"57569135","dka":"52e37e0f","sodium":"d48794f6","pesticide":"cc40359c","nad":"2372fca7","heparin":"59f90d43","upper_airway":"e3405878"};
-const HIST=[["2026-11-13 19:06", "脳出血：中和薬の併記を直した（イダルシズマブとダビガトランの書き方）"], ["2026-11-13 19:05", "③-3 の直し：FFP の使用期限、DKA の基準（2024）、TTM の時間、肺塞栓の薬、硫酸 Mg の商品名"], ["2026-11-13 18:18", "③-2 後半の直し：機械弁の抗凝固、PMX の試験、FFP の単位、術後の K と報告の血圧をそろえた"], ["2026-11-13 18:08", "引っ越しのファイル名を英数字にする（日本語の名前だと、名前が付かない端末があるため）"], ["2026-11-13 18:05", "夜の画面（暗い配色）を追加。右上の 🌙 で切り替え"], ["2026-11-13 18:04", "まちがって入った作業用ファイル（all.json）を外した"], ["2026-11-13 18:04", "誤記 2 か所：CHDF のヘパリンロックの量、心外受け入れの ART(M)"], ["2026-11-13 18:02", "③-2 前半の直し：ドブタミン・ニトロールの量、心停止後の SpO₂、EF と肺動脈圧の書き方をそろえた（本文）"], ["2026-11-13 18:01", "③-2 前半の直し：ドブタミン・ニトロールの量、心停止後の SpO₂、EF と肺動脈圧の書き方をそろえた"], ["2026-11-13 17:59", "お気に入りを用語集にも。引っ越し（お気に入り・メモ・希釈の書き出しと読みこみ）を追加"], ["2026-11-13 17:56", "確認のあとに本文が変わったことを知らせる印と、更新の履歴を追加"], ["2026-11-13 17:44", "お気に入り：スコア（GCS・RASS・NIHSS など 8 つ）にも ☆ を追加"], ["2026-11-13 17:38", "第三者点検③-1 の直し：気管チューブの位置、NRS の介入基準、予測体重の例、造影剤の漏れ、末梢からの昇圧薬ほか"], ["2026-11-13 16:14", "お気に入り機能を追加（知識メモ・薬剤各論・計算ツール。端末内に固定 ID で保存、更新しても消えない）"], ["2026-11-13 16:13", "第三者点検③-1：HIT の時期を 5〜14 日にそろえる（残り 3 か所）"], ["2026-11-13 16:11", "第三者点検②の直し：浅い鎮静の RASS を −2〜0 に統一、頭部外傷の PaCO₂、腹部コンパートメントの基準、Na の図"], ["2026-11-13 14:00", "第三者点検②：11 月に追加した疾患 16 項目。PICS の重複を直し、Na の異常・農薬中毒に照合の印"], ["2026-11-13 12:17", "第三者点検の直し：薬剤各論 30 項目と「すぐ報告する目安」68 項目（A 4・B 19・C 13）"], ["2026-11-13 12:06", "図のなかった 8 項目に病態関連図を追加（図 84 枚）"], ["2026-11-13 12:02", "すぐ報告する目安を、無かった 66 項目に追加。薬剤各論にも「すぐ報告」の枠を表示"], ["2026-11-13 11:25", "薬剤各論にサムスカ・サムタス（トルバプタン）を追加、配合変化にサムタスを追加"], ["2026-11-13 09:22", "農薬中毒の項目を追加（有機リン・カーバメート・グルホシネート・パラコート・グリホサート）"], ["2026-11-13 08:07", "内容確認のお願い（説明）とチェック表 3 つを Word で作る（QR コードつき）"], ["2026-11-13 07:48", "確認のスクリプトと、追加した文の元を tools に残す"], ["2026-11-13 07:44", "確認用の一覧を、今日の直しのあとの本文で作り直す"], ["2026-11-13 07:15", "疾患 6 項目を原本と照合（高 K・アナフィラキシー・てんかん重積・脳梗塞・FN・DKA）、3 か所を直す"], ["2026-11-13 07:07", "病態関連図を詳しくする（21 項目）、体の絵 6 枚、図の折り返しの改善"], ["2026-11-13 06:59", "30 秒で読む版（見出しの折りたたみ）、すぐ報告の一覧、利用の記録の追加"], ["2026-11-13 06:52", "原本との照合の続き（薬 7 を追加、ドブタミンとドパミンの量の書き方を直す）"], ["2026-11-13 02:32", "図の折り返し：行の頭に句読点が来ないようにする"], ["2026-11-13 02:30", "原本との照合（薬 14・疾患 3）と直し、確認用の一覧、出典の追記、発表資料の数字"], ["2026-11-13 02:22", "図を 68 枚追加（病態関連図・時期の図）、照合の印、最近追加した項目、薬剤タブの見出し"], ["2026-11-13 02:06", "創外固定と骨接合術の術後管理を追加"], ["2026-11-13 02:00", "腹部外傷（肝・脾損傷）と、抗菌薬の各論（メロペン・ゾシン・バンコマイシンと TDM）を追加"], ["2026-11-13 00:46", "急性下肢虚血と血行再建後、上気道閉塞と抜管後の喉頭浮腫を追加"], ["2026-11-12 17:50", "配布時の説明原稿を今の内容に合わせる"], ["2026-11-12 17:50", "発表資料・配布カード・手順書を今の内容に合わせる"], ["2026-11-12 17:47", "疾患 10 項目と薬剤各論 4 つを追加"], ["2026-11-12 17:31", "薬の一般名と商品名を併記する"], ["2026-11-12 14:33", "版の日時を画面に出し、開きっぱなしでも新しい版を確認する"], ["2026-11-12 14:28", "ステロイドのツールを「内服中の人のステロイドカバーの確認」に作り替え（対象の判定・状況別の量の目安・力価換算表）"], ["2026-11-12 14:21", "血液浄化の各論（種類と使い分け・血漿交換・PMX・ECUM）、腫瘍崩壊症候群、発熱性好中球減少症を追加。計算タブにステロイドの力価換算ツールを追加"], ["2026-11-12 14:05", "疾患 10 項目（急性中毒・内分泌緊急症・重症熱傷・高 K 血症・横紋筋融解症・胸部外傷・骨盤骨折・コンパートメント症候群と脂肪塞栓・髄膜炎と脳炎・重症筋無力症クリーゼ）と薬剤各論 5 項目（インスリン・KCL・ステロイド・抗けいれん薬・筋弛緩薬）を追加"], ["2026-11-12 13:44", "疾患を 10 項目追加（心タンポナーデ・感染性心内膜炎・心筋炎とたこつぼ・重症肺炎・COPD 増悪・消化管出血・急性膵炎・肝不全と肝性脳症・アナフィラキシー・熱中症と低体温）。カテゴリに消化器内科と救急・集中治療を追加"], ["2026-11-12 13:20", "新しい版が届いたら「更新する」を表示（電波が弱いとき・開きっぱなしのときに古い版を見続けないように）"], ["2026-11-12 13:09", "ARDS（定義・病態・治療・看護）を呼吸器に追加。iNO を心臓血管外科へ移し、成人の保険適応が心臓手術周術期のみであることを明記"], ["2026-11-12 13:03", "ドルミカム 1A＋生食8mL（1 mg/mL）の共通希釈を追加し、各論に 2 濃度の注意を反映"], ["2026-11-12 13:00", "当院：デバイス管理台帳を循環器内科へ"], ["2026-11-12 12:58", "当院の項目を内容に合うカテゴリに入れ、当院タグは残す（当院ボタンでまとめて表示）"], ["2026-11-12 12:53", "最初のリンク処理を全スクリプト読み込み後に行う（薬剤各論への直リンクの取りこぼし予防）"], ["2026-11-12 12:49", "知識の疾患を診療科のカテゴリに分ける（循環器内科・心臓血管外科・呼吸器・呼吸器外科・消化器外科・脳神経外科・脳神経内科・整形外科・外傷）。切り替えボタンを疾患／共通の 2 段に"], ["2026-11-12 12:45", "分野の色分け：知識のカテゴリと薬剤の種類に色を付け、薬剤一覧に種類の絞り込みを追加"], ["2026-11-12 12:40", "循環器の知識を追加：急性大動脈解離、高血圧性緊急症、急性心不全の深掘り（2025 年改訂 GL）、抗血栓薬、循環器の内服薬。薬剤各論 10 剤（ドブタミン・ドパミン・バソプレシン・ニトログリセリン・ハンプ・フロセミド・ミルリノン・アミオダロン・ヘパリン・アドレナリン）"], ["2026-11-12 04:00", "フェンタニルの当院の共通希釈（0.5mg/10mL＋生食40mL、10 μg/mL）を登録し、各論に反映"], ["2026-11-12 03:52", "発表準備：スライド 4 の画面を現行版に差し替え（計算ツール表示）、数字と説明原稿を更新"], ["2026-11-12 03:50", "オフライン対応（Service Worker・manifest・アイコン）、薬剤各論 6 剤（ノルアドレナリン・プロポフォール・フェンタニル・ミダゾラム・ニカルジピン・オノアクト）、間違いを報告ボタンを追加"], ["2026-11-09 12:27", "肺切除後の術後管理（術式・呼吸・ドレーン・循環・鎮痛・合併症）と当院：呼吸器外科の帰室時ルーチンを追加"], ["2026-11-03 02:12", "薬剤各論を薬剤タブ内で開く形に変更（知識タブの一覧からは外し、リンクは薬剤タブへ）"], ["2026-11-03 01:42", "薬剤各論：プレセデックス（作用・副作用・看護）を追加、薬剤タブから知識へのリンク"], ["2026-11-01 22:21", "陰圧閉鎖療法（NPWT・VAC）と当院の V.A.C.Ulta・チェックリストを知識に追加"], ["2026-10-28 19:55", "修正：出典行がファイル先頭に混入していたのを正しい位置へ"], ["2026-10-28 15:40", "心外術後・iNO・ERAS・by system・循環パラメーターの出典を追記"], ["2026-10-28 15:04", "知識に「心外術後」カテゴリを新設：共通管理・AVR/TAVI・MVR/MVP・大動脈基部/弓部/A型解離・三尖弁/右心の術式別注意点"], ["2026-10-28 14:58", "カルシウム製剤を独立した知識項目に（心外術後・大量輸血・高K・CHDF）"], ["2026-10-28 14:54", "心外術後のカルチコールの意味を CABG・弁術後に追加"], ["2026-10-28 14:23", "一酸化窒素吸入療法（iNO）と当院の INOflo DS を知識に追加"], ["2026-10-28 14:06", "循環のパラメーター（意味と正常値）を知識に追加"], ["2026-10-27 23:09", "計算タブの見出しを「ガンマ計算」→「計算ツール」に"]];
+const VERH={"diltiazem":"2826aade","nicorandil":"3022e7a1","osmotic":"c1e2d4d7","meropenem":"d2560e9a","tazopipe":"ee87a652","tolvaptan":"741ecea7","vancomycin":"20edc7dc","magnesium":"4bb55867","pics":"05b82659","iah":"3d43aedd","amiodarone":"83289ad1","landiolol":"bc2a4fc4","milrinone":"bebc6fc1","hanp":"d1a8ebb2","dex":"ea7e1ff1","midazolam":"f94ed349","kcl":"582e30de","propofol":"a6467639","nicardipine":"dac76987","ntg":"d847d450","dobutamine":"14752eb8","dopamine":"a8c63cb5","aed":"8063c6e7","nmb":"bd064e56","hyperk":"e3f05698","anaphylaxis":"edff3848","se":"d4173c7d","stroke":"a0f24b28","fn":"81e5803b","dka":"52e37e0f","sodium":"ec7217f4","pesticide":"d23b985e","nad":"2372fca7","heparin":"59f90d43","upper_airway":"e3405878"};
+const HIST=[["2026-11-13 19:12", "確認モード（医師・薬剤師が読みながら指摘を残して送れる道具。#review で開く）を追加。行の途中の「!」を直す"], ["2026-11-13 19:07", "脳出血：中和薬の併記を直した（イダルシズマブとダビガトランの書き方）"], ["2026-11-13 19:05", "③-3 の直し：FFP の使用期限、DKA の基準（2024）、TTM の時間、肺塞栓の薬、硫酸 Mg の商品名"], ["2026-11-13 18:18", "③-2 後半の直し：機械弁の抗凝固、PMX の試験、FFP の単位、術後の K と報告の血圧をそろえた"], ["2026-11-13 18:08", "引っ越しのファイル名を英数字にする（日本語の名前だと、名前が付かない端末があるため）"], ["2026-11-13 18:05", "夜の画面（暗い配色）を追加。右上の 🌙 で切り替え"], ["2026-11-13 18:04", "まちがって入った作業用ファイル（all.json）を外した"], ["2026-11-13 18:04", "誤記 2 か所：CHDF のヘパリンロックの量、心外受け入れの ART(M)"], ["2026-11-13 18:02", "③-2 前半の直し：ドブタミン・ニトロールの量、心停止後の SpO₂、EF と肺動脈圧の書き方をそろえた（本文）"], ["2026-11-13 18:01", "③-2 前半の直し：ドブタミン・ニトロールの量、心停止後の SpO₂、EF と肺動脈圧の書き方をそろえた"], ["2026-11-13 17:59", "お気に入りを用語集にも。引っ越し（お気に入り・メモ・希釈の書き出しと読みこみ）を追加"], ["2026-11-13 17:56", "確認のあとに本文が変わったことを知らせる印と、更新の履歴を追加"], ["2026-11-13 17:44", "お気に入り：スコア（GCS・RASS・NIHSS など 8 つ）にも ☆ を追加"], ["2026-11-13 17:38", "第三者点検③-1 の直し：気管チューブの位置、NRS の介入基準、予測体重の例、造影剤の漏れ、末梢からの昇圧薬ほか"], ["2026-11-13 16:14", "お気に入り機能を追加（知識メモ・薬剤各論・計算ツール。端末内に固定 ID で保存、更新しても消えない）"], ["2026-11-13 16:13", "第三者点検③-1：HIT の時期を 5〜14 日にそろえる（残り 3 か所）"], ["2026-11-13 16:11", "第三者点検②の直し：浅い鎮静の RASS を −2〜0 に統一、頭部外傷の PaCO₂、腹部コンパートメントの基準、Na の図"], ["2026-11-13 14:00", "第三者点検②：11 月に追加した疾患 16 項目。PICS の重複を直し、Na の異常・農薬中毒に照合の印"], ["2026-11-13 12:17", "第三者点検の直し：薬剤各論 30 項目と「すぐ報告する目安」68 項目（A 4・B 19・C 13）"], ["2026-11-13 12:06", "図のなかった 8 項目に病態関連図を追加（図 84 枚）"], ["2026-11-13 12:02", "すぐ報告する目安を、無かった 66 項目に追加。薬剤各論にも「すぐ報告」の枠を表示"], ["2026-11-13 11:25", "薬剤各論にサムスカ・サムタス（トルバプタン）を追加、配合変化にサムタスを追加"], ["2026-11-13 09:22", "農薬中毒の項目を追加（有機リン・カーバメート・グルホシネート・パラコート・グリホサート）"], ["2026-11-13 08:07", "内容確認のお願い（説明）とチェック表 3 つを Word で作る（QR コードつき）"], ["2026-11-13 07:48", "確認のスクリプトと、追加した文の元を tools に残す"], ["2026-11-13 07:44", "確認用の一覧を、今日の直しのあとの本文で作り直す"], ["2026-11-13 07:15", "疾患 6 項目を原本と照合（高 K・アナフィラキシー・てんかん重積・脳梗塞・FN・DKA）、3 か所を直す"], ["2026-11-13 07:07", "病態関連図を詳しくする（21 項目）、体の絵 6 枚、図の折り返しの改善"], ["2026-11-13 06:59", "30 秒で読む版（見出しの折りたたみ）、すぐ報告の一覧、利用の記録の追加"], ["2026-11-13 06:52", "原本との照合の続き（薬 7 を追加、ドブタミンとドパミンの量の書き方を直す）"], ["2026-11-13 02:32", "図の折り返し：行の頭に句読点が来ないようにする"], ["2026-11-13 02:30", "原本との照合（薬 14・疾患 3）と直し、確認用の一覧、出典の追記、発表資料の数字"], ["2026-11-13 02:22", "図を 68 枚追加（病態関連図・時期の図）、照合の印、最近追加した項目、薬剤タブの見出し"], ["2026-11-13 02:06", "創外固定と骨接合術の術後管理を追加"], ["2026-11-13 02:00", "腹部外傷（肝・脾損傷）と、抗菌薬の各論（メロペン・ゾシン・バンコマイシンと TDM）を追加"], ["2026-11-13 00:46", "急性下肢虚血と血行再建後、上気道閉塞と抜管後の喉頭浮腫を追加"], ["2026-11-12 17:50", "配布時の説明原稿を今の内容に合わせる"], ["2026-11-12 17:50", "発表資料・配布カード・手順書を今の内容に合わせる"], ["2026-11-12 17:47", "疾患 10 項目と薬剤各論 4 つを追加"], ["2026-11-12 17:31", "薬の一般名と商品名を併記する"], ["2026-11-12 14:33", "版の日時を画面に出し、開きっぱなしでも新しい版を確認する"], ["2026-11-12 14:28", "ステロイドのツールを「内服中の人のステロイドカバーの確認」に作り替え（対象の判定・状況別の量の目安・力価換算表）"], ["2026-11-12 14:21", "血液浄化の各論（種類と使い分け・血漿交換・PMX・ECUM）、腫瘍崩壊症候群、発熱性好中球減少症を追加。計算タブにステロイドの力価換算ツールを追加"], ["2026-11-12 14:05", "疾患 10 項目（急性中毒・内分泌緊急症・重症熱傷・高 K 血症・横紋筋融解症・胸部外傷・骨盤骨折・コンパートメント症候群と脂肪塞栓・髄膜炎と脳炎・重症筋無力症クリーゼ）と薬剤各論 5 項目（インスリン・KCL・ステロイド・抗けいれん薬・筋弛緩薬）を追加"], ["2026-11-12 13:44", "疾患を 10 項目追加（心タンポナーデ・感染性心内膜炎・心筋炎とたこつぼ・重症肺炎・COPD 増悪・消化管出血・急性膵炎・肝不全と肝性脳症・アナフィラキシー・熱中症と低体温）。カテゴリに消化器内科と救急・集中治療を追加"], ["2026-11-12 13:20", "新しい版が届いたら「更新する」を表示（電波が弱いとき・開きっぱなしのときに古い版を見続けないように）"], ["2026-11-12 13:09", "ARDS（定義・病態・治療・看護）を呼吸器に追加。iNO を心臓血管外科へ移し、成人の保険適応が心臓手術周術期のみであることを明記"], ["2026-11-12 13:03", "ドルミカム 1A＋生食8mL（1 mg/mL）の共通希釈を追加し、各論に 2 濃度の注意を反映"], ["2026-11-12 13:00", "当院：デバイス管理台帳を循環器内科へ"], ["2026-11-12 12:58", "当院の項目を内容に合うカテゴリに入れ、当院タグは残す（当院ボタンでまとめて表示）"], ["2026-11-12 12:53", "最初のリンク処理を全スクリプト読み込み後に行う（薬剤各論への直リンクの取りこぼし予防）"], ["2026-11-12 12:49", "知識の疾患を診療科のカテゴリに分ける（循環器内科・心臓血管外科・呼吸器・呼吸器外科・消化器外科・脳神経外科・脳神経内科・整形外科・外傷）。切り替えボタンを疾患／共通の 2 段に"], ["2026-11-12 12:45", "分野の色分け：知識のカテゴリと薬剤の種類に色を付け、薬剤一覧に種類の絞り込みを追加"], ["2026-11-12 12:40", "循環器の知識を追加：急性大動脈解離、高血圧性緊急症、急性心不全の深掘り（2025 年改訂 GL）、抗血栓薬、循環器の内服薬。薬剤各論 10 剤（ドブタミン・ドパミン・バソプレシン・ニトログリセリン・ハンプ・フロセミド・ミルリノン・アミオダロン・ヘパリン・アドレナリン）"], ["2026-11-12 04:00", "フェンタニルの当院の共通希釈（0.5mg/10mL＋生食40mL、10 μg/mL）を登録し、各論に反映"], ["2026-11-12 03:52", "発表準備：スライド 4 の画面を現行版に差し替え（計算ツール表示）、数字と説明原稿を更新"], ["2026-11-12 03:50", "オフライン対応（Service Worker・manifest・アイコン）、薬剤各論 6 剤（ノルアドレナリン・プロポフォール・フェンタニル・ミダゾラム・ニカルジピン・オノアクト）、間違いを報告ボタンを追加"], ["2026-11-09 12:27", "肺切除後の術後管理（術式・呼吸・ドレーン・循環・鎮痛・合併症）と当院：呼吸器外科の帰室時ルーチンを追加"], ["2026-11-03 02:12", "薬剤各論を薬剤タブ内で開く形に変更（知識タブの一覧からは外し、リンクは薬剤タブへ）"], ["2026-11-03 01:42", "薬剤各論：プレセデックス（作用・副作用・看護）を追加、薬剤タブから知識へのリンク"], ["2026-11-01 22:21", "陰圧閉鎖療法（NPWT・VAC）と当院の V.A.C.Ulta・チェックリストを知識に追加"], ["2026-10-28 19:55", "修正：出典行がファイル先頭に混入していたのを正しい位置へ"], ["2026-10-28 15:40", "心外術後・iNO・ERAS・by system・循環パラメーターの出典を追記"], ["2026-10-28 15:04", "知識に「心外術後」カテゴリを新設：共通管理・AVR/TAVI・MVR/MVP・大動脈基部/弓部/A型解離・三尖弁/右心の術式別注意点"], ["2026-10-28 14:58", "カルシウム製剤を独立した知識項目に（心外術後・大量輸血・高K・CHDF）"], ["2026-10-28 14:54", "心外術後のカルチコールの意味を CABG・弁術後に追加"], ["2026-10-28 14:23", "一酸化窒素吸入療法（iNO）と当院の INOflo DS を知識に追加"], ["2026-10-28 14:06", "循環のパラメーター（意味と正常値）を知識に追加"], ["2026-10-27 23:09", "計算タブの見出しを「ガンマ計算」→「計算ツール」に"], ["2026-10-27 23:03", "看護部発表の準備キット（スライド叩き台・配布カード・手順書・アンケート・原稿）を docs に保存"], ["2026-10-27 22:40", "利用の記録（端末内・非表示）を追加"], ["2026-10-27 02:11", "ERAS と GDFT（読み方つき）を知識に追加"], ["2026-10-24 13:12", "by system シート（系統別の情報収集・申し送り作成ツール）を追加"], ["2026-10-24 12:55", "by system（系統別評価）の知識を追加"], ["2026-10-24 12:09", "JACCN「ICU経験のない看護師のための重症患者管理クイックガイド」を知識に追加"], ["2026-10-20 23:34", "HFrEF/HFpEF/HFmrEF の読み方と定義を追記"], ["2026-10-20 23:33", "心不全 4 剤：商品名と一般名の対応を追加"], ["2026-10-20 23:26", "心不全：ファンタスティック4（HFrEF 基本4剤）を知識に追加"], ["2026-10-20 23:21", "当院ICU 薬剤×薬剤 配合変化表（46剤）を配合変化ツールに追加"], ["2026-10-20 23:06", "当院：抗菌薬×輸液の配合禁忌表（薬剤部）を配合変化ツールに、嚥下スクリーニング（RSST・MWST）を知識に追加"], ["2026-10-20 23:02", "計算：体液の見える化（区画・消化液の組成・喪失の推定・1日必要量・NICE CG174 の蘇生判断）を追加"], ["2026-10-20 22:58", "計算：膠質浸透圧・アルブミン、周術期の体液喪失を追加。知識：アルブミンの生理・周術期輸液・術式別の栄養を追加"], ["2026-10-20 00:09", "全文検索（知識・用語・計算・薬剤・スコア）をヘッダーに追加"], ["2026-10-17 11:27", "知識：重症頭部外傷と びまん性軸索損傷（DAI）を追加（図2点・用語7語）"], ["2026-10-16 04:18", "輸液：選択リストを当院に合わせて調整"], ["2026-10-16 04:06", "輸液：経路に PICC①②・VA 黄/白を追加、流れ図の名前の重なりを修正、点滴の選択リストを拡充"], ["2026-10-16 03:54", "輸液：投与経路（CV dis/mid/pro・末梢など）、投与の流れ図、流量の推移グラフ、変更履歴を追加"], ["2026-10-14 22:17", "VA-ECMO：Temp.1 は送血側と明記"], ["2026-10-14 21:46", "VA-ECMO：当院の本体画面の見方（図）とアセスメント例を追加"], ["2026-10-08 08:07", "人工呼吸器入門：当院の PB980 での画面表示の節と対応表を追加"], ["2026-10-08 07:57", "人工呼吸器：Ppeak 上限は看護師が触らない／回路を外してバッグ換気は医師・先輩の判断（PEEP 解除）に修正"], ["2026-10-08 07:55", "人工呼吸器入門：Ppeak 上限アラームは看護師が触らないことを明記"], ["2026-10-08 07:39", "人工呼吸器入門：文章を平易に、図を描き直し"], ["2026-10-08 07:25", "README：GitHub連携の運用を追記"], ["2026-10-07 22:55", "人工呼吸器：はじめての受け持ち（図7点）を追加、チェックリスト連動の土台"], ["2026-10-07 13:50", "Add files via upload"], ["2026-10-04 16:26", "計算・電解質：BUN/Cr 比と評価の表を追加（FENa のカードに統合）"], ["2026-09-30 15:15", "血管の模式図：左右を修正（大動脈は患者の左、腕頭動脈・上下大静脈は患者の右）"], ["2026-09-30 15:06", "血管の模式図：左右を修正（大動脈弓・下行大動脈は患者の左、腕頭動脈・上大静脈は患者の右）。「患者の右／左」を明記"], ["2026-09-30 15:00", "解剖：全身の血管と略語（動脈・静脈の模式図 2 点＋略語の表＋実画像 5 点）を追加"], ["2026-09-28 07:33", "当院の TTM プロトコルと Arctic Sun 準備手順を「心停止後（ROSC）と TTM」に 6 セクションで追加"], ["2026-09-28 06:40", "当院資料を反映：IABP 勉強会（5 セクション）、各科ドレーンの取り扱い（新規）、PMX の運用、フィラデルフィアカラー、心外帰室シミュレーション動画リンク"], ["2026-09-28 03:43", "心筋梗塞：「誘導は心臓をどこから見ているか」の図と解説を追加（四肢誘導の方向・胸部誘導の断面）"], ["2026-09-28 03:36", "責任血管と誘導の図を、心臓の部位図＋表の形に作り直し"], ["2026-09-28 03:33", "心筋梗塞：責任血管ごとの心電図変化（前壁・側壁・下壁・後壁・右室・左主幹部、Wellens、de Winter、時間経過）を 12 誘導の図つきで追加"], ["2026-09-28 03:28", "修正：直前のコミットで壊れた文字列 3 か所を復旧（強調記号の移動）"], ["2026-09-28 03:27", "文中に紛れた強調記号「!」を先頭に移動"], ["2026-09-28 03:25", "後壁誘導の体位（側臥位で貼る・記録の考え方）を追記"]];
 (function(){
   const fnv=s=>{let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193);}return ('0000000'+(h>>>0).toString(16)).slice(-8);};
   const hashOf=id=>{const k=KNOW.find(x=>x.t===KID[id]);if(!k)return '';const m=META[k.t]||{};
@@ -14432,6 +14442,109 @@ html.dark mark{background:#6B5600;color:#fff}
   let on=false;try{on=localStorage.getItem(KEY)==='1';}catch(e){}
   set(on);
   window.__dark=set;
+})();
+
+/* ===== 確認モード（医師・薬剤師に内容を見てもらうための道具）（2026-11-13） =====
+   目的：見てくれる人が、スマホで読みながら「ここを直す」をその場で残し、まとめて小山田に送れるようにする。
+   入り方：アドレスの最後に #review を付けて開く（配布の紙の QR コード）。終わるときは「確認モードを終わる」。
+   保存：その人の端末の中だけ（localStorage の 'review'）。送るのは、本人が「コピー」か「ファイルに保存」をしたときだけ。
+   行の見分け方：項目の固定 ID ＋ 見出し ＋ 行の文。行の文が後で変わっても、指摘の一覧には、指摘したときの文が残る。 */
+(function(){
+  const KEY='review';let R={on:false,who:'',items:[],ok:{}};
+  try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&typeof v==='object')R=Object.assign(R,v);}catch(e){}
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(R));}catch(e){}};
+  const st=document.createElement('style');st.textContent=`
+#rvFab{display:none;position:fixed;left:12px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:9;border:0;border-radius:22px;padding:10px 14px;font-size:13.5px;font-weight:700;background:#B25E00;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+html.rev #rvFab{display:block}
+.rvb{display:none;border:1px solid #D9A066;background:#FFF8EE;color:#8A4B00;border-radius:12px;font-size:11.5px;padding:1px 8px;margin-left:6px;vertical-align:middle;white-space:nowrap}
+html.rev .rvb{display:inline-block}
+li.rvhit{background:#FFF1DC;box-shadow:-6px 0 0 #FFF1DC,-10px 0 0 #D98200;border-radius:2px}
+.rvnote{display:none;font-size:12.5px;color:#8A4B00;font-weight:700;margin:2px 0}
+html.rev .rvnote{display:block}
+.rvtop{display:none;margin:8px 0;padding:8px 10px;border:1px dashed #D9A066;border-radius:10px;background:#FFFBF4;font-size:12.5px;line-height:1.6}
+html.rev .rvtop{display:block}
+.rvtop button{font-size:12.5px;margin:4px 6px 0 0}
+.rvtop button.on{background:#2E7D32;border-color:#2E7D32;color:#fff}
+.rved{margin:6px 0 4px;padding:8px;border:1px solid #D9A066;border-radius:10px;background:#FFFBF4}
+.rved textarea{width:100%;min-height:74px;font-size:15px}
+.rved .bar{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+#rvSheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:35;align-items:flex-end}
+#rvSheet .sheet{background:var(--card,#fff);width:100%;max-height:90vh;overflow:auto;border-radius:16px 16px 0 0;padding:12px 14px calc(16px + env(safe-area-inset-bottom))}
+#rvSheet .sheet-h{display:flex;justify-content:space-between;align-items:center}
+#rvSheet .rvi{padding:8px 0;border-bottom:1px solid var(--line,#e3e9ec);font-size:13.5px;line-height:1.6}
+#rvSheet .rvi b{color:var(--teal,#0F6E7C)}
+#rvSheet .rvi .q{color:var(--muted);font-size:12.5px;margin:2px 0}
+#rvSheet .rvi .c{font-weight:700}
+#rvSheet .rvi button{font-size:11.5px;padding:2px 8px;margin-top:4px}`;document.head.appendChild(st);
+
+  const clean=el=>{const c=el.cloneNode(true);c.querySelectorAll('.rvb,.rvnote,.rved,.favb,.vdot').forEach(x=>x.remove());return c.textContent.replace(/\s+/g,' ').trim();};
+  /* その行が、どの項目の、どの見出しの下かを調べる */
+  const where=li=>{const body=li.closest('.body');if(!body)return null;let title='';
+    const det=body.parentElement;if(det&&det.dataset&&det.dataset.key&&det.dataset.key.startsWith('k:'))title=det.dataset.key.slice(2);
+    else{const rp=body.querySelector('[data-rep]');title=rp?rp.dataset.rep:'';}
+    const id=KID_R[title];if(!id)return null;
+    let h='';if(li.closest('.keybox'))h='まず押さえる';else{let n=li.closest('ul,ol');while(n&&n!==body){let s=n.previousElementSibling;while(s){if(s.tagName==='H3'){h=clean(s);break;}s=s.previousElementSibling;}if(h)break;n=n.parentElement;}}
+    return {id,t:title,h};};
+  const find=(id,h,x)=>R.items.findIndex(i=>i.id===id&&i.h===h&&i.x===x);
+  const mark=li=>{const w=li._rv;if(!w)return;const i=find(w.id,w.h,w.x);li.classList.toggle('rvhit',i>=0);let n=li.querySelector(':scope>.rvnote');
+    if(i>=0){if(!n){n=document.createElement('div');n.className='rvnote';n.dataset.nopair=1;li.appendChild(n);}n.textContent='指摘：'+R.items[i].c;}else if(n)n.remove();
+    const b=li.querySelector(':scope>.rvb');if(b)b.textContent=i>=0?'指摘を直す':'指摘する';};
+  const edit=li=>{const w=li._rv;if(!w||li.querySelector(':scope>.rved'))return;const i=find(w.id,w.h,w.x);
+    const d=document.createElement('div');d.className='rved';d.dataset.nopair=1;
+    d.innerHTML='<textarea placeholder="どこが、どう違うか。正しい値や、根拠があれば（例：上限は 0.7 ではなく 1.0。添付文書）"></textarea><div class="bar"><button type="button" class="small primary" data-a="s">指摘を残す</button>'+(i>=0?'<button type="button" class="small danger" data-a="x">この指摘を消す</button>':'')+'<button type="button" class="small" data-a="c">やめる</button></div>';
+    li.appendChild(d);const ta=d.querySelector('textarea');if(i>=0)ta.value=R.items[i].c;ta.focus();
+    d.addEventListener('click',e=>{const a=e.target.dataset&&e.target.dataset.a;if(!a)return;e.stopPropagation();
+      if(a==='s'){const c=ta.value.trim();if(!c){toast('内容を書いてください');return;}const j=find(w.id,w.h,w.x);const it={id:w.id,t:w.t,h:w.h,x:w.x,c,at:new Date().toISOString().slice(0,16)};if(j>=0)R.items[j]=it;else R.items.push(it);delete R.ok[w.id];save();toast('指摘を残しました');}
+      if(a==='x'){const j=find(w.id,w.h,w.x);if(j>=0)R.items.splice(j,1);save();toast('消しました');}
+      d.remove();mark(li);paintTop();fab();});};
+  const paintTop=()=>document.querySelectorAll('.rvtop').forEach(b=>{const id=b.dataset.id;const ok=!!R.ok[id];const n=R.items.filter(i=>i.id===id).length;const k=b.querySelector('[data-ok]');k.classList.toggle('on',ok);k.textContent=ok?'✓ 問題なし、と記録しました':'この項目は問題なし';b.querySelector('.rvn').textContent=n?'この項目の指摘：'+n+' 件':'';});
+  const sweep=()=>{if(!R.on)return;
+    document.querySelectorAll('#kList details[data-key]>.body, .dkpanel>.body').forEach(body=>{
+      if(!body.querySelector(':scope>.rvtop')){let title='';const det=body.parentElement;if(det.dataset&&det.dataset.key&&det.dataset.key.startsWith('k:'))title=det.dataset.key.slice(2);else{const rp=body.querySelector('[data-rep]');title=rp?rp.dataset.rep:'';}
+        const id=KID_R[title];if(id){const t=document.createElement('div');t.className='rvtop';t.dataset.id=id;t.dataset.nopair=1;
+          t.innerHTML='<b>確認モード</b>　気になる行の「指摘する」を押して、内容を書いてください。<br><button type="button" class="small" data-ok="1"></button><span class="rvn muted"></span>';
+          t.querySelector('[data-ok]').onclick=e=>{e.stopPropagation();if(R.ok[id])delete R.ok[id];else{if(R.items.some(i=>i.id===id)){toast('この項目には指摘があります。指摘を消してから押してください');return;}R.ok[id]=new Date().toISOString().slice(0,10);}save();paintTop();fab();};
+          body.insertBefore(t,body.firstChild);}}
+      body.querySelectorAll('li').forEach(li=>{if(li._rv||li.closest('figure,.memo,.rved'))return;const w=where(li);if(!w)return;w.x=clean(li);if(!w.x)return;li._rv=w;
+        const b=document.createElement('button');b.type='button';b.className='rvb';b.dataset.nopair=1;b.onclick=e=>{e.preventDefault();e.stopPropagation();edit(li);};li.appendChild(b);mark(li);});});
+    paintTop();};
+  let tm=null;const mo=new MutationObserver(()=>{if(tm)return;tm=setTimeout(()=>{tm=null;try{sweep();}catch(e){}},260);});
+
+  /* ---------- 左下のボタンと、指摘の一覧 ---------- */
+  const fb=document.createElement('button');fb.id='rvFab';fb.type='button';document.body.appendChild(fb);
+  const fab=()=>{fb.textContent='確認モード　指摘 '+R.items.length+' 件 ／ 問題なし '+Object.keys(R.ok).length+' 項目';};
+  const sheet=document.createElement('div');sheet.id='rvSheet';
+  sheet.innerHTML='<div class="sheet"><div class="sheet-h"><b>確認モード：指摘の一覧</b><button class="small" id="rvClose">閉じる</button></div>'
+   +'<p class="muted" style="font-size:12px;margin:4px 0 8px;line-height:1.7">指摘は、この端末の中だけに保存されています。見終わったら、下の「コピー」か「ファイルに保存」で取り出し、ICU 小山田へ Teams で送ってください。</p>'
+   +'<label style="font-size:12.5px">職種・お名前（任意。送る文の最初に入ります）</label><input type="text" id="rvWho" placeholder="例：麻酔科　○○" style="width:100%">'
+   +'<div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0"><button type="button" class="small primary" id="rvCopy">まとめてコピー</button><button type="button" class="small" id="rvFile">ファイルに保存</button><button type="button" class="small danger" id="rvEnd">確認モードを終わる</button></div>'
+   +'<p class="muted" id="rvMsg" style="font-size:12px;margin:0 0 6px"></p><div id="rvList"></div>'
+   +'<div style="margin-top:14px"><button type="button" class="small danger" id="rvClear">送ったあと：指摘と記録を全部消す</button></div></div>';
+  document.body.appendChild(sheet);
+  const text=()=>{const L=[];L.push('ICU ツール　内容の確認の結果');L.push('確認した人：'+(R.who||'（未記入）'));L.push('取り出した日：'+new Date().toLocaleString('ja-JP'));L.push('アプリの版：'+(typeof APP_BUILD!=='undefined'?APP_BUILD:''));L.push('');
+    L.push('■ 指摘（'+R.items.length+' 件）');const by={};R.items.forEach(i=>(by[i.id]=by[i.id]||[]).push(i));
+    Object.keys(by).forEach(id=>{L.push('');L.push('【'+by[id][0].t+'】（ID：'+id+'）');by[id].forEach((i,n)=>{L.push((n+1)+'. 見出し：'+(i.h||'（なし）'));L.push('   今の文：'+i.x);L.push('   指摘：'+i.c);});});
+    L.push('');const ok=Object.keys(R.ok);L.push('■ 問題なし、とした項目（'+ok.length+'）');ok.forEach(id=>L.push('・'+(KID[id]||id)+'（'+R.ok[id]+'）'));return L.join('\n');};
+  const draw=()=>{$('rvWho').value=R.who||'';const L=$('rvList');
+    L.innerHTML=(R.items.length?R.items.map((i,n)=>`<div class="rvi" data-nopair="1"><b>${esc(i.t)}</b>${i.h?'　'+esc(i.h):''}<div class="q">今の文：${esc(i.x)}</div><div class="c">指摘：${esc(i.c)}</div><button type="button" class="small" data-go="${n}">この項目を開く</button> <button type="button" class="small danger" data-del="${n}">消す</button></div>`).join(''):'<p class="muted" style="padding:8px 0">指摘はまだありません。知識メモや薬剤の項目を開いて、気になる行の「指摘する」を押してください。</p>')
+      +(Object.keys(R.ok).length?'<div class="rvi" data-nopair="1"><b>問題なし、とした項目</b><div class="q">'+Object.keys(R.ok).map(id=>esc((KID[id]||id).replace(/^薬剤各論：/,''))).join('／')+'</div></div>':'');
+    L.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{R.items.splice(+b.dataset.del,1);save();draw();fab();document.querySelectorAll('li').forEach(li=>{if(li._rv)mark(li);});paintTop();});
+    L.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{const i=R.items[+b.dataset.go];sheet.style.display='none';const m=META[i.t]||{};if(m.cat==='薬剤詳細'){showPage('drug');setTimeout(()=>window.__drugDetail&&window.__drugDetail(i.id,null,true),60);}else openTopic(i.id,i.h&&i.h!=='まず押さえる'?i.h:null);});};
+  const openSheet=()=>{sheet.style.display='flex';$('rvMsg').textContent='';draw();};
+  fb.onclick=openSheet;$('rvClose').onclick=()=>sheet.style.display='none';sheet.addEventListener('click',e=>{if(e.target===sheet)sheet.style.display='none';});
+  $('rvWho').addEventListener('input',e=>{R.who=e.target.value;save();});
+  $('rvCopy').onclick=()=>{const t=text();const done=()=>{$('rvMsg').textContent='コピーしました。Teams のメッセージに貼って、ICU 小山田へ送ってください。';};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done).catch(()=>fall());else fall();
+    function fall(){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){$('rvMsg').textContent='コピーできませんでした。「ファイルに保存」を使ってください。';}ta.remove();}};
+  $('rvFile').onclick=()=>{const d=new Date(),ymd=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');const blob=new Blob([text()],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='icu-tool_review_'+ymd+'.txt';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},800);$('rvMsg').textContent='保存しました。このファイルを、Teams で ICU 小山田へ送ってください。';};
+  $('rvClear').onclick=()=>{if(!confirm('この端末にある指摘と「問題なし」の記録を、全部消します。送ったあとですか？'))return;R.items=[];R.ok={};save();draw();fab();document.querySelectorAll('li').forEach(li=>{if(li._rv)mark(li);});paintTop();};
+  const set=on=>{R.on=on;save();document.documentElement.classList.toggle('rev',on);if(on){fab();sweep();mo.observe(document.body,{childList:true,subtree:true});}else mo.disconnect();};
+  $('rvEnd').onclick=()=>{if(R.items.length&&!confirm('確認モードを終わります。指摘は端末に残りますが、まだ送っていなければ、先に「コピー」か「ファイルに保存」をしてください。終わりますか？'))return;set(false);sheet.style.display='none';toast('確認モードを終わりました');};
+  const byHash=()=>{if(/^#(p=)?review$/.test(location.hash)){set(true);showPage('know');toast('確認モードにしました');try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}if(window.__useInc)window.__useInc('f','確認モードに入る');}};
+  window.addEventListener('hashchange',byHash);
+  window.__review=set;window.__reviewText=text;window.__reviewOpen=openSheet;
+  if(R.on)set(true);
+  if(document.readyState==='complete')setTimeout(byHash,120);else window.addEventListener('load',()=>setTimeout(byHash,120));
 })();
 
 /* ===== オフライン対応（Service Worker） ===== */
