@@ -46,4 +46,11 @@
 
 - 置き場所：`docs/確認用/麻酔科/`（お願い 1 つ＋チェック表 A〜G）
 - 作り直し：本文を直したあとは、全項目を書き出して（`ex.js`）、数字の入った行と「すぐ報告」の行を抜き出し、`word_build_masuika.js` で Word にする。チェック表は、作った時点の版の本文（表紙に版の日時を印字）
+- 作り直しの手順（2026-11-13 夜に追加。理由：行を抜き出す道具と QR の作り方がリポジトリになく、作り直せなかったため）
+  1. `node tools/確認/ex2.js index.html /tmp/all.json`：全項目の本文を書き出す（`ex.js` と同じ中身。jsdom で動くので Playwright が要らない）
+  2. `python3 tools/確認/check_build.py /tmp/all.json /tmp/build`：`data.json` と「数字の行」のテキスト 3 つを作る。抜き出す行の決まりは、このファイルの先頭に書いてある。どの項目をどの表に入れるかは `check_parts.json`
+  3. `node tools/確認/qr_build.js /tmp/build/data.json /tmp/build/qr`：QR コードの画像（`npm install qrcode` が要る）
+  4. `word_build_masuika.js` を `/tmp/build` に置いて `node word_build_masuika.js`：`out/` に Word が 8 つ出る。`docs/確認用/麻酔科/` と `docs/確認用/` に置きかえる
+  5. このコミットでは `stamp.py` を走らせない。理由：版の日時が変わると、表紙に印字した版とアプリの版がずれるから（本文は同じでも、見る人が迷う）
+- 新しい項目を足したら `check_parts.json` にも ID を足す。足し忘れは、手順 2 の出力「どの表にも入っていない項目」に出る（解剖 6 つと出典は、わざと入れていない）
 - アプリの確認モード：アドレスの最後に `#review` を付けて開く。指摘は見る人の端末の中だけに残り、「まとめてコピー」か「ファイルに保存」で取り出して送ってもらう
