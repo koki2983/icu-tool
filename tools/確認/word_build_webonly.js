@@ -3,7 +3,7 @@ const {Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,WidthType,Alig
 const URL='https://koki2983.github.io/icu-tool/#review';
 const F={ascii:'Arial',eastAsia:'游ゴシック',hAnsi:'Arial'};
 const T=(t,o={})=>new TextRun(Object.assign({text:t,font:F,size:19},o));
-const P=(runs,o={})=>new Paragraph(Object.assign({children:Array.isArray(runs)?runs:[runs],spacing:{before:0,after:36,line:256,lineRule:'auto'}},o));
+const P=(runs,o={})=>new Paragraph(Object.assign({children:Array.isArray(runs)?runs:[runs],spacing:{before:0,after:30,line:248,lineRule:'auto'}},o));
 const NB={style:BorderStyle.NONE,size:0,color:'FFFFFF'};const none={top:NB,bottom:NB,left:NB,right:NB};
 const LN={style:BorderStyle.SINGLE,size:6,color:'9AA8B2'};const box={top:LN,bottom:LN,left:LN,right:LN};
 const W=9638;
@@ -15,7 +15,7 @@ const H=t=>P(T(t,{bold:true,size:24,color:'0F6E7C'}),{spacing:{before:130,after:
    cell([P(T(String(n),{bold:true,size:30,color:'FFFFFF'}),{alignment:AlignmentType.CENTER,spacing:{before:0,after:0}})],700,{shading:{type:ShadingType.CLEAR,fill:'0F6E7C',color:'auto'},verticalAlign:VerticalAlign.CENTER}),
    cell([P(T(t,{bold:true,size:21}),{spacing:{before:0,after:16,line:270,lineRule:'auto'}}),P(T(d,{size:18,color:'444444'}),{spacing:{before:0,after:0,line:246,lineRule:'auto'}})],W-700)]});
  const doc=new Document({styles:{default:{document:{run:{font:F,size:21}}}},
-  sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:680,bottom:620,left:1134,right:1134}}},children:[
+  sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:600,bottom:540,left:1134,right:1134}}},children:[
    P(T('先生方へ',{size:20,color:'444444'}),{spacing:{before:0,after:20}}),
    P(T('ICU 看護師向けツール　内容確認のお願い',{bold:true,size:30}),{spacing:{before:0,after:20,line:330,lineRule:'auto'}}),P(T('スマホ・パソコンで見る方法（確認モード）',{bold:true,size:22,color:'0F6E7C'}),{spacing:{before:0,after:40}}),
    P(T('ICU　小山田 光希',{size:19,color:'444444'}),{spacing:{before:0,after:90}}),
@@ -25,7 +25,8 @@ const H=t=>P(T(t,{bold:true,size:24,color:'0F6E7C'}),{spacing:{before:130,after:
        P(T('ICU の看護師が勤務中にスマホで引くツールの中身に、誤りや、当院のやり方と違う所がないかを見てください。')),
        P([T('全部を見ていただく必要はありません。',{bold:true}),T('ご専門の所、気になった所だけで十分です。')]),
        P(T('右の QR コードを読むと、「確認モード」で開きます。アプリを入れる作業や、登録は要りません。')),
-       P([T('期限の目安：　　　月　　　日ごろ',{bold:true})],{spacing:{before:60,after:0}}),
+       P([T('期限の目安：11 月 25 日ごろ',{bold:true})],{spacing:{before:50,after:20}}),
+       P(T('※ あくまで暫定の期限です。ICU の看護師の間では、12 月から正式に使い始める予定です。これ以降も、改善点は随時受け付け、すぐに直していきます。',{size:17,color:'444444'}),{spacing:{before:0,after:0,line:240,lineRule:'auto'}}),
      ],W-2700,{borders:{top:LN,bottom:LN,left:LN,right:NB},shading:{type:ShadingType.CLEAR,fill:'F1F7F8',color:'auto'}}),
      cell([
        P(new ImageRun({type:'png',data:png,transformation:{width:128,height:128}}),{alignment:AlignmentType.CENTER,spacing:{before:0,after:20,line:240,lineRule:'auto'}}),
