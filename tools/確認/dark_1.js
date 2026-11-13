@@ -1,0 +1,21 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto(process.argv[2],{waitUntil:'load'});await p.waitForTimeout(1500);
+await p.evaluate(()=>document.getElementById('dkBtn').click());await p.waitForTimeout(500);
+const shot=async(n,f)=>{if(f)await p.evaluate(f);await p.waitForTimeout(900);await p.screenshot({path:'/home/claude/fv/dk_'+n+'.png'});};
+await shot('calc');
+await shot('know',()=>showPage('know'));
+await shot('topic',()=>openTopic('sodium'));
+await shot('topic2',()=>{window.scrollBy(0,700)});
+await shot('drug',()=>{showPage('drug');window.scrollTo(0,0)});
+await shot('drugd',()=>{window.__drugDetail('nad',null,true)});
+await shot('score',()=>{showPage('score');window.scrollTo(0,0)});
+await shot('iv',()=>{showPage('iv');window.scrollTo(0,0)});
+await shot('gloss',()=>{showPage('gloss');window.scrollTo(0,0)});
+await shot('fav',()=>{window.__favOpen()});
+await shot('rep',()=>{document.getElementById('fvClose').click();window.__reportListOpen()});
+// back to light: check restoration
+await p.evaluate(()=>{document.getElementById('rpClose').click();document.getElementById('dkBtn').click();showPage('know');});await p.waitForTimeout(600);
+console.log('left dk0',await p.evaluate(()=>document.querySelectorAll('[data-dk0]').length),'dark',await p.evaluate(()=>document.documentElement.classList.contains('dark')));
+await p.screenshot({path:'/home/claude/fv/dk_light.png'});
+console.log(errs);await b.close();})();

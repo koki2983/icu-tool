@@ -1,0 +1,18 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto(process.argv[2],{waitUntil:'load'});await p.waitForTimeout(1500);
+await p.evaluate(()=>window.__dark(true));await p.waitForTimeout(500);
+const names=[];const shot=async(n,f)=>{if(f)await p.evaluate(f);await p.waitForTimeout(1000);await p.screenshot({path:'/home/claude/fv/d2_'+n+'.png'});names.push(n);};
+await shot('topic',()=>openTopic('sodium'));
+await shot('topicfig',()=>{const h=[...document.querySelectorAll('#kList details[open] h3')][1];if(h){window.__openSec&&window.__openSec(h);h.scrollIntoView();}});
+await shot('rep',()=>{window.scrollTo(0,0);window.__reportListOpen()});
+await shot('hist',()=>{document.getElementById('rpClose').click();window.__histOpen()});
+await shot('pf',()=>{document.getElementById('hsClose').click();openCalc('pf')});
+await shot('compat',()=>{openCalc('compat')});
+await shot('rhythm',()=>{openCalc('rhythm')});
+await shot('drugl',()=>{showPage('drug');window.scrollTo(0,500)});
+await shot('nihss',()=>{showPage('score');document.querySelector('#scoreSeg [data-s="nihss"]').click();window.scrollTo(0,300)});
+await shot('bys',()=>{document.querySelector('#scoreSeg [data-s="bys"]').click();window.scrollTo(0,0)});
+await shot('search',()=>{document.getElementById('srBtn').click()});
+await shot('ivfig',()=>{const x=document.querySelector('#srClose,#srX');if(x)x.click();showPage('iv');window.scrollTo(0,600)});
+console.log(names.join(' '),errs);await b.close();})();
