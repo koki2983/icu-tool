@@ -1,0 +1,15 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto(process.argv[2],{waitUntil:'load'});await p.waitForTimeout(1500);
+console.log('changed now',await p.evaluate(()=>Object.keys(VERH).filter(id=>window.__verChanged(id)).length,0),'VERH',await p.evaluate(()=>Object.keys(VERH).length),'HIST',await p.evaluate(()=>HIST.length+' '+HIST[0].join(' | ')));
+await p.evaluate(()=>{VERH.sodium='00000000';VERH.nad='00000000';openTopic('sodium');});await p.waitForTimeout(900);
+console.log('know chg',await p.evaluate(()=>[...document.querySelectorAll('#kList .verchg')].filter(x=>x.offsetParent).map(x=>x.innerText.slice(0,40)),0),'dot',await p.evaluate(()=>document.querySelectorAll('#kList .vdot.chg').length));
+await p.screenshot({path:'/home/claude/fv/chg.png'});
+await p.evaluate(()=>{showPage('drug');window.__drugDetail('nad',null,true);});await p.waitForTimeout(700);
+console.log('drug chg',await p.evaluate(()=>document.querySelectorAll('.dkpanel .verchg').length),'other',await p.evaluate(()=>{window.__drugDetail('dex',null,true);return 0;}));
+await p.waitForTimeout(500);console.log('dex chg',await p.evaluate(()=>[...document.querySelectorAll('.dkpanel')].map(x=>x.querySelectorAll('.verchg').length)));
+await p.evaluate(()=>{showPage('know');});await p.waitForTimeout(300);
+await p.evaluate(()=>document.querySelector('#kRev [data-hist]').click());await p.waitForTimeout(300);
+console.log('hist rows',await p.evaluate(()=>document.querySelectorAll('#hsList .hi').length+' / days '+document.querySelectorAll('#hsList .hd').length+' vis '+getComputedStyle(document.getElementById('histSheet')).display));
+await p.screenshot({path:'/home/claude/fv/hist.png'});
+console.log(errs);await b.close();})();
