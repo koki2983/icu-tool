@@ -81,7 +81,7 @@ function explain2() {
     p([r('※ あくまで暫定の期限です。ICU の看護師の間では、12 月から正式に使い始める予定です。これ以降も、改善点は随時受け付け、すぐに直していきます。')], { after: 0 }),
   ]));
   k.push(table([W - 4200, 2100, 2100], [new TableRow({ children: [
-    cell([p([r('スマホで見る場合は、右の「確認モード」の QR コードから開いてください。読みながら、気になる行に指摘を残せます（使い方は「4. 見かた」）。', { size: 19 })], { after: 0, line: 290 })], W - 4200, { bc: 'FFFFFF', va: VerticalAlign.CENTER }),
+    cell([p([r('スマホで見る場合は、右の「確認モード」の QR コードから開いてください。読みながら、気になる行に指摘を残せます（使い方は「4. 見かた」）。URL の送付をご希望の方は、ICU 小山田へお申し付けください。Teams でお送りします。', { size: 19 })], { after: 0, line: 290 })], W - 4200, { bc: 'FFFFFF', va: VerticalAlign.CENTER }),
     cell([p([img(QR('_review'), 104)], { align: AlignmentType.CENTER, after: 10 }), p([r('確認モードで開く', { size: 17, bold: true, color: C.brand })], { align: AlignmentType.CENTER, after: 0 })], 2100, { bc: 'FFFFFF' }),
     cell([p([img(QR('_top'), 104)], { align: AlignmentType.CENTER, after: 10 }), p([r('ふつうに開く', { size: 17, color: C.sub })], { align: AlignmentType.CENTER, after: 0 })], 2100, { bc: 'FFFFFF' }),
   ] })]));

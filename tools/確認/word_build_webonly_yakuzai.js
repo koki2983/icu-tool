@@ -33,7 +33,8 @@ const H=t=>P(T(t,{bold:true,size:24,color:'0F6E7C'}),{spacing:{before:130,after:
        P(T('確認モードで開く',{bold:true,size:19}),{alignment:AlignmentType.CENTER,spacing:{before:0,after:0}}),
      ],2700,{borders:{top:LN,bottom:LN,left:NB,right:LN},shading:{type:ShadingType.CLEAR,fill:'F1F7F8',color:'auto'},verticalAlign:VerticalAlign.CENTER}),
    ]})]}),
-   P(T('パソコンで開くとき：'+URL,{size:18,color:'444444'}),{spacing:{before:60,after:0}}),
+   P(T('パソコンで開くとき：'+URL,{size:18,color:'444444'}),{spacing:{before:50,after:0,line:240,lineRule:'auto'}}),
+   P(T('URL の送付をご希望の方は、ICU 小山田へお申し付けください。Teams でお送りします。',{size:18,color:'444444'}),{spacing:{before:0,after:0,line:240,lineRule:'auto'}}),
    H('使い方（5 つ）'),
    new Table({width:{size:W,type:WidthType.DXA},columnWidths:[700,W-700],rows:[
      step(1,'QR コードを読む','アプリが開き、左下にオレンジ色の「確認モード」のボタンが出ます。'),
