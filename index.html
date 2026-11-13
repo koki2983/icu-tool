@@ -12961,7 +12961,7 @@ window.DEPTS=['循環器内科','心臓血管外科','呼吸器','呼吸器外�
 
 /* よく使う・入口・ステッパー（すべて軽い処理） */
 /* APP_BUILD：公開するたびに書き換える版の印（日本時間）。画面の「版」に出る。stamp は公開の直前に自動で付ける */
-const APP_BUILD='2026-11-13 17:38';
+const APP_BUILD='2026-11-13 17:44';
 const KNOW_REV='2026 年 11 月 13 日（お気に入り・すぐ報告する目安を全項目に・サムスカ・サムタス・農薬中毒・30 秒で読む版・すぐ報告の一覧・病態関連図の詳しい版 21・体の絵 6・図 84 枚・照合の印・原本との照合（薬 14、疾患 3）・創外固定・骨接合術の術後管理・腹部外傷（肝・脾損傷）・抗菌薬の各論（メロペン・ゾシン・バンコマイシンと TDM）・急性下肢虚血と血行再建後・上気道閉塞と抜管後の喉頭浮腫・腸閉塞と腸管虚血・消化管穿孔と腹膜炎・腹部コンパートメント症候群・胆管炎と胆嚢炎・肝切除術後・開頭術後と頭蓋内圧亢進・Na の異常・壊死性軟部組織感染症・PICS と ICU-AW・大腿骨近位部骨折・薬剤各論 4 つ（ヘルベッサー・シグマート・グリセオールとマンニトール・硫酸マグネシウム）・血液浄化の各論（種類と使い分け・血漿交換・PMX・ECUM）・腫瘍崩壊症候群・発熱性好中球減少症・急性中毒・内分泌の緊急症・重症熱傷・高 K 血症・横紋筋融解症・胸部外傷・骨盤骨折・コンパートメント症候群と脂肪塞栓・髄膜炎と脳炎・重症筋無力症クリーゼ・薬剤各論（インスリン・KCL・ステロイド・抗けいれん薬・筋弛緩薬）・心タンポナーデ・感染性心内膜炎・心筋炎とたこつぼ型心筋症・重症肺炎・COPD 増悪・消化管出血・急性膵炎・肝不全と肝性脳症・アナフィラキシー・熱中症と低体温・ARDS・急性大動脈解離・高血圧性緊急症・急性心不全の深掘り・抗血栓薬・循環器の内服薬・薬剤各論 17 剤（ドブタミン・ドパミン・バソプレシン・ニトログリセリン・ハンプ・フロセミド・ミルリノン・アミオダロン・ヘパリン・アドレナリン・ノルアドレナリン・プロポフォール・フェンタニル・ミダゾラム・ニカルジピン・オノアクト・プレセデックス）・肺切除後の術後管理と当院のルーチン・NPWT・VAC と当院の V.A.C.Ulta・心外術後カテゴリ・術式別の注意点・カルシウム製剤・iNO・循環のパラメーター・ERAS と GDFT・by system・JACCN 重症患者管理クイックガイド・心不全の基本 4 剤・当院：薬剤配合変化表 46 剤・抗菌薬の配合禁忌表・嚥下スクリーニングを追加）';
 (function(){
   /* --- 計算タブ：よく使う --- */
@@ -14218,7 +14218,7 @@ loadDrugs(); loadKnow(); calc();
 /* ===== お気に入り（2026-11-13） =====
    目的：項目が多いので、人ごとに「すぐ開きたいもの」を自分の端末に置けるようにする。
    保存：端末の中だけ（localStorage の 'fav'）。固定 ID で持つので、アプリが更新されても消えない・ずれない。
-   対象：知識メモ（k:固定ID）、薬剤各論（d:固定ID）、計算ツール（c:CALC_ID のキー）。 */
+   対象：知識メモ（k:固定ID）、薬剤各論（d:固定ID）、計算ツール（c:CALC_ID のキー）、スコア（s:scoreSeg の data-s）。 */
 (function(){
   const KEY='fav';let F=[];
   try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(v))F=v.filter(x=>typeof x==='string');}catch(e){}
@@ -14240,7 +14240,8 @@ loadDrugs(); loadKnow(); calc();
 #favSheet .fvr .mv:disabled{opacity:.3}
 #favSheet .fvr .mv.x{color:#C0392B;border-color:#E6B8B2}`;document.head.appendChild(st);
 
-  const KIND={k:'知識',d:'薬剤',c:'計算'};
+  const KIND={k:'知識',d:'薬剤',c:'計算',s:'スコア'};
+  const segBtn=id=>[...document.querySelectorAll('#scoreSeg button')].find(b=>b.dataset.s===id)||null;
   const cards=()=>[...document.querySelectorAll('#p-calc details')];
   const calcCard=key=>{const t=CALC_ID[key];if(!t)return null;if(t==='__gamma')return $('calcTop');return cards().find(d=>d.querySelector('summary')&&d.querySelector('summary').textContent.includes(t))||null;};
   const short=s=>{s=String(s).replace(/^薬剤各論：/,'').replace(/^当院：/,'');const m=s.match(/^(.{3,}?)[（：]/);if(m)s=m[1];return s.length>16?s.slice(0,15)+'…':s;};
@@ -14249,10 +14250,12 @@ loadDrugs(); loadKnow(); calc();
     if(kind==='k'||kind==='d'){const t=KID[id];return t?{ok:true,full:t.replace(/^薬剤各論：/,''),lab:short(t)}:{ok:false,full:id,lab:id};}
     if(kind==='c'){if(id==='gamma')return {ok:true,full:'ガンマ計算',lab:'ガンマ計算'};const c=calcCard(id);if(!c)return {ok:false,full:id,lab:id};
       const sm=c.querySelector('summary').cloneNode(true);sm.querySelectorAll('.favb').forEach(x=>x.remove());const t=sm.textContent.trim();return {ok:true,full:t,lab:short(t)};}
+    if(kind==='s'){const b=segBtn(id);return b?{ok:true,full:b.textContent.trim(),lab:b.textContent.trim()}:{ok:false,full:id,lab:id};}
     return {ok:false,full:f,lab:f};};
   const open=f=>{const kind=f[0],id=f.slice(2);if(window.__useInc)window.__useInc('f','お気に入りから開く');
     if(kind==='k')return openTopic(id);
     if(kind==='c')return openCalc(id);
+    if(kind==='s'){showPage('score');const b=segBtn(id);if(b)b.click();window.scrollTo({top:0});return;}
     if(kind==='d'){showPage('drug');setTimeout(()=>{if(window.__drugDetail)window.__drugDetail(id,null,true);},60);}};
 
   /* ---------- 上の帯 ---------- */
@@ -14275,12 +14278,18 @@ loadDrugs(); loadKnow(); calc();
   const decoCalc=()=>{Object.keys(CALC_ID).forEach(key=>{const c=calcCard(key);if(!c)return;
     if(key==='gamma'){if(c.querySelector(':scope>.favb'))return;const b=mk('c:gamma');b.style.cssText='float:right;padding:0 0 6px 10px';c.insertBefore(b,c.firstChild);return;}
     const sm=c.querySelector('summary');if(!sm||sm.querySelector('.favb'))return;sm.appendChild(mk('c:'+key));});paint();};
+  /* スコア：タブの並びのすぐ下に、今えらんでいるスコアの ☆ を 1 つ出す */
+  const sRow=document.createElement('div');sRow.id='favScore';sRow.style.cssText='display:flex;justify-content:flex-end;align-items:center;gap:2px;margin:-2px 0 6px;font-size:12.5px;color:var(--muted)';
+  const decoScore=()=>{const seg=$('scoreSeg');if(!seg)return;if(!sRow.parentNode)seg.parentNode.insertBefore(sRow,seg.nextSibling);
+    const cur=seg.querySelector('button.on')||seg.querySelector('button');if(!cur)return;sRow.innerHTML='';
+    const sp=document.createElement('span');sp.textContent=cur.textContent.trim()+' をお気に入りに';const b=mk('s:'+cur.dataset.s);b.style.padding='2px 2px 2px 4px';sRow.appendChild(sp);sRow.appendChild(b);paint();};
+  {const seg=$('scoreSeg');if(seg){seg.addEventListener('click',()=>setTimeout(decoScore,0));new MutationObserver(decoScore).observe(seg,{attributes:true,subtree:true,attributeFilter:['class'],childList:true});}}
   const watch=(id,fn)=>{const el=$(id);if(!el)return;new MutationObserver(fn).observe(el,{childList:true});fn();};
-  watch('kList',decoKnow);watch('drugList',decoDrug);decoCalc();setTimeout(()=>{decoKnow();decoDrug();decoCalc();drawBar();},600);
+  watch('kList',decoKnow);watch('drugList',decoDrug);decoCalc();decoScore();setTimeout(()=>{decoKnow();decoDrug();decoCalc();decoScore();drawBar();},600);
 
   /* ---------- 並べ替え・削除の画面 ---------- */
   const sheet=document.createElement('div');sheet.id='favSheet';
-  sheet.innerHTML='<div class="sheet"><div class="sheet-h"><b>★ お気に入り</b><button class="small" id="fvClose">閉じる</button></div><p class="muted" style="font-size:12px;margin:4px 0 8px;line-height:1.7">知識メモ・薬剤・計算ツールの名前の右にある ☆ を押すと、ここに入ります。画面のいちばん上の帯から、すぐに開けます。<br>この端末だけに保存されます。アプリが更新されても消えません（ブラウザの「サイトのデータを消す」をしたときと、別の端末では、入れ直しが必要です）。</p><div id="fvList"></div></div>';
+  sheet.innerHTML='<div class="sheet"><div class="sheet-h"><b>★ お気に入り</b><button class="small" id="fvClose">閉じる</button></div><p class="muted" style="font-size:12px;margin:4px 0 8px;line-height:1.7">知識メモ・薬剤・計算ツールの名前の右、スコアの名前の下にある ☆ を押すと、ここに入ります。画面のいちばん上の帯から、すぐに開けます。<br>この端末だけに保存されます。アプリが更新されても消えません（ブラウザの「サイトのデータを消す」をしたときと、別の端末では、入れ直しが必要です）。</p><div id="fvList"></div></div>';
   document.body.appendChild(sheet);
   const drawSheet=()=>{const L=$('fvList');
     if(!F.length){L.innerHTML='<p class="muted" style="padding:10px 0">まだありません。よく使う項目の ☆ を押してください。</p>';return;}
