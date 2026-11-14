@@ -25,7 +25,7 @@ const H=t=>P(T(t,{bold:true,size:24,color:'0F6E7C'}),{spacing:{before:130,after:
        P(T('ICU の看護師が勤務中にスマホで引くツールの中身に、誤りや、当院のやり方と違う所がないかを見てください。')),
        P([T('全部を見ていただく必要はありません。',{bold:true}),T('薬剤各論と配合変化など、薬に関わる所だけで十分です。')]),
        P(T('右の QR コードを読むと、「確認モード」で開きます。アプリを入れる作業や、登録は要りません。')),
-       P([T('期限の目安：11 月 25 日ごろ',{bold:true})],{spacing:{before:50,after:20}}),
+       P([T('期限の目安：11 月 30 日ごろ',{bold:true})],{spacing:{before:50,after:20}}),
        P(T('※ あくまで暫定の期限です。ICU の看護師の間では、12 月から正式に使い始める予定です。これ以降も、改善点は随時受け付け、すぐに直していきます。',{size:17,color:'444444'}),{spacing:{before:0,after:0,line:240,lineRule:'auto'}}),
      ],W-2700,{borders:{top:LN,bottom:LN,left:LN,right:NB},shading:{type:ShadingType.CLEAR,fill:'F1F7F8',color:'auto'}}),
      cell([
