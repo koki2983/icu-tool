@@ -77,3 +77,10 @@
 2. index.html の `RV_HOOK` を `''`（空）にする。確認モードは、前と同じ「コピーして Teams で送る」形に戻る。画面の「自動で届きます」の文も合わせて戻す
 3. 配布の紙（tools/確認/word_build_webonly*.js と word_build_masuika.js）の「送る操作は要りません」を元に戻す
 4. git の過去の記録にはアドレスが残るが、1 で削除すれば使えないので、履歴の書きかえは要らない
+
+### Excel にためる（2026-11-15 に追加）
+- 送る JSON の一番上に `rv`（種類・ID・項目・見出し・今の文・指摘・人・端末・版・時刻）を添えている。Teams のカードには使われない
+- ワークフローのいちばん下（「Send each adaptive card」のループの外）に「Excel Online (Business)：表に行を追加」を置き、列に次の式を入れる
+  受信日時：convertFromUtc(utcNow(),'Tokyo Standard Time','yyyy-MM-dd HH:mm')／種類：triggerBody()?['rv']?['k']／項目：triggerBody()?['rv']?['t']／指摘：triggerBody()?['rv']?['c']／全部：string(triggerBody()?['rv'])
+- いちばん下に置く理由：Excel の手順が失敗しても、Teams のカードは先に届くから
+- 本文の版だけ進めた変更なので、配布の紙は作り直していない（紙の版の印字は 2026-11-15 01:45 のまま、本文は同じ）

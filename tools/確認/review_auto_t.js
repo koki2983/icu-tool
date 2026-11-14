@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const ctx=await b.newContext({viewport:{width:390,height:844}});const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
 const got=[];let fail=false;
-await p.route(/powerplatform\.com/,async r=>{if(fail)return r.abort();const j=JSON.parse(r.request().postData());const c=j.attachments[0].content.body;got.push(c[0].text+' | '+(c[1].type==='TextBlock'?c[1].text:'')+' | '+c[c.length-1].facts.map(f=>f.title+'='+f.value).join(', ').slice(0,160));r.fulfill({status:202,body:''});});
+await p.route(/powerplatform\.com/,async r=>{if(fail)return r.abort();const j=JSON.parse(r.request().postData());const c=j.attachments[0].content.body;if(!j.rv||!j.rv.k)got.push('NO RV');got.push(c[0].text+' | '+(c[1].type==='TextBlock'?c[1].text:'')+' | '+c[c.length-1].facts.map(f=>f.title+'='+f.value).join(', ').slice(0,160));r.fulfill({status:202,body:''});});
 await p.goto(process.argv[2]+'#review',{waitUntil:'load'});await p.waitForTimeout(1800);
 await p.evaluate(()=>openTopic('sodium'));await p.waitForTimeout(2800);
 const say=async (txt)=>{await p.evaluate(t=>{const li=[...document.querySelectorAll('#kList details[open] li')].find(l=>l.querySelector(':scope>.rvb')&&l.offsetParent);li.querySelector(':scope>.rvb').click();const ta=li.querySelector('.rved textarea');ta.value=t;li.querySelector('.rved [data-a="s"]').click();},txt);await p.waitForTimeout(600);};
