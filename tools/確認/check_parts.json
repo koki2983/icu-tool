@@ -11,7 +11,8 @@
     "nmb",
     "aed",
     "padis",
-    "analgesia"
+    "analgesia",
+    "delirium"
    ]
   },
   {
@@ -190,7 +191,8 @@
     "ct",
     "hosp_swallow",
     "by_system",
-    "normal_values"
+    "normal_values",
+    "pressure_injury"
    ]
   }
  ],
@@ -275,7 +277,9 @@
    "upper_airway",
    "abd_trauma",
    "exfix",
-   "orif"
+   "orif",
+   "delirium",
+   "pressure_injury"
   ],
   "old": [
    "abg",
