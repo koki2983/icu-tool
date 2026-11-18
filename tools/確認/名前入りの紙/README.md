@@ -19,7 +19,7 @@
    - 先生方（全員）：`node build.js`
    - 先生の一部だけ：`ONLY=D10,D11 OUT="ICUツール_内容確認のお願い_一部.docx" node build.js`
    - 看護部（全員）：`node build_n.js nurses.json "ICUツール_内容確認のお願い_看護部_名前入り.docx"`
-   - 看護師 1 人：`node build_n.js nurse_N05.json "ICUツール_内容確認のお願い_中川特定看護師.docx"`（ファイル名は作る人に合わせる）
+   - 看護師 1 人：`node build_n.js nurse_N05.json "ICUツール_内容確認のお願い_N05.docx"`（ファイル名は自由）
    - 薬剤部 `node build_p.js`／臨床工学部 `node build_e.js`／テスト用 `node build_t.js`／研修医（共通 R01）`node build_r.js`／誰にでも渡せる共通の紙（D99・N99）`node build_g.js`
    - 対応表：`node build_map.js`
 5. 確かめる
