@@ -6,14 +6,14 @@
 
 ## 大事な決まり（理由つき）
 1. 名前はこのリポジトリに入れない。理由：公開リポジトリで、誰でも見られるため。このフォルダの .gitignore で、作った JSON・Word・対応表を入れないようにしてある
-2. 名前は、小山田さんの手元の「ICUツール_記号と名前の対応表.docx」からだけ取る。記号ごとの所属と見ていただく項目は、Project の資料「ICUアプリ_名前入りの紙の作り方」の JSON（名前なし）に置いてある。理由：記号と資格の組み合わせも、院内の人を特定できるため、公開リポジトリには置かない
+2. 名前は、Project の資料「ICUアプリ_記号と名前の対応表」（TSV）か、小山田さんの手元の「ICUツール_記号と名前の対応表.docx」からだけ取る。記号ごとの所属と見ていただく項目は、Project の資料「ICUアプリ_名前入りの紙の作り方」の JSON（名前なし）に置いてある。理由：記号と資格の組み合わせも、院内の人を特定できるため、公開リポジトリには置かない
 3. 医師の記号は並び順で決まる（D01 から）。新しい人は必ず最後に足す。途中に入れると、配った紙の記号がずれて、誰の指摘か分からなくなる
 4. 行の高さは固定にする（fixlines.py。各 build の最後で自動で走る）。理由：游ゴシックは Word で行が高くなり、こちらで 1 枚でも Word で 2 枚になるため
 
 ## 手順
 1. `npm install docx qrcode`（このフォルダか、NODE_PATH で指す場所に）
-2. Project の資料の JSON を `noname_inputs.json` として、このフォルダに保存。対応表の Word をこのフォルダに置く
-3. `python3 make_inputs.py noname_inputs.json ICUツール_記号と名前の対応表.docx`
+2. Project の資料の JSON を `noname_inputs.json`、対応表の資料の表を `map.tsv` として、このフォルダに保存（Word の対応表でもよい）
+3. `python3 make_inputs.py noname_inputs.json map.tsv`
    → people.json、nurses.json、nurse_N01.json〜、pharm.json、ce.json、test.json、resident.json、general.json、all_map.txt、titles.json ができる
 4. 作る
    - 先生方（全員）：`node build.js`
